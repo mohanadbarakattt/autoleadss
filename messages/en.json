@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "title": "AutoLeadss — UAE Lead Generation Agency",
+    "description": "We build the whole system — landing pages, ads, chatbots, content. You get the leads. One fixed monthly fee."
+  },
+  "nav": {
+    "services": "Services",
+    "process": "Process",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "caseStudies": "Case Studies",
+    "bookCall": "Book a 20-min call",
+    "whatsapp": "WhatsApp"
+  },
+  "hero": {
+    "eyebrow": "Lead generation, fully managed",
+    "heading": "We build the whole machine — landing pages, ads, chat, content. You get the leads.",
+    "subheading": "AutoLeadss is a done-for-you growth team for UAE businesses. One monthly fee covers everything from your landing page to your ad spend to 24/7 lead follow-up.",
+    "ctaPrimary": "Book a free strategy call",
+    "ctaSecondary": "See pricing",
+    "trustText": "Trusted by businesses across Dubai, Abu Dhabi, and Sharjah"
+  },
+  "problem": {
+    "eyebrow": "Sound familiar?",
+    "heading": "Your ads aren't the problem — the system around them is.",
+    "cards": {
+      "slow": {
+        "title": "Leads go cold in hours",
+        "description": "The average response time for a UAE business inquiry is 4+ hours. By then, your lead has already spoken to a competitor."
+      },
+      "scattered": {
+        "title": "Tools scattered everywhere",
+        "description": "Ads running on Meta. Leads landing in email. WhatsApp messages piling up. No CRM. No follow-up system. No clarity."
+      },
+      "noDestination": {
+        "title": "Ads with nowhere to go",
+        "description": "You're paying to send traffic to a homepage that explains your business instead of converting your visitor. Every click is a wasted dirham."
+      }
+    }
+  },
+  "pillars": {
+    "eyebrow": "What we do",
+    "heading": "Four systems. One monthly fee. Zero guesswork.",
+    "subheading": "We don't hand you tools and walk away. We run the whole operation.",
+    "items": {
+      "landingPages": {
+        "title": "High-Converting Landing Pages",
+        "subtitle": "Built for one job: turning visitors into qualified leads.",
+        "description": "Mobile-first, bilingual, sub-2s load times. CRM-connected, form-protected, split-tested.",
+        "bullets": [
+          "E-commerce: product pages with Stripe checkout",
+          "Real estate: listing pages with inquiry forms and WhatsApp integration",
+          "Connected to your CRM from day one",
+          "Bilingual (Arabic + English) by default"
+        ],
+        "outcome": "Outcome: Visitors that land convert — not bounce."
+      },
+      "socialMedia": {
+        "title": "Social Media That Drives Demand",
+        "subtitle": "Strategy, content, scheduling, posting — done for you.",
+        "description": "We pick the platforms where your buyers actually are, then build and post consistently.",
+        "bullets": [
+          "Instagram, TikTok, Snapchat, LinkedIn — chosen for your audience",
+          "Bilingual content, on-brand, posted consistently",
+          "Content calendar you can review before it goes live",
+          "Community management and comment responses"
+        ],
+        "outcome": "Outcome: A consistent brand presence without the daily grind."
+      },
+      "chatbots": {
+        "title": "Chatbots That Reply in 60 Seconds",
+        "subtitle": "WhatsApp Business API + web chat, running 24/7.",
+        "description": "Qualifies leads, books appointments, answers FAQs — then hands off to your team when the lead is hot.",
+        "bullets": [
+          "WhatsApp Business API setup and management",
+          "Web chat widget on your landing page",
+          "Lead qualification flows and appointment booking",
+          "Smooth handoff to your sales team with full context"
+        ],
+        "outcome": "Outcome: No lead waits more than 60 seconds for a response, ever."
+      },
+      "adCampaigns": {
+        "title": "Ad Campaigns Built to Profit",
+        "subtitle": "Meta, Google, TikTok, Snapchat — managed end-to-end.",
+        "description": "Weekly optimization. Transparent reporting. Conversion tracking pushed back into ad platforms.",
+        "bullets": [
+          "Full campaign setup: audience research, copy, creative, targeting",
+          "Weekly optimization — not monthly reviews",
+          "Conversion tracking connected back to your CRM",
+          "You see exactly where every dirham goes"
+        ],
+        "outcome": "Outcome: Ad spend that turns into pipeline, not just impressions."
+      }
+    }
+  },
+  "process": {
+    "eyebrow": "How it works",
+    "heading": "From onboarding to live leads in 4 weeks.",
+    "steps": {
+      "discovery": {
+        "week": "Week 1",
+        "title": "Discovery",
+        "description": "We audit your business, ICP, current funnel, and ad accounts. You get a clear picture of what's working and what isn't before we touch anything."
+      },
+      "setup": {
+        "week": "Weeks 2–3",
+        "title": "Setup",
+        "description": "Landing page built. Chatbot flows configured. Social channels set up. Ad accounts, tracking pixels, and CRM integrations connected."
+      },
+      "launch": {
+        "week": "Week 4",
+        "title": "Launch",
+        "description": "Campaigns go live. Leads start flowing. Your chatbot is responding in under 60 seconds. Your team gets notified when a lead is qualified."
+      },
+      "optimize": {
+        "week": "Ongoing",
+        "title": "Optimize & Report",
+        "description": "Weekly tweaks based on real data. Monthly reports you can actually read. Quarterly strategy reviews with the founder."
+      }
+    }
+  },
+  "results": {
+    "eyebrow": "What you get",
+    "heading": "Numbers that move your business.",
+    "stats": {
+      "responseTime": {
+        "value": "60",
+        "unit": "sec",
+        "label": "Lead response time, 24/7"
+      },
+      "conversionRate": {
+        "value": "2–5×",
+        "unit": "",
+        "label": "Industry-average landing page conversion"
+      },
+      "optimizationCycle": {
+        "value": "Weekly",
+        "unit": "",
+        "label": "Ad spend optimization cadence"
+      },
+      "transparency": {
+        "value": "100%",
+        "unit": "",
+        "label": "Transparent reporting — no black boxes"
+      }
+    },
+    "callout": "Most clients see qualified lead volume increase within the first 30–45 days."
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "heading": "One price. Every service. No surprises.",
+    "subheading": "Ad spend is billed separately and goes directly to the ad platforms. No markups, ever.",
+    "contractToggle": {
+      "3": "3 months",
+      "6": "6 months",
+      "12": "12 months"
+    },
+    "savingsLabel": "You save {amount} total",
+    "industryToggle": {
+      "ecommerce": "E-commerce",
+      "realEstate": "Real Estate"
+    },
+    "perMonth": "/ month",
+    "mostPopular": "Most Popular",
+    "getStarted": "Get started",
+    "performanceFeeEcommerce": "{percent} of attributed online sales",
+    "performanceFeeRealEstate": "{percent} of broker commission on closed deals",
+    "performanceFeeLabel": "Performance fee:",
+    "adSpendNote": "Ad spend billed separately, direct to platforms. No markup.",
+    "notSure": "Not sure which fits?",
+    "bookCallCta": "Book a free call — we'll tell you straight.",
+    "tiers": {
+      "starter": {
+        "name": "Starter",
+        "tagline": "For businesses testing the waters",
+        "features": [
+          "1 landing page (single or bilingual)",
+          "Basic WhatsApp chatbot — FAQ + lead capture",
+          "2 social platforms, 12 posts/month",
+          "Up to AED 3,000/month managed ad spend",
+          "Monthly reporting"
+        ]
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "For businesses ready to scale",
+        "features": [
+          "Full bilingual landing page (e-commerce or real estate)",
+          "Advanced chatbot flows + web chat widget",
+          "3 social platforms, 20 posts/month",
+          "Up to AED 7,000/month managed ad spend",
+          "Monthly report + bi-weekly check-ins"
+        ]
+      },
+      "premium": {
+        "name": "Premium",
+        "tagline": "For serious operators",
+        "features": [
+          "Everything in Growth, plus:",
+          "Dedicated account manager",
+          "4 social platforms, 30 posts/month",
+          "Up to AED 15,000/month managed ad spend",
+          "Weekly reporting + priority support",
+          "Quarterly strategy review with the founder"
+        ]
+      }
+    },
+    "performanceExplainer": {
+      "heading": "How the performance fee works",
+      "points": [
+        "We earn the fee only on sales or deals we can directly attribute to AutoLeadss — tracked through our landing page, ads, chatbot conversations, and UTM links.",
+        "Attribution windows: 30-day click / 7-day view for e-commerce. 90-day click for real estate (property cycles are longer).",
+        "You see every attributed transaction in your monthly dashboard before it's billed.",
+        "Performance fees are invoiced monthly, in arrears, after attribution is reconciled with you.",
+        "No retroactive claims — we don't charge for sales that happened before our work went live, or for organic word-of-mouth from your existing list.",
+        "Lower retainer = higher performance fee. Higher retainer = lower fee. We share the upside at the right scale."
+      ]
+    }
+  },
+  "whyUs": {
+    "eyebrow": "Why AutoLeadss",
+    "heading": "Built different. On purpose.",
+    "items": {
+      "uae": {
+        "title": "Built in the UAE, for the UAE",
+        "description": "Bilingual by default. Local market expertise. We know Bayut, Property Finder, and the platforms your buyers actually use."
+      },
+      "ownership": {
+        "title": "You own everything we build",
+        "description": "Your landing page, your content, your ad accounts, your audience data. Walk away any time and take it all with you."
+      },
+      "aligned": {
+        "title": "We earn when you earn",
+        "description": "Every plan includes a performance fee tied to attributed sales or closed deals. We have skin in the game."
+      },
+      "noLockIn": {
+        "title": "No hidden lock-ins",
+        "description": "Clear contract terms — 3, 6, or 12 months. No auto-renewal traps. No surprises in the fine print."
+      }
+    }
+  },
+  "caseStudies": {
+    "eyebrow": "Results",
+    "heading": "What happens when the system runs right.",
+    "readMore": "Read the full story",
+    "placeholder": "Sample — real case study coming soon"
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "heading": "Straight answers.",
+    "items": [
+      {
+        "q": "What's included in the contract?",
+        "a": "Every tier covers landing page design and maintenance, chatbot setup and management, social media content and posting, ad campaign management, and monthly reporting. The breakdown per tier is listed in the pricing section above."
+      },
+      {
+        "q": "Do I own the landing page and content after the contract ends?",
+        "a": "Yes. Everything we build is yours. Landing page code, content, ad creatives, audience data, ad accounts — all of it. You own it from day one, and you leave with it if you cancel."
+      },
+      {
+        "q": "Is the ad budget included in the monthly fee?",
+        "a": "No. Ad spend is billed separately and goes directly to Meta, Google, or TikTok. We never touch your ad budget — you control it. We manage the campaigns; the spend is yours."
+      },
+      {
+        "q": "How is the performance fee calculated and billed?",
+        "a": "We track every lead, sale, or deal that comes through our landing pages, ads, chatbot flows, and UTM links. At the end of each month, we send you a reconciliation report showing every attributed transaction. You review it, confirm it, and we invoice the performance fee. Nothing is billed you haven't already seen."
+      },
+      {
+        "q": "What counts as an 'attributed' sale or deal?",
+        "a": "Any sale or inquiry that came through our tracked channels: UTM-tagged ad clicks, chatbot conversations, form submissions on our landing pages, or tracked WhatsApp threads. Walk-in customers, repeat buyers from your existing list, and organic word-of-mouth don't count."
+      },
+      {
+        "q": "What if I close a deal myself that didn't come through your channels?",
+        "a": "You don't pay a performance fee on it. Simple as that. We only earn on what we drove."
+      },
+      {
+        "q": "For real estate — is the performance fee a % of the property price or my commission?",
+        "a": "Your commission, not the property price. If you close a deal on an AED 2M property and earn a 2% commission (AED 40,000), our fee is a percentage of that AED 40,000 — not of the property value."
+      },
+      {
+        "q": "What if I want to cancel before my term is up?",
+        "a": "Contracts are for 3, 6, or 12 months. Early termination means settling the remaining months at a reduced rate — detailed in the contract. We don't believe in holding clients hostage, but we do expect the agreed term to be honoured."
+      },
+      {
+        "q": "How long until I see results?",
+        "a": "Most clients see qualified lead volume increase within 30–45 days of launch. Setup takes 3–4 weeks. We don't promise overnight miracles, but we do promise a system that's built to work."
+      },
+      {
+        "q": "Can the website and ads be in Arabic?",
+        "a": "Yes. Everything we build is bilingual (Arabic + English) by default. Full RTL support. Arabic ad copy written by native-fluent copywriters."
+      },
+      {
+        "q": "Do you handle WhatsApp Business API setup?",
+        "a": "Yes. WhatsApp Business API setup, Meta verification, chatbot flow design, and ongoing management are all included depending on your tier."
+      },
+      {
+        "q": "What industries do you specialize in?",
+        "a": "We specialize in UAE real estate (brokerages, developers, off-plan projects) and e-commerce (product retailers selling to UAE consumers). Both have dedicated landing page templates, chatbot flows, and ad strategies."
+      },
+      {
+        "q": "How is reporting delivered?",
+        "a": "Monthly reports via a shared dashboard you can access any time. Growth and Premium tiers include bi-weekly or weekly check-in calls. You see exactly what's running, what it costs, and what it's producing."
+      }
+    ]
+  },
+  "cta": {
+    "heading": "Ready to stop guessing and start growing?",
+    "subheading": "Talk to us. No contract until call #2.",
+    "primaryCta": "Book a strategy call",
+    "secondaryCta": "Message us on WhatsApp"
+  },
+  "contact": {
+    "eyebrow": "Get in touch",
+    "heading": "Let's talk",
+    "subheading": "Tell us about your business and we'll come back with a plan.",
+    "whatsappCta": "Or message us directly on WhatsApp",
+    "fields": {
+      "name": "Your name",
+      "businessName": "Business name",
+      "phone": "Phone number",
+      "email": "Email address",
+      "industry": "Industry",
+      "industryOptions": {
+        "ecommerce": "E-commerce",
+        "realEstate": "Real estate",
+        "other": "Other"
+      },
+      "budget": "Monthly marketing budget",
+      "budgetOptions": {
+        "under5k": "Under AED 5,000",
+        "5kTo15k": "AED 5,000 – 15,000",
+        "15kTo30k": "AED 15,000 – 30,000",
+        "over30k": "Over AED 30,000"
+      },
+      "message": "Message (optional)",
+      "whatsappOptIn": "I'm happy to be contacted via WhatsApp"
+    },
+    "submit": "Send message",
+    "submitting": "Sending...",
+    "success": {
+      "heading": "Message sent.",
+      "body": "We'll be in touch within one business day. You can also reach us on WhatsApp if it's urgent."
+    },
+    "errors": {
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number",
+      "generic": "Something went wrong. Please try again or message us on WhatsApp."
+    }
+  },
+  "footer": {
+    "tagline": "The complete growth system for UAE businesses.",
+    "location": "Dubai, UAE",
+    "links": {
+      "title": "Navigation",
+      "services": "Services",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "caseStudies": "Case Studies",
+      "contact": "Contact"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "connect": {
+      "title": "Connect",
+      "whatsapp": "WhatsApp",
+      "email": "info@autoleadss.com"
+    },
+    "copyright": "© 2025 AutoLeadss. All rights reserved."
+  },
+  "notFound": {
+    "heading": "Page not found",
+    "body": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to home"
+  }
+}

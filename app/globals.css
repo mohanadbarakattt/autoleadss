@@ -1,26 +1,98 @@
+/* ── Font imports must precede @import "tailwindcss" per CSS spec ── */
+@import url("https://api.fontshare.com/v2/css?f[]=general-sans@500,600,700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ── Palette: Operator White + Signal Orange ── */
+  --color-background:        #FAFAF7;
+  --color-foreground:        #0A0A0B;
+  --color-accent:            #FF5C2A;
+  --color-accent-foreground: #FFFFFF;
+  --color-muted:             #F1EFE9;
+  --color-muted-foreground:  #6B6860;
+  --color-border:            #E2DED4;
+  --color-card:              #FFFFFF;
+  --color-card-foreground:   #0A0A0B;
+
+  /* ── Typography ── */
+  --font-sans:    "Switzer", system-ui, sans-serif;
+  --font-display: "General Sans", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Spacing / radius ── */
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--color-border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Arabic: switch entire body to IBM Plex Sans Arabic */
+html[lang="ar"] body {
+  font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+
+/* Display/heading class — General Sans for Latin, IBM Plex for Arabic */
+.font-display {
+  font-family: var(--font-display);
+}
+
+html[lang="ar"] .font-display {
+  font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+
+/* ── Focus ── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* ── Marquee ── */
+@keyframes marquee {
+  from { transform: translateX(0) }
+  to   { transform: translateX(-50%) }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
