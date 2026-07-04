@@ -3,7 +3,7 @@ import { MessageCircle, X, Send } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 
-const CAL_URL = 'https://calendly.com/autoleadss-info/30min'
+const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 
 type Message = {
   id: number
