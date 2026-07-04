@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FAFAF7;
+  --foreground: #0A0A0B;
+  --accent: #FF5C2A;
+  --muted: #F1EFE9;
+  --border: #E2DED4;
+  --card: #FFFFFF;
+  --muted-fg: #57544E;
+  --text-dim: #6B6660;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Switzer', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(255, 92, 42, 0.25);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'General Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Arabic / RTL typography */
+html[dir="rtl"] body,
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] h4,
+html[dir="rtl"] h5,
+html[dir="rtl"] h6 {
+  font-family: 'IBM Plex Sans Arabic', 'Switzer', sans-serif;
+}
+
+html[dir="rtl"] .font-display {
+  font-family: 'IBM Plex Sans Arabic', 'General Sans', sans-serif !important;
+}
+
+@layer utilities {
+  .section-padding {
+    @apply py-[120px] max-md:py-20;
+  }
+
+  .content-width {
+    @apply max-w-[1200px] mx-auto px-6 md:px-8;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(100deg, #FF5C2A 0%, #FF8A5C 55%, #FF5C2A 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-dark {
+    background: rgba(17, 17, 19, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-hover {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s;
+  }
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px -16px rgba(10, 10, 11, 0.16);
+    border-color: rgba(255, 92, 42, 0.4);
+  }
+}
+
+/* Marquee */
+@keyframes marquee-ltr {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(50%); }
+}
+.marquee-track {
+  animation: marquee-ltr 30s linear infinite;
+}
+html[dir="rtl"] .marquee-track {
+  animation-name: marquee-rtl;
+}
+
+/* Floating elements */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(-8px); }
+  50% { transform: translateY(8px); }
+}
+@keyframes float-slower {
+  0%, 100% { transform: translateY(6px); }
+  50% { transform: translateY(-6px); }
+}
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+.float-slower { animation: float-slower 8s ease-in-out infinite; }
+
+/* Slow orbit for hero ring */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-slow { animation: spin-slow 40s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track, .float-slow, .float-slower, .spin-slow {
+    animation: none;
+  }
+}

@@ -1,0 +1,14 @@
+# AutoLeadss
+
+> Done-for-you lead generation and sales automation for businesses in the UAE and Egypt — landing pages, ads, social media, and AI chatbots working together as a 24/7 sales machine.
+
+AutoLeadss builds full marketing funnels (not just ads) for e-commerce and real estate businesses in the GCC. Pricing starts at AED 3,500/month. Bilingual (Arabic + English) team. Clients own all ad accounts and creative assets.
+
+## Pages
+
+- [Home (English)](/en): Overview of services, pricing, process, and FAQs.
+- [Home (Arabic)](/ar): النسخة العربية — نظرة عامة على الخدمات والأسعار والأسئلة الشائعة.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Machine-readable list of indexable routes.
