@@ -2,10 +2,10 @@ import { Helmet } from 'react-helmet-async'
 import Navigation from './components/Navigation'
 import Hero from './components/sections/Hero'
 import Services from './components/sections/Services'
+import Regions from './components/sections/Regions'
 import Process from './components/sections/Process'
 import Work from './components/sections/Work'
 import Results from './components/sections/Results'
-import Testimonials from './components/sections/Testimonials'
 import WhyUs from './components/sections/WhyUs'
 import FAQ from './components/sections/FAQ'
 import CTABanner from './components/sections/CTABanner'
@@ -57,10 +57,10 @@ export default function App() {
       <main>
         <Hero />
         <Services />
-        <Process />
+        <Regions />
         <Work />
         <Results />
-        <Testimonials />
+        <Process />
         <WhyUs />
         <FAQ />
         <CTABanner />

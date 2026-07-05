@@ -1,62 +1,113 @@
 import { motion } from 'framer-motion'
-import { Filter, PanelsTopLeft, Megaphone, Share2, Bot, Search } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useT } from '../../i18n/LocaleProvider'
-import SectionHeading from '../SectionHeading'
-import TiltCard from '../TiltCard'
+import WhatsAppChat from '../mockups/WhatsAppChat'
+import LandingPreview from '../mockups/LandingPreview'
+import GoogleAd from '../mockups/GoogleAd'
+import SocialGrid from '../mockups/SocialGrid'
 
-const ICONS = [Filter, PanelsTopLeft, Megaphone, Share2, Bot, Search]
+const VISUALS = [<WhatsAppChat />, <LandingPreview />, <GoogleAd />, <SocialGrid />]
 
 export default function Services() {
   const t = useT()
 
   return (
-    <section id="services" className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
-      {/* ambient glow */}
+    <section id="services" className="relative overflow-hidden bg-background py-24">
+      {/* soft textured backdrop */}
+      <div aria-hidden className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,92,42,0.06) 0%, transparent 60%)' }} />
       <div
         aria-hidden
-        className="absolute top-0 left-1/2 -translate-x-1/2 blur-3xl opacity-40 pointer-events-none"
-        style={{ width: '70%', height: '40%', background: 'radial-gradient(ellipse, rgba(255,92,42,0.18) 0%, transparent 70%)' }}
+        className="absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage: 'radial-gradient(rgba(10,10,11,0.05) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
+          maskImage: 'linear-gradient(180deg, black, transparent 30%)',
+          WebkitMaskImage: 'linear-gradient(180deg, black, transparent 30%)',
+        }}
       />
-      <div className="content-width relative z-10">
-        <SectionHeading
-          dark
-          eyebrow={t.services.eyebrow}
-          title={t.services.titleA}
-          titleAccent={t.services.titleB}
-          sub={t.services.sub}
-        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {t.services.items.map((item, i) => {
-            const Icon = ICONS[i]
+      <div className="content-width relative z-10">
+        {/* heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-16 max-w-2xl text-center"
+        >
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <span className="h-px w-8 bg-accent" />
+            <p className="eyebrow text-accent">{t.services.eyebrow}</p>
+            <span className="h-px w-8 bg-accent" />
+          </div>
+          <h2 className="font-display font-bold" style={{ fontSize: 'clamp(1.9rem, 3.8vw, 3rem)', letterSpacing: '-0.03em', lineHeight: 1.08 }}>
+            {t.services.titleA} <span className="text-gradient-accent">{t.services.titleB}</span>
+          </h2>
+        </motion.div>
+
+        {/* alternating visual demos */}
+        <div className="flex flex-col gap-20 md:gap-28">
+          {t.services.demos.map((demo, i) => {
+            const flip = i % 2 === 1
             return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: (i % 3) * 0.08, ease: [0.22, 1, 0.36, 1] as const }}
-                className="h-full"
-              >
-                <TiltCard className="group h-full rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-colors duration-300 hover:border-accent/50 hover:bg-white/[0.06]">
-                  <div style={{ transform: 'translateZ(30px)', transformStyle: 'preserve-3d' }}>
-                    <div className="mb-6 flex items-center justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/12 border border-accent/25 transition-all duration-300 group-hover:bg-accent group-hover:shadow-[0_8px_24px_-6px_rgba(255,92,42,0.6)]"
-                        style={{ background: 'rgba(255,92,42,0.12)' }}>
-                        <Icon size={21} className="text-accent transition-colors duration-300 group-hover:text-white" />
-                      </span>
-                      <span className="eyebrow rounded-full border border-white/10 px-3 py-1 text-white/40">{item.tag}</span>
-                    </div>
-                    <h3 className="font-display font-semibold text-white text-xl mb-3">{item.title}</h3>
-                    <p className="text-white/65 text-sm leading-relaxed">{item.body}</p>
+              <div key={i} className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
+                {/* visual */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+                  className={`flex justify-center ${flip ? 'md:order-2' : ''}`}
+                >
+                  <div className="relative w-full max-w-[440px]">
+                    <div aria-hidden className="absolute -inset-6 rounded-[2rem] opacity-70 blur-2xl" style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,92,42,0.22), transparent 70%)' }} />
+                    <div className="relative">{VISUALS[i]}</div>
                   </div>
-                  {/* corner accent line */}
-                  <span aria-hidden className="pointer-events-none absolute bottom-0 h-px w-0 bg-gradient-to-r from-accent to-transparent transition-all duration-500 group-hover:w-2/3" style={{ insetInlineStart: 0 }} />
-                </TiltCard>
-              </motion.div>
+                </motion.div>
+
+                {/* copy */}
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-60px' }}
+                  transition={{ duration: 0.55, delay: 0.1 }}
+                  className={flip ? 'md:order-1' : ''}
+                >
+                  <span className="eyebrow text-accent">{demo.tag}</span>
+                  <h3 className="mt-3 font-display text-3xl font-bold text-foreground" style={{ letterSpacing: '-0.02em' }}>{demo.title}</h3>
+                  <p className="mt-3 max-w-md text-muted-fg">{demo.body}</p>
+                  <ul className="mt-6 flex flex-col gap-2.5">
+                    {demo.points.map((p, j) => (
+                      <li key={j} className="flex items-center gap-3 text-sm font-medium text-foreground">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/12" style={{ background: 'rgba(255,92,42,0.12)' }}>
+                          <Check size={12} className="text-accent" />
+                        </span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </div>
             )
           })}
         </div>
+
+        {/* supporting services strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-24 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-border pt-10"
+        >
+          <span className="text-sm font-medium text-muted-fg">{t.services.alsoLabel}</span>
+          {t.services.also.map((a, i) => (
+            <span key={i} className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              {a}
+            </span>
+          ))}
+        </motion.div>
       </div>
     </section>
   )
