@@ -69,25 +69,25 @@ Sub-account hierarchy, agency branding, reseller billing, per-seat/per-sub-accou
 
 ## 5 — PRICING & TIERS (build these into billing)
 
-Two regional price sheets. Annual billing −20%. 14-day trial.
+Two regional price sheets. Annual billing −20%. 14-day trial. **Regional-premium rule: every Gulf/UAE price must be at least 1.5× the Egyptian equivalent** (Gulf purchasing power is far higher; the tiers below run ~2×). Keep this ratio if you adjust any number.
 
-**Egypt (EGP / month)**
-| Tier | Price | Core |
-|---|---|---|
-| Starter | **1,500 EGP** | 1 funnel, AI page builder, basic web chatbot, ~500 leads/mo, AutoLeadss badge |
-| Growth ⭐ | **3,000 EGP** | 5 funnels, WhatsApp AI bot, ad-copy + social generation, remove badge, CRM, A/B test |
-| Pro | **7,500 EGP** | Unlimited funnels, team seats, priority AI, advanced analytics, integrations |
-| Done-with-you | from **30,000 EGP** | Everything + AutoLeadss builds & optimizes |
-| Managed / White-label | custom | Full management or reseller sub-accounts |
+**Egypt (EGP / month)** — (~USD at ≈50 EGP/$ for reference)
+| Tier | Price | ≈ USD | Core |
+|---|---|---|---|
+| Starter | **1,500 EGP** | ~$30 | 1 funnel, AI page builder, basic web chatbot, ~500 leads/mo, AutoLeadss badge |
+| Growth ⭐ | **3,000 EGP** | ~$60 | 5 funnels, WhatsApp AI bot, ad-copy + social generation, remove badge, CRM, A/B test |
+| Pro | **7,500 EGP** | ~$150 | Unlimited funnels, team seats, priority AI, advanced analytics, integrations |
+| Done-with-you | from **30,000 EGP** | ~$600 | Everything + AutoLeadss builds & optimizes |
+| White-label / Agency | from **150,000 EGP** | ~$3,000 | Reseller sub-accounts, agency branding |
 
-**Gulf / UAE (USD / month)**
-| Tier | Price | Core |
-|---|---|---|
-| Starter | **$49** | as above |
-| Growth ⭐ | **$149** | as above |
-| Pro | **$399** | as above |
-| Done-with-you | from **$1,200** | as above |
-| Managed / White-label | from **$1,500–3,000+** | as above |
+**Gulf / UAE (USD / month)** — each ≥1.5× the Egyptian equivalent
+| Tier | Price | ×EG | Core |
+|---|---|---|---|
+| Starter | **$59** | ~2.0× | as above |
+| Growth ⭐ | **$149** | ~2.5× | as above |
+| Pro | **$349** | ~2.3× | as above |
+| Done-with-you | from **$1,500** | ~2.5× | as above |
+| White-label / Agency | from **$6,000** | ~2.0× | Reseller sub-accounts, agency branding, priority support |
 
 Usage add-ons everywhere: extra AI generation credits, extra funnels/seats, WhatsApp beyond quota (pass-through + ~15% markup), ad management (flat or 10–15% of spend). Goal: **net revenue retention > 100%**.
 
