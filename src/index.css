@@ -86,6 +86,26 @@ html[dir="rtl"] .font-display {
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  .glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(226, 222, 212, 0.8);
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(10, 10, 11, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10, 10, 11, 0.04) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+  .grid-bg-dark {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 46px 46px;
+  }
+
   .card-hover {
     transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s;
   }
@@ -131,8 +151,15 @@ html[dir="rtl"] .marquee-track {
 }
 .spin-slow { animation: spin-slow 40s linear infinite; }
 
+/* Wizard generation pulse */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track, .float-slow, .float-slower, .spin-slow {
+  .marquee-track, .float-slow, .float-slower, .spin-slow, .pulse-ring {
     animation: none;
   }
 }
