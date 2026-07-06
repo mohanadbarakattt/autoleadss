@@ -6,14 +6,25 @@ import './index.css'
 import App from './App'
 import { LocaleProvider } from './i18n/LocaleProvider'
 import { LocaleProvider as SaasLocaleProvider } from './saas/i18n'
-import AuthForm from './saas/components/AuthForm'
+import AuthProvider from './saas/auth/AuthProvider'
+import AuthRoute from './saas/auth/AuthRoute'
+import RemoteBridge from './saas/auth/RemoteBridge'
+import { clerkEnabled } from './saas/config'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import Editor from './saas/pages/Editor'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
 
-const withSaas = (el: React.ReactNode) => <SaasLocaleProvider>{el}</SaasLocaleProvider>
+// Every SaaS route: optional Clerk provider → locale → Clerk↔store bridge → page.
+const withSaas = (el: React.ReactNode) => (
+  <AuthProvider>
+    <SaasLocaleProvider>
+      {clerkEnabled && <RemoteBridge />}
+      {el}
+    </SaasLocaleProvider>
+  </AuthProvider>
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -27,8 +38,8 @@ createRoot(document.getElementById('root')!).render(
 
           {/* Self-serve platform (the AI funnel builder) */}
           <Route path="/pricing" element={withSaas(<Pricing />)} />
-          <Route path="/login" element={withSaas(<AuthForm mode="login" />)} />
-          <Route path="/signup" element={withSaas(<AuthForm mode="signup" />)} />
+          <Route path="/login" element={withSaas(<AuthRoute mode="signin" />)} />
+          <Route path="/signup" element={withSaas(<AuthRoute mode="signup" />)} />
           <Route path="/app" element={withSaas(<Dashboard />)} />
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/funnel/:id" element={withSaas(<Editor />)} />

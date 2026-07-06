@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { LayoutGrid, Plus, CreditCard, LogOut, Globe } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, Globe } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
-import { useSession, signOut } from '../store'
+import { useSession } from '../store'
 import { planName } from '../pricing'
+import LogoutButton from '../auth/LogoutButton'
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t, locale, setLocale, isRTL } = useI18n()
@@ -58,9 +59,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-foreground">
             <Globe size={17} /> {t.lang.switch}
           </button>
-          <button onClick={() => { signOut(); navigate('/') }} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-foreground">
-            <LogOut size={17} /> {isRTL ? 'خروج' : 'Log out'}
-          </button>
+          <LogoutButton label={isRTL ? 'خروج' : 'Log out'} />
         </div>
       </aside>
 

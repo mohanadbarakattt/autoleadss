@@ -1,6 +1,14 @@
-
 import { useSyncExternalStore } from 'react'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Funnel, Lead, Session, Workspace, User, PlanId, Region } from './types'
+import { clerkEnabled } from './config'
+import {
+  listFunnels as rListFunnels,
+  createFunnel as rCreateFunnel,
+  updateFunnel as rUpdateFunnel,
+  deleteFunnel as rDeleteFunnel,
+  setLeadStatusRemote as rSetLeadStatus,
+} from './db/remote'
 
 const KEY = 'virlo:state:v1'
 
@@ -15,6 +23,9 @@ let state: State = empty
 let hydrated = false
 const listeners = new Set<() => void>()
 
+/** When set, mutations persist to Supabase (optimistic) and localStorage is bypassed. */
+let remote: { sb: SupabaseClient } | null = null
+
 function load(): State {
   if (typeof window === 'undefined') return empty
   try {
@@ -26,7 +37,7 @@ function load(): State {
 }
 
 function persist() {
-  if (typeof window === 'undefined') return
+  if (remote || typeof window === 'undefined') return // remote mode: DB is the source of truth
   try {
     window.localStorage.setItem(KEY, JSON.stringify(state))
   } catch {
@@ -34,14 +45,19 @@ function persist() {
   }
 }
 
-function set(next: Partial<State>) {
-  state = { ...state, ...next }
-  persist()
+function emit() {
   listeners.forEach((l) => l())
 }
 
+function set(next: Partial<State>) {
+  state = { ...state, ...next }
+  persist()
+  emit()
+}
+
 function ensureHydrated() {
-  if (!hydrated && typeof window !== 'undefined') {
+  // Clerk-backed sessions load from Supabase (via configureRemote), never localStorage.
+  if (!hydrated && typeof window !== 'undefined' && !clerkEnabled) {
     state = load()
     hydrated = true
   }
@@ -51,6 +67,11 @@ function subscribe(cb: () => void) {
   ensureHydrated()
   listeners.add(cb)
   return () => listeners.delete(cb)
+}
+
+function syncRemote(fn: (sb: SupabaseClient) => Promise<void>) {
+  if (!remote) return
+  fn(remote.sb).catch((e) => console.error('[remote sync]', e))
 }
 
 // ---------- ids ----------
@@ -70,27 +91,41 @@ export function slugify(s: string): string {
 
 // ---------- hooks ----------
 export function useSession(): Session | null {
-  return useSyncExternalStore(
-    subscribe,
-    () => state.session,
-    () => null,
-  )
+  return useSyncExternalStore(subscribe, () => state.session, () => null)
 }
-
 export function useFunnels(): Funnel[] {
-  return useSyncExternalStore(
-    subscribe,
-    () => state.funnels,
-    () => [],
-  )
+  return useSyncExternalStore(subscribe, () => state.funnels, () => [])
 }
-
 export function useFunnel(id: string): Funnel | undefined {
-  const funnels = useFunnels()
-  return funnels.find((f) => f.id === id)
+  return useFunnels().find((f) => f.id === id)
 }
 
-// ---------- auth ----------
+// ---------- remote lifecycle (called by the Clerk bridge) ----------
+export async function configureRemote(sb: SupabaseClient, session: Session) {
+  remote = { sb }
+  hydrated = true
+  set({ session })
+  try {
+    const funnels = await rListFunnels(sb)
+    state = { ...state, funnels }
+    emit()
+  } catch (e) {
+    console.error('[remote load]', e)
+  }
+}
+
+export function teardownRemote() {
+  remote = null
+  state = { session: null, funnels: [] }
+  emit()
+}
+
+/** Bridge a Clerk identity into the local session shape (demo-parity) without Supabase. */
+export function setBridgedSession(session: Session | null) {
+  set({ session })
+}
+
+// ---------- auth (demo mode) ----------
 export function signUp(name: string, email: string, region: Region): Session {
   ensureHydrated()
   const user: User = { id: uid('u_'), name, email }
@@ -134,26 +169,37 @@ export function createFunnel(f: Funnel) {
   let slug = f.slug
   let i = 2
   while (slugs.has(slug)) slug = `${f.slug}-${i++}`
-  set({ funnels: [{ ...f, slug }, ...state.funnels] })
+  const funnel = { ...f, slug }
+  set({ funnels: [funnel, ...state.funnels] })
+  syncRemote((sb) => rCreateFunnel(sb, funnel))
 }
 
 export function updateFunnel(id: string, patch: Partial<Funnel>) {
   ensureHydrated()
-  set({
-    funnels: state.funnels.map((f) => (f.id === id ? { ...f, ...patch, updatedAt: Date.now() } : f)),
-  })
+  set({ funnels: state.funnels.map((f) => (f.id === id ? { ...f, ...patch, updatedAt: Date.now() } : f)) })
+  // leads are persisted via their own path; don't push them through the funnel row.
+  const rest: Partial<Funnel> = { ...patch }
+  delete rest.leads
+  syncRemote((sb) => rUpdateFunnel(sb, id, rest))
 }
 
 export function updateSpec(id: string, mutate: (spec: Funnel['spec']) => Funnel['spec']) {
   ensureHydrated()
+  let nextSpec: Funnel['spec'] | undefined
   set({
-    funnels: state.funnels.map((f) => (f.id === id ? { ...f, spec: mutate(f.spec), updatedAt: Date.now() } : f)),
+    funnels: state.funnels.map((f) => {
+      if (f.id !== id) return f
+      nextSpec = mutate(f.spec)
+      return { ...f, spec: nextSpec, updatedAt: Date.now() }
+    }),
   })
+  if (nextSpec) syncRemote((sb) => rUpdateFunnel(sb, id, { spec: nextSpec }))
 }
 
 export function deleteFunnel(id: string) {
   ensureHydrated()
   set({ funnels: state.funnels.filter((f) => f.id !== id) })
+  syncRemote((sb) => rDeleteFunnel(sb, id))
 }
 
 export function publishFunnel(id: string) {
@@ -162,17 +208,13 @@ export function publishFunnel(id: string) {
 
 export function recordVisit(slug: string) {
   ensureHydrated()
-  set({
-    funnels: state.funnels.map((f) => (f.slug === slug ? { ...f, visits: f.visits + 1 } : f)),
-  })
+  set({ funnels: state.funnels.map((f) => (f.slug === slug ? { ...f, visits: f.visits + 1 } : f)) })
 }
 
 export function addLead(slug: string, lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {
   ensureHydrated()
   const full: Lead = { ...lead, id: uid('l_'), createdAt: Date.now(), status: 'new' }
-  set({
-    funnels: state.funnels.map((f) => (f.slug === slug ? { ...f, leads: [full, ...f.leads] } : f)),
-  })
+  set({ funnels: state.funnels.map((f) => (f.slug === slug ? { ...f, leads: [full, ...f.leads] } : f)) })
   return full
 }
 
@@ -183,10 +225,12 @@ export function setLeadStatus(funnelId: string, leadId: string, status: Lead['st
       f.id === funnelId ? { ...f, leads: f.leads.map((l) => (l.id === leadId ? { ...l, status } : l)) } : f,
     ),
   })
+  syncRemote((sb) => rSetLeadStatus(sb, leadId, status))
 }
 
-/** Seed a couple of demo leads so the CRM/analytics never look empty. */
+/** Seed demo leads so the CRM/analytics never look empty. Demo mode only. */
 export function seedDemoLeads(funnelId: string, names: [string, string][]) {
+  if (remote) return
   ensureHydrated()
   const f = state.funnels.find((x) => x.id === funnelId)
   if (!f || f.leads.length) return

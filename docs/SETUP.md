@@ -27,10 +27,30 @@ Routing: landing copy → Sonnet/Fable, ads+social → Sonnet, WhatsApp bot → 
 
 ---
 
-## Phase 3 — Database & real auth  (next)
-Supabase Postgres tables (Users, Funnels, Leads, MediaJobs, ActivityLogs) + RLS; the
-`src/saas` store swaps localStorage for the DB when `VITE_SUPABASE_*` auth is enabled.
-_Steps added when this phase lands._
+## Phase 3 — Database & Clerk auth  ✅ code shipped
+
+Funnels/leads persist to Supabase (RLS-scoped by Clerk user id), with optimistic UI and a
+localStorage fallback. Auth is Clerk. All gated: set the three env vars and it activates;
+without them the app stays in demo mode.
+
+**Go live:**
+1. **Clerk** → create an app at https://clerk.com, copy the **Publishable key**.
+2. **Supabase → Authentication → Sign In / Providers → Third-Party Auth → Add Clerk**, paste your
+   Clerk **issuer/Frontend API domain**. (In Clerk: Configure → Supabase integration → Connect.)
+3. Apply the schema (from repo root, logged into project `ultznwftohbbgceiwkuh`):
+   ```bash
+   supabase db push          # runs supabase/migrations/0001_saas.sql
+   ```
+4. Add env vars to **Vercel** (and `.env` locally), then redeploy:
+   ```
+   VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxxx
+   VITE_SUPABASE_URL=...            # already set
+   VITE_SUPABASE_PUBLISHABLE_KEY=... # already set
+   ```
+Now `/login` /`/signup` use Clerk, funnels persist per-user in Postgres (RLS enforced), and the
+public `/p/:slug` page reads + captures leads via SECURITY DEFINER RPCs (no broad table access).
+
+_Note: workspace plan/region sync to the DB lands with Phase 4 (billing)._
 
 ## Phase 4 — Billing (Stripe + Paymob/Tap)
 Dual-region checkout + plan entitlements + upgrade gates. _Steps added when it lands._
