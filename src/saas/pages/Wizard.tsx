@@ -8,7 +8,7 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n } from '../i18n'
 import { useSession, createFunnel, seedDemoLeads, uid, slugify } from '../store'
 import { INDUSTRIES } from '../industries'
-import { generateFromTemplate } from '../ai/generate'
+import { generateFunnel } from '../ai/generateLive'
 import type { Industry, Tone, WizardInput, FunnelSpec, Funnel } from '../types'
 
 const ACCENTS = ['#FF5C2A', '#2563EB', '#7C3AED', '#059669', '#E11D48', '#0A0A0B']
@@ -29,7 +29,7 @@ export default function Wizard() {
 
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<'form' | 'generating' | 'ready'>('form')
-  const [genStep, setGenStep] = useState(0)
+  const [liveSteps, setLiveSteps] = useState<string[]>([])
   const [createdId, setCreatedId] = useState<string | null>(null)
   const [spec, setSpec] = useState<FunnelSpec | null>(null)
 
@@ -60,8 +60,7 @@ export default function Wizard() {
   async function generate() {
     if (!session || !industry) return
     setPhase('generating')
-    setGenStep(0)
-    const timer = setInterval(() => setGenStep((s) => Math.min(s + 1, GEN_STEPS.en.length - 1)), 620)
+    setLiveSteps([])
     const input: WizardInput = {
       industry,
       businessName: businessName.trim(),
@@ -72,10 +71,13 @@ export default function Wizard() {
       accent,
     }
     const started = Date.now()
-    const resultSpec = generateFromTemplate(input)
-    const wait = Math.max(0, 3400 - (Date.now() - started))
+    const { spec: resultSpec } = await generateFunnel(
+      input,
+      (label) => setLiveSteps((s) => (s.includes(label) ? s : [...s, label])),
+      GEN_STEPS[locale],
+    )
+    const wait = Math.max(0, 2400 - (Date.now() - started))
     await new Promise((r) => setTimeout(r, wait))
-    clearInterval(timer)
 
     const id = uid('f_')
     const funnel: Funnel = {
@@ -217,14 +219,17 @@ export default function Wizard() {
             <h2 className="font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.wizard.generating}</h2>
             <p className="mt-2 text-sm text-muted-fg">{t.wizard.generatingSub}</p>
             <div className="mt-8 flex w-full max-w-xs flex-col gap-2.5">
-              {GEN_STEPS[locale].map((g, i) => (
-                <motion.div key={i} initial={{ opacity: 0.3 }} animate={{ opacity: i <= genStep ? 1 : 0.3 }} className="flex items-center gap-3 text-sm">
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-full ${i < genStep ? 'bg-accent text-white' : i === genStep ? 'bg-accent/20' : 'bg-muted'}`}>
-                    {i < genStep ? <Check size={12} /> : i === genStep ? <Loader2 size={12} className="animate-spin text-accent" /> : null}
-                  </span>
-                  <span className={i <= genStep ? 'font-medium text-foreground' : 'text-muted-fg'}>{g}</span>
-                </motion.div>
-              ))}
+              {(liveSteps.length ? liveSteps : [GEN_STEPS[locale][0]]).map((label, i, arr) => {
+                const active = i === arr.length - 1
+                return (
+                  <motion.div key={label + i} initial={{ opacity: 0, x: isRTL ? 8 : -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 text-sm">
+                    <span className={`flex h-5 w-5 items-center justify-center rounded-full ${active ? 'bg-accent/20' : 'bg-accent text-white'}`}>
+                      {active ? <Loader2 size={12} className="animate-spin text-accent" /> : <Check size={12} />}
+                    </span>
+                    <span className="font-medium text-foreground">{label}</span>
+                  </motion.div>
+                )
+              })}
             </div>
           </motion.div>
         )}

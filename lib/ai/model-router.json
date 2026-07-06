@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "task": "funnel_copy", "model": "claude-sonnet-5", "fallback": "claude-fable-5", "rationale": "High-quality bilingual long-form landing/funnel copy." },
+    { "task": "ad_social_copy", "model": "claude-sonnet-5", "fallback": "claude-haiku-4-5-20251001", "rationale": "Balanced quality/cost for ad and social variants." },
+    { "task": "chatbot_reply", "model": "claude-haiku-4-5-20251001", "fallback": "claude-sonnet-5", "rationale": "Cheap, fast, high-volume WhatsApp replies." },
+    { "task": "lead_qualification", "model": "claude-haiku-4-5-20251001", "fallback": "claude-haiku-4-5-20251001", "rationale": "Simple classification — cheapest model." }
+  ],
+  "notes": "Cheap-first, escalate on failure. Wired in supabase/functions/generate-funnel (env overrides: ANTHROPIC_MODEL_FUNNEL / _ADSOCIAL / _CHATBOT). Prompt-cache the brand/system context in production."
+}
