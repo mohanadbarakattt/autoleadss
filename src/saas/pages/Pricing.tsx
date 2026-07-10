@@ -4,14 +4,16 @@ import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Logo from '../../components/Logo'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { TIERS, priceFor } from '../pricing'
 import { useSession, setPlan, setRegion } from '../store'
 import { billingEnabled, startCheckout } from '../billing/checkout'
 import type { Region } from '../types'
+import LocaleSwitcher from '../components/LocaleSwitcher'
 
 export default function Pricing() {
   const { t, locale, isRTL, setLocale } = useI18n()
+  const contentLocale = toContentLocale(locale)
   const session = useSession()
   const navigate = useNavigate()
   const [region, setRegionState] = useState<Region>(session?.workspace.region ?? 'gulf')
@@ -38,10 +40,14 @@ export default function Pricing() {
     navigate('/app')
   }
 
-  const title = isRTL ? 'الأسعار — AutoLeadss' : 'Pricing — AutoLeadss'
+  const isFranco = locale === 'fr-eg'
+  const title = isRTL ? 'الأسعار — AutoLeadss' : isFranco ? 'El As3ar — AutoLeadss' : 'Pricing — AutoLeadss'
   const description = isRTL
     ? 'أسعار AutoLeadss لمنشئ القمع بالذكاء الاصطناعي — باقات لمصر والخليج، من التجربة المجانية إلى وضع الوكالة.'
-    : 'AutoLeadss pricing for the self-serve AI funnel builder — plans for Egypt and the Gulf, from a free start to white-label agency.'
+    : isFranco
+      ? 'As3ar AutoLeadss lel funnel builder bel AI — plans le Masr w El Khaleeg, men ebda2 majjany le agency white-label.'
+      : 'AutoLeadss pricing for the self-serve AI funnel builder — plans for Egypt and the Gulf, from a free start to white-label agency.'
+  const htmlLang = isRTL ? 'ar' : isFranco ? 'ar-Latn' : 'en'
 
   // Only the tiers with a fixed, published price (not "contact us" tiers) go into
   // structured data — no fabricated/estimated prices for the done-with-you or
@@ -64,7 +70,7 @@ export default function Pricing() {
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-background">
       <Helmet defer={false}>
-        <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
+        <html lang={htmlLang} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href="https://autoleadss.com/pricing" />
@@ -82,7 +88,7 @@ export default function Pricing() {
         <div className="glass-dark mx-auto flex h-14 max-w-[1200px] items-center justify-between rounded-2xl px-5">
           <Link to="/"><Logo variant="dark" size={28} /></Link>
           <div className="flex items-center gap-3">
-            <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-bold text-white/80 hover:text-white">{t.lang.switch}</button>
+            <LocaleSwitcher locale={locale} setLocale={setLocale} variant="dark" />
             <Link to={session ? '/app' : '/login'} className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white">{session ? t.nav.dashboard : t.nav.login}</Link>
           </div>
         </div>
@@ -110,8 +116,8 @@ export default function Pricing() {
             {TIERS.slice(0, 3).map((tier, i) => (
               <motion.div key={tier.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} className={`relative flex flex-col rounded-2xl border bg-card p-7 ${tier.popular ? 'border-accent shadow-[0_24px_60px_-30px_rgba(255,92,42,0.5)]' : 'border-border'}`}>
                 {tier.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-[10px] font-semibold text-white">{t.pricing.popular}</span>}
-                <p className="font-display text-lg font-bold">{tier.name[locale]}</p>
-                <p className="mt-1 text-sm text-muted-fg">{tier.tagline[locale]}</p>
+                <p className="font-display text-lg font-bold">{tier.name[contentLocale]}</p>
+                <p className="mt-1 text-sm text-muted-fg">{tier.tagline[contentLocale]}</p>
                 <p className="mt-5 font-display text-4xl font-bold">
                   {priceFor(tier, region)}
                   <span className="text-base font-normal text-muted-fg">{t.pricing.mo}</span>
@@ -119,7 +125,7 @@ export default function Pricing() {
                 <ul className="mt-6 flex flex-1 flex-col gap-2.5">
                   {tier.features.map((f, j) => (
                     <li key={j} className="flex items-start gap-2.5 text-sm text-foreground">
-                      <Check size={16} className="mt-0.5 shrink-0 text-accent" /> {f[locale]}
+                      <Check size={16} className="mt-0.5 shrink-0 text-accent" /> {f[contentLocale]}
                     </li>
                   ))}
                 </ul>
@@ -134,8 +140,8 @@ export default function Pricing() {
             {TIERS.slice(3).map((tier) => (
               <div key={tier.id} className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-[#0A0A0B] p-7 text-white sm:flex-row sm:items-center">
                 <div>
-                  <p className="font-display text-lg font-bold">{tier.name[locale]}</p>
-                  <p className="mt-1 text-sm text-white/60">{tier.tagline[locale]}</p>
+                  <p className="font-display text-lg font-bold">{tier.name[contentLocale]}</p>
+                  <p className="mt-1 text-sm text-white/60">{tier.tagline[contentLocale]}</p>
                   <p className="mt-3 font-display text-2xl font-bold text-gradient-accent">{priceFor(tier, region)}</p>
                 </div>
                 <button onClick={() => choose(tier.id, true)} className="shrink-0 rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10">
@@ -146,7 +152,7 @@ export default function Pricing() {
           </div>
 
           <div className="mt-12 text-center">
-            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">← {isRTL ? 'العودة إلى AutoLeadss' : 'Back to AutoLeadss'}</Link>
+            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">← {isRTL ? 'العودة إلى AutoLeadss' : isFranco ? 'Erga3 le AutoLeadss' : 'Back to AutoLeadss'}</Link>
           </div>
         </div>
       </section>

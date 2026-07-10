@@ -6,9 +6,11 @@ import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
 import { signUp } from '../store'
 import type { Region } from '../types'
+import LocaleSwitcher from './LocaleSwitcher'
 
 export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   const { t, isRTL, locale, setLocale } = useI18n()
+  const isFranco = locale === 'fr-eg'
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -22,13 +24,14 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   }
 
   const title = isSignup
-    ? (isRTL ? 'إنشاء حساب — AutoLeadss' : 'Sign up — AutoLeadss')
-    : (isRTL ? 'تسجيل الدخول — AutoLeadss' : 'Log in — AutoLeadss')
+    ? (isRTL ? 'إنشاء حساب — AutoLeadss' : isFranco ? 'Emel account — AutoLeadss' : 'Sign up — AutoLeadss')
+    : (isRTL ? 'تسجيل الدخول — AutoLeadss' : isFranco ? 'Log in — AutoLeadss' : 'Log in — AutoLeadss')
+  const htmlLang = isRTL ? 'ar' : isFranco ? 'ar-Latn' : 'en'
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="grid min-h-screen lg:grid-cols-2">
       <Helmet defer={false}>
-        <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
+        <html lang={htmlLang} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <meta name="description" content={isSignup ? t.auth.signupSub : t.auth.loginSub} />
         <link rel="canonical" href={`https://autoleadss.com/${isSignup ? 'signup' : 'login'}`} />
@@ -57,9 +60,9 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
           <div className="mb-8 flex items-center justify-between lg:hidden">
             <Logo size={30} />
           </div>
-          <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="mb-6 text-xs font-bold text-muted-fg hover:text-foreground">
-            {t.lang.switch}
-          </button>
+          <div className="mb-6">
+            <LocaleSwitcher locale={locale} setLocale={setLocale} />
+          </div>
           <h1 className="font-display text-3xl font-bold" style={{ letterSpacing: '-0.02em' }}>
             {isSignup ? t.auth.signupTitle : t.auth.loginTitle}
           </h1>

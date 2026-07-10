@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, Check } from 'lucide-react'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useSession } from '../store'
 import { entitlementFor, nextPlanFor, type Feature } from '../entitlements'
 import { planName, TIERS, priceFor } from '../pricing'
@@ -26,11 +26,12 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [reason, setReason] = useState<Reason | null>(null)
 
+  const contentLocale = toContentLocale(locale)
   const plan = session?.workspace.plan ?? 'starter'
   const region = session?.workspace.region ?? 'gulf'
   const target = reason ? nextPlanFor(reason, plan) : 'growth'
   const tier = TIERS.find((x) => x.id === target)
-  const copy = reason ? COPY[reason][locale] : ['', '']
+  const copy = reason ? COPY[reason][contentLocale] : ['', '']
 
   return (
     <Ctx.Provider value={{ openUpgrade: setReason }}>
@@ -64,19 +65,19 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
               {tier && (
                 <div className="px-8 py-6">
                   <div className="flex items-baseline justify-between">
-                    <p className="font-display text-lg font-bold">{planName(target, locale)}</p>
+                    <p className="font-display text-lg font-bold">{planName(target, contentLocale)}</p>
                     <p className="font-display text-2xl font-bold">{priceFor(tier, region)}<span className="text-sm font-normal text-muted-fg">{t.pricing.mo}</span></p>
                   </div>
                   <ul className="mt-4 flex flex-col gap-2">
                     {tier.features.slice(0, 4).map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-foreground"><Check size={15} className="text-accent" /> {f[locale]}</li>
+                      <li key={i} className="flex items-center gap-2 text-sm text-foreground"><Check size={15} className="text-accent" /> {f[contentLocale]}</li>
                     ))}
                   </ul>
                   <button
                     onClick={() => { setReason(null); navigate('/pricing') }}
                     className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
                   >
-                    {isRTL ? `الترقية إلى ${planName(target, locale)}` : `Upgrade to ${planName(target, locale)}`}
+                    {isRTL ? `الترقية إلى ${planName(target, contentLocale)}` : `Upgrade to ${planName(target, contentLocale)}`}
                   </button>
                   <button onClick={() => setReason(null)} className="mt-2 w-full text-center text-xs text-muted-fg hover:text-foreground">
                     {isRTL ? 'ليس الآن' : 'Maybe later'}

@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useFunnels, useAgency } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
@@ -108,7 +108,7 @@ function DashboardInner() {
                   <div aria-hidden className="absolute inset-0 opacity-50" style={{ background: `radial-gradient(ellipse at 80% 20%, ${f.accent}55, transparent 60%)` }} />
                   <div className="relative flex items-center justify-between">
                     <span className="flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-0.5 text-[10px] text-white/70">
-                      <span>{ind?.emoji}</span> {industryLabel(f.industry, locale)}
+                      <span>{ind?.emoji}</span> {industryLabel(f.industry, toContentLocale(locale))}
                     </span>
                     <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${f.status === 'published' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
                       {f.status === 'published' ? t.common.published : t.common.draft}

@@ -1,13 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { LayoutGrid, Plus, CreditCard, Globe, MessageCircle, Building2 } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, MessageCircle, Building2 } from 'lucide-react'
 import Logo from '../../components/Logo'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useAgency } from '../store'
 import { planName } from '../pricing'
 import { entitlementFor } from '../entitlements'
 import LogoutButton from '../auth/LogoutButton'
 import SaasFooter from './SaasFooter'
+import LocaleSwitcher from './LocaleSwitcher'
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t, locale, setLocale, isRTL } = useI18n()
@@ -61,12 +62,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div className="mt-auto flex flex-col gap-2">
           <div className="rounded-xl border border-border bg-muted/50 p-3">
             <p className="text-xs text-muted-fg">{session.workspace.name}</p>
-            <p className="mt-0.5 text-sm font-semibold text-foreground">{planName(session.workspace.plan, locale)} · {session.workspace.region === 'egypt' ? '🇪🇬' : '🇦🇪'}</p>
+            <p className="mt-0.5 text-sm font-semibold text-foreground">{planName(session.workspace.plan, toContentLocale(locale))} · {session.workspace.region === 'egypt' ? '🇪🇬' : '🇦🇪'}</p>
             {isAgency && activeSub && <p className="mt-1 truncate text-[11px] font-medium text-accent">▸ {activeSub.name}</p>}
           </div>
-          <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-foreground">
-            <Globe size={17} /> {t.lang.switch}
-          </button>
+          <LocaleSwitcher locale={locale} setLocale={setLocale} />
           <LogoutButton label={isRTL ? 'خروج' : 'Log out'} />
         </div>
       </aside>
@@ -75,7 +74,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/90 px-5 py-3 backdrop-blur lg:hidden">
           <Link to="/app"><Logo size={26} /></Link>
           <div className="flex items-center gap-2">
-            <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="rounded-full border border-border px-2.5 py-1 text-xs font-bold text-muted-fg">{t.lang.label === 'EN' ? 'AR' : 'EN'}</button>
+            <LocaleSwitcher locale={locale} setLocale={setLocale} size="sm" />
             <Link to="/app/new" className="rounded-full bg-accent px-4 py-1.5 text-xs font-medium text-white">{t.common.new}</Link>
           </div>
         </div>

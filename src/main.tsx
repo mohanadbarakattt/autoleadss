@@ -20,6 +20,8 @@ import Agency from './saas/pages/Agency'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
 import NotFound from './pages/NotFound'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 // Every SaaS route: optional Clerk provider → locale → Clerk↔store bridge → page.
 const withSaas = (el: React.ReactNode) => (
@@ -47,6 +49,14 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
           <Route path="/fr-eg/*" element={<LocaleProvider locale="fr-eg"><App /></LocaleProvider>} />
+
+          {/* Legal pages — one per locale, take priority over the /:locale/* wildcard above */}
+          <Route path="/en/privacy" element={<LocaleProvider locale="en"><Privacy /></LocaleProvider>} />
+          <Route path="/en/terms" element={<LocaleProvider locale="en"><Terms /></LocaleProvider>} />
+          <Route path="/ar/privacy" element={<LocaleProvider locale="ar"><Privacy /></LocaleProvider>} />
+          <Route path="/ar/terms" element={<LocaleProvider locale="ar"><Terms /></LocaleProvider>} />
+          <Route path="/fr-eg/privacy" element={<LocaleProvider locale="fr-eg"><Privacy /></LocaleProvider>} />
+          <Route path="/fr-eg/terms" element={<LocaleProvider locale="fr-eg"><Terms /></LocaleProvider>} />
 
           {/* Self-serve platform (the AI funnel builder) */}
           <Route path="/pricing" element={withSaas(<Pricing />)} />

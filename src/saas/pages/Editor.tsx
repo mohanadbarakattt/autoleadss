@@ -8,7 +8,7 @@ import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
 import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
 import { remoteEnabled } from '../config'
@@ -215,7 +215,7 @@ function EditorInner() {
           </div>
         )}
 
-        {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={locale} isRTL={isRTL} />}
+        {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />}
 
         {tab === 'insights' && <FunnelAnalytics funnel={funnel} isRTL={isRTL} />}
 

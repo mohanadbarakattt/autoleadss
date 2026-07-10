@@ -6,7 +6,7 @@ import { X, ArrowRight, ArrowLeft, Check, Sparkles, Loader2 } from 'lucide-react
 import Logo from '../../components/Logo'
 import FunnelRenderer from '../components/FunnelRenderer'
 import BrowserFrame from '../components/BrowserFrame'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useFunnels, createFunnel, seedDemoLeads, uid, slugify } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 import { INDUSTRIES, industryNamePlaceholder } from '../industries'
@@ -38,9 +38,10 @@ export default function Wizard() {
   const [createdId, setCreatedId] = useState<string | null>(null)
   const [spec, setSpec] = useState<FunnelSpec | null>(null)
 
+  const contentLocale = toContentLocale(locale)
   const [industry, setIndustry] = useState<Industry | null>(null)
   const [businessName, setBusinessName] = useState('')
-  const [language, setLanguage] = useState(locale)
+  const [language, setLanguage] = useState(contentLocale)
   const [goal, setGoal] = useState<string>('leads')
   const [tone, setTone] = useState<Tone>('bold')
   const [accent, setAccent] = useState(ACCENTS[0])
@@ -83,7 +84,7 @@ export default function Wizard() {
     const { spec: resultSpec } = await generateFunnel(
       input,
       (label) => setLiveSteps((s) => (s.includes(label) ? s : [...s, label])),
-      GEN_STEPS[locale],
+      GEN_STEPS[contentLocale],
     )
     const wait = Math.max(0, 2400 - (Date.now() - started))
     await new Promise((r) => setTimeout(r, wait))
@@ -151,7 +152,7 @@ export default function Wizard() {
                     {INDUSTRIES.map((ind) => (
                       <button key={ind.id} onClick={() => setIndustry(ind.id)} className={`flex flex-col items-start gap-3 rounded-2xl border p-5 text-start transition-all ${industry === ind.id ? 'border-accent bg-accent/5 shadow-[0_10px_30px_-14px_rgba(255,92,42,0.5)]' : 'border-border bg-card hover:border-accent/40'}`}>
                         <span className="text-2xl">{ind.emoji}</span>
-                        <span className="text-sm font-semibold">{ind.label[locale]}</span>
+                        <span className="text-sm font-semibold">{ind.label[contentLocale]}</span>
                       </button>
                     ))}
                   </div>
@@ -160,7 +161,7 @@ export default function Wizard() {
 
               {step === 1 && (
                 <StepWrap title={t.wizard.nameQ}>
-                  <input autoFocus value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder={industryNamePlaceholder(industry, locale)} className="w-full rounded-xl border border-border bg-card px-5 py-4 font-display text-xl font-semibold outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+                  <input autoFocus value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder={industryNamePlaceholder(industry, contentLocale)} className="w-full rounded-xl border border-border bg-card px-5 py-4 font-display text-xl font-semibold outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
                   <div className="mt-6">
                     <p className="mb-2 text-xs font-medium text-muted-fg">{t.wizard.langQ}</p>
                     <div className="grid grid-cols-2 gap-2">
@@ -232,7 +233,7 @@ export default function Wizard() {
             <h2 className="font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.wizard.generating}</h2>
             <p className="mt-2 text-sm text-muted-fg">{t.wizard.generatingSub}</p>
             <div className="mt-8 flex w-full max-w-xs flex-col gap-2.5">
-              {(liveSteps.length ? liveSteps : [GEN_STEPS[locale][0]]).map((label, i, arr) => {
+              {(liveSteps.length ? liveSteps : [GEN_STEPS[contentLocale][0]]).map((label, i, arr) => {
                 const active = i === arr.length - 1
                 return (
                   <motion.div key={label + i} initial={{ opacity: 0, x: isRTL ? 8 : -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 text-sm">
