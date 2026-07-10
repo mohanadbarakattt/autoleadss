@@ -562,8 +562,8 @@ const francoEg: Dict = {
     eyebrow: 'Anzimet Nomo — El Emarat w Masr',
     titleA: 'Bateb2a tigri wara el 3omala2.',
     titleB: 'Khaleehom yiegu lek.',
-    sub: 'Ehna bnsammem w bnshaghal kol nizam el sales bta3ak — funnels, landing pages, ads, social media, w chatbot AI, kolohom shaghalin sawa ka nizam wahed. Enta bas rakkez fi elly enta shatir feeh.',
-    ctaBook: 'Ehgez call estrategy majjany',
+    sub: 'Ehna bnsammem w bnshaghal kol nizam el sales bta3ak — funnels, landing pages, ads, social media, w chatbot AI, kolohom shaghalin sawa zay nizam wahed. Enta bas rakkez fi elly enta shatir feeh.',
+    ctaBook: 'Ehgez call strategy majjany',
     ctaWork: 'Shoof shoghlna',
     serving: 'Bnkhdem shoghl fi Dubai · Abu Dhabi · El Qahera · El Eskendareya',
     respBadge: '⚡ Motawaset waqt el radd 3al 3omala2: 12 sanya',
@@ -624,7 +624,7 @@ const francoEg: Dict = {
     title: 'Anzima 7a2ee2eya. Arqam 7a2ee2eya.',
     confidentiality: 'Shoghl mukhtar. Asma2 el 3omala2 mahgooba be NDA.',
     ctaText: '3ayez nata2eg zay di le shoghlak?',
-    ctaBtn: 'Ehgez call estrategy majjany',
+    ctaBtn: 'Ehgez call strategy majjany',
     cases: [
       {
         industry: 'Real Estate · Dubai',
@@ -632,7 +632,7 @@ const francoEg: Dict = {
         big: '3×',
         label: 'ziyada fi el ma3ayenat el mo2ahala khelal 45 youm',
         imgAlt: 'Landing page 3a2areya w funnel WhatsApp',
-        quote: 'Khelal talat asabee3 el bot kan byehgez el ma3ayenat wana el team beyenam. Msh betfawwet wala lead khales.',
+        quote: 'Khelal talat asabee3 el bot kan byehgez el ma3ayenat wel team beyenam. Msh betfawwet wala lead khales.',
         name: 'Khaled M.',
         role: 'Managing Partner — real estate brokerage, Dubai',
         metrics: ['74% radd asra3', 'ROI positive be el osboo3 el talet', 'Radd fi 60 sanya'],
@@ -689,7 +689,7 @@ const francoEg: Dict = {
     title: 'Se2a men ashab shoghl bye2eesoo kol 7aga.',
     items: [
       {
-        quote: 'Khelal talat asabee3 el WhatsApp bot kan byehgez el ma3ayenat wana el team beyenam. Batalt a2la2 khales men waqt el radd — msh betfawwet wala lead.',
+        quote: 'Khelal talat asabee3 el WhatsApp bot kan byehgez el ma3ayenat wel team beyenam. Batalt a2la2 khales men waqt el radd — msh betfawwet wala lead.',
         name: 'Khaled M.',
         role: 'Managing Partner, Real Estate Brokerage — Dubai',
       },
@@ -727,14 +727,14 @@ const francoEg: Dict = {
       { q: 'GEO eh w leh mohem?', a: 'Generative Engine Optimization bykhalli shoghlak zaher gowa AI assistants zay ChatGPT w Gemini w Perplexity. Kol shahr, 3omala2 aktar bysa2lo el AI 3ashan yela2o hall — ehna bn2akkedlak enno enta el hall.' },
       { q: 'Ezay betqaddemo el nata2eg?', a: 'Byewsalak report tafseely yeghatti el impressions w el clicks w cost per lead w conversion rates w revenue attribution — ma3 dashboard live 3ashan mafeesh 7aga makhfeya.' },
       { q: 'Eh elly bymayyezkom 3an wakalat tanya?', a: 'Talat 7agat: (1) benebni el funnel kolo, mesh el ads bas; (2) nagahna marboot be nata2egak el metabba3a; (3) enta malek kol el assets w te2dar temshi emta 3ayez.' },
-      { q: 'Ezay abda2?', a: 'Ehgez call estrategy majjany. Han3ayen el wad3 el7aly beta3ak w henawareelak bezabt shaklo hayeb2a nizam el nomo le shoghlak — bidoon eltizam.' },
+      { q: 'Ezay abda2?', a: 'Ehgez call strategy majjany. Han3ayen el wad3 el7aly beta3ak w henawareelak bezabt shaklo hayeb2a nizam el nomo le shoghlak — bidoon eltizam.' },
     ],
   },
   cta: {
     titleA: 'Gahez tekbar?',
     titleB: 'Yalla nekallem.',
     sub: 'Kol youm betsabbar feeh, el monafeseen beta3ak bysharo ads, bysaydo leads, w byeksabo 3omala2 kan lazem yekonoo lek.',
-    book: 'Ehgez call estrategy majjany',
+    book: 'Ehgez call strategy majjany',
     whatsapp: 'Raslna 3ala WhatsApp',
   },
   contact: {
@@ -802,9 +802,9 @@ const francoEg: Dict = {
     bookFreeLabel: 'Ehgez call majjany ←',
     fallback: 'So2al 7elw. 3ashan radd tafseely, al2a7san call sari3 — majjany khales bidoon eltizam. Aw raslna 3ala WhatsApp.',
     responses: {
-      services: 'Bnshaghal el operation el sales beta3ak kolha — sales funnels, landing pages, ads 3ala Google w social, content, chatbot AI, w SEO/GEO. Kol 7aga beteshtaghal sawa ka nizam wahed 3ashan tekhod leads besabat bidoon ma tedeer khamas adawat mokhtalfa.',
-      pricing: 'Kol shoghl mokhtalef, fa bnehded scope kol project ba3d call estrategy majjany. Fel call bnraga3 el wad3 beta3ak w bendeek offer wade7 mokhassas — bidoon eltizam. 3ayzak te7gez wahed?',
-      start: 'Sahl — ehgez call estrategy majjany w hangolak bezabt eh elly hanshtaghalo le shoghlak. Bidoon eltizam.',
+      services: 'Bnshaghal el operation el sales beta3ak kolha — sales funnels, landing pages, ads 3ala Google w social, content, chatbot AI, w SEO/GEO. Kol 7aga beteshtaghal sawa zay nizam wahed 3ashan tekhod leads besabat bidoon ma tedeer khamas adawat mokhtalfa.',
+      pricing: 'Kol shoghl mokhtalef, fa bnehded scope kol project ba3d call strategy majjany. Fel call bnraga3 el wad3 beta3ak w bendeek offer wade7 mokhassas — bidoon eltizam. 3ayzak te7gez wahed?',
+      start: 'Sahl — ehgez call strategy majjany w hangolak bezabt eh elly hanshtaghalo le shoghlak. Bidoon eltizam.',
       landing: 'Bnebni landing pages 3alya el ta7weel bel 3araby w el engelizy. Sari3a, mobile-first, w metassela be CRM w el chatbot men awel youm. Aghlab el 3omala2 byshoofo ta7weel a7san be 2-5×.',
       chatbot: 'Benrakkeb chatbot AI 3ala WhatsApp w mo23ak byrodd 3al leads fi a2al men 60 sanya — 24/7. Byet2ayem el leads, byehgez el mawa3eed, w mabyewassalsh le team beta3ak illa lama el lead yeb2a gahez.',
       ads: 'Bnedeer el ads beta3ak 3ala Google w Meta w TikTok men el awel lel akher. Campaign setup, tahseen youmy, conversion tracking — betshoof bezabt fen bayro7 kol genih aw dirham betesrafo.',

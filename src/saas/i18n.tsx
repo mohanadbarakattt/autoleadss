@@ -255,7 +255,7 @@ const STRINGS = {
       region: 'Beteb3 fen?',
       egypt: 'Masr',
       gulf: 'El Khaleeg / El Emarat',
-      createAccount: 'Emel el account',
+      createAccount: 'E3mel el account',
       login: 'Log in',
       haveAccount: '3andak account already?',
       noAccount: 'Mesh 3andak account?',
