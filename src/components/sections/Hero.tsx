@@ -77,10 +77,11 @@ export default function Hero() {
         />
       </div>
 
-      <div className="content-width relative z-10 min-h-screen flex flex-col justify-center pt-32 pb-10 md:pt-36">
+      {/* tighter top offset + gap on mobile so the "serving" caption clears the fixed WhatsApp/chat buttons on short viewports */}
+      <div className="content-width relative z-10 min-h-screen flex flex-col justify-center pt-24 pb-24 md:pb-10 md:pt-36">
         <div className="grid grid-cols-1 lg:grid-cols-[54fr_46fr] gap-14 lg:gap-8 items-center flex-1">
           {/* ── Copy ── */}
-          <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-5 sm:gap-7">
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show"
               className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5">
               <span className="relative flex h-1.5 w-1.5">

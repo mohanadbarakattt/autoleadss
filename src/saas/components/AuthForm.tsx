@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Info } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
 import { signUp } from '../store'
@@ -68,7 +68,12 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
           </h1>
           <p className="mt-2 text-sm text-muted-fg">{isSignup ? t.auth.signupSub : t.auth.loginSub}</p>
 
-          <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
+          <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-amber-300/50 bg-amber-50 px-3.5 py-3 text-xs text-amber-800">
+            <Info size={15} className="mt-0.5 shrink-0" />
+            <p>{t.auth.demoNote}</p>
+          </div>
+
+          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
             {isSignup && (
               <Field label={t.auth.name}>
                 <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder={isRTL ? 'اسمك' : 'Your name'} />
@@ -93,8 +98,6 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
               <ArrowRight size={16} className={`transition-transform group-hover:translate-x-0.5 ${isRTL ? 'rotate-180' : ''}`} />
             </button>
           </form>
-
-          <p className="mt-4 text-center text-xs text-muted-fg">{t.auth.demoNote}</p>
 
           <p className="mt-6 text-center text-sm text-muted-fg">
             {isSignup ? t.auth.haveAccount : t.auth.noAccount}{' '}
