@@ -1,28 +1,19 @@
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config'
 import type { PlanId, Region } from '../types'
 
-const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined
-
-/** Billing is live only when a Stripe publishable key + Supabase are configured. */
-export const billingEnabled = !!(STRIPE_PK && SUPABASE_URL && SUPABASE_ANON_KEY)
+/**
+ * Dual-region checkout (Stripe for Gulf/USD, Paymob for Egypt/EGP) was wired to a
+ * Supabase Edge Function (`create-checkout`) before the Phase 2 migration to the
+ * shared Neon backend. That edge function depended on the Supabase project removed
+ * in this phase (see docs/SETUP.md), so `billingEnabled` is hardcoded off for now.
+ * Re-wiring checkout to a Vercel function under `api/` is a reasonable follow-up but
+ * is out of scope for this phase (funnels/leads/publish persistence only).
+ */
+export const billingEnabled = false
 
 /**
- * Starts a dual-region checkout via the `create-checkout` edge function
- * (Stripe for Gulf/USD, Paymob for Egypt/EGP). Returns a redirect URL, or null
- * if billing isn't configured / the plan isn't purchasable (caller falls back).
+ * Starts a dual-region checkout. Always returns `null` for now (see above) — the
+ * caller already falls back to setting the plan locally (demo) when this happens.
  */
-export async function startCheckout(plan: PlanId, region: Region, userId?: string): Promise<string | null> {
-  if (!billingEnabled || !SUPABASE_URL) return null
-  try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', apikey: SUPABASE_ANON_KEY!, authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ plan, region, userId, origin: window.location.origin }),
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    return typeof data.url === 'string' ? data.url : null
-  } catch {
-    return null
-  }
+export async function startCheckout(_plan: PlanId, _region: Region, _userId?: string): Promise<string | null> {
+  return null
 }

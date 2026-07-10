@@ -41,8 +41,18 @@ Strategy (from `docs/SAAS_BUILD_PROMPT.md`): **B** self-serve builder = front do
 ## Current state (what's shipped)
 
 - ✅ Marketing site rebuilt (3D hero, mockups, region map, case studies, no pricing).
-- ✅ Self-serve SaaS merged in and live — **demo mode**: localStorage persistence, client-side
-  template generation, funnels publish to `/p/:slug` (same-browser in demo).
+- ✅ Self-serve SaaS merged in and live — **demo mode by default**: localStorage
+  persistence, client-side template generation, funnels publish to `/p/:slug`
+  (same-browser in demo).
+- ✅ Shared Neon backend wired for funnels/leads/publish (`api/`, schema `autoleadss`
+  in the shared MBAI Neon project — see `docs/SETUP.md` "Phase 2 — Shared Neon
+  backend"): activates once Clerk + `DATABASE_URL` + `CLERK_SECRET_KEY` are
+  configured, fixing cross-device publishing; falls back to demo-mode localStorage
+  otherwise. This **replaced** an earlier Supabase-backed remote-persistence layer
+  (removed entirely — see `docs/SETUP.md`). Custom domains, WhatsApp remote
+  persistence, agency/workspace sync, real AI generation, and billing checkout were
+  also Supabase-backed and were **not** carried over to Neon — see `docs/SETUP.md`
+  "Out of scope" for the full list and follow-up plan.
 - ✅ Bilingual EN/AR verified; all routes 200 live.
 - ✅ Standalone "Virlo" experiment **reversed** (repo + Vercel deleted; local backup at
   `~/projects/virlo-fable-5`) and rebranded/merged into AutoLeadss.
@@ -50,23 +60,28 @@ Strategy (from `docs/SAAS_BUILD_PROMPT.md`): **B** self-serve builder = front do
 ## Gotchas
 
 - **framer-motion v12**: nested `AnimatePresence mode="wait"` **hangs** the exit and freezes
-  transitions — use plain keyed `motion.div`s (this bit the wizard).
-- Real AI, real persistence, and billing are NOT wired yet — demo mode by design.
+  transitions — use plain keyed `motion.div`s (this bit the wizard once; already fixed, and
+  the pattern used everywhere in `src/saas/`).
+- Real AI generation and billing checkout are NOT wired yet — demo mode by design. Funnel/lead
+  persistence now *can* be real (see above) but stays demo-mode until Neon + Clerk are configured.
 
 ## Production roadmap (SaaS → real product)
 
-Dependency-ordered. Phase 1 is shipped; the rest turn the demo into a real, billable SaaS.
+Dependency-ordered. Phases 1–2 are shipped; the rest turn the demo into a real, billable SaaS.
 
 | Phase | Name | What it delivers |
 |---|---|---|
 | **1** | Self-serve MVP (demo) | ✅ SHIPPED — wizard, editor, publishing, demo mode |
-| **2** | Real AI generation | Anthropic serverless endpoint + streaming; router by task |
-| **3** | Persistence & real auth | Supabase multi-tenant + RLS; funnels/leads server-side |
-| **4** | Billing & plan gating | Stripe (Gulf) + Paymob/Tap (Egypt); entitlements per tier |
-| **5** | WhatsApp Cloud API | BYO WABA per tenant; live bot + shared inbox |
-| **6** | Real publishing | Custom domains/subdomains, cross-device shareable pages, SEO |
-| **7** | White-label / agency mode | Sub-accounts, agency branding, reseller billing (tier D) |
+| **2** | Persistence & real auth | ✅ SHIPPED — shared Neon Postgres (schema `autoleadss`) + Clerk; funnels/leads server-side via `api/`, graceful localStorage fallback |
+| **3** | Real AI generation | Wire `src/saas/ai/generateLive.ts` to the shared MBAI Model Gateway (`MBAI_GATEWAY_URL`/`MBAI_GATEWAY_KEY`); streaming |
+| **4** | Billing & plan gating | Stripe (Gulf) + Paymob/Tap (Egypt) via a Vercel function under `api/`; entitlements per tier |
+| **5** | WhatsApp Cloud API | BYO WABA per tenant; live bot + shared inbox; new `autoleadss.whatsapp_*` tables |
+| **6** | Real custom domains | Host-based rendering for subdomains/custom domains; new `autoleadss.domains` table |
+| **7** | White-label / agency mode | Sync sub-accounts, agency branding, workspace plan/region to Neon (currently local-only) |
 | **8** | Analytics, admin, hardening | Dashboards, impersonation, observability, security/perf |
 
-> Note: Phase 7 (white-label) normally depends on Phases 2–6 (persistence, billing, tenancy).
-> Confirm sequencing before jumping ahead.
+> Numbering follows the original phase plan for continuity; Phase 2's scope changed from
+> "Supabase multi-tenant + RLS" to "shared Neon backend" when the ecosystem-wide contract
+> (one shared Neon project, no parallel data stores — see
+> `~/projects/mbai-ecosystem/docs/SHARED-DB-DESIGN.md`) superseded the original Supabase plan.
+> Phase 7 (white-label sync) depends on Phases 4–6 landing their own Neon tables first.

@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import { useUser, useSession } from '@clerk/clerk-react'
-import { remoteEnabled } from '../config'
-import { getSupabase } from '../db/client'
-import { configureRemote, teardownRemote, setBridgedSession } from '../store'
+import { bridgeClerkSession, teardownRemote } from '../store'
 import type { Session } from '../types'
 
 /** Map a Clerk user into the app's Session shape (demo-parity). */
@@ -26,9 +24,12 @@ function toSession(user: {
 }
 
 /**
- * Bridges Clerk auth into the store: on sign-in it builds a token-scoped Supabase
- * client and loads the user's funnels; on sign-out it tears everything down.
- * Rendered only when Clerk is enabled (so the Clerk hooks always have a provider).
+ * Bridges Clerk auth into the store: on sign-in it hydrates the user's namespaced
+ * localStorage state and probes the shared Neon backend (`GET /api/funnels`) with a
+ * fresh Clerk token on every call — if it responds, funnel mutations sync there too;
+ * otherwise the store stays in plain localStorage mode (see `bridgeClerkSession`).
+ * On sign-out it tears everything down. Rendered only when Clerk is enabled (so the
+ * Clerk hooks always have a provider).
  */
 export default function RemoteBridge() {
   const { isLoaded, isSignedIn, user } = useUser()
@@ -41,12 +42,7 @@ export default function RemoteBridge() {
       return
     }
     const sess = toSession(user)
-    if (remoteEnabled && session) {
-      const sb = getSupabase(async () => (await session.getToken()) ?? null)
-      configureRemote(sb, sess)
-    } else {
-      setBridgedSession(sess)
-    }
+    bridgeClerkSession(sess, { getToken: async () => (session ? ((await session.getToken()) ?? null) : null) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, isSignedIn, user?.id, session?.id])
 

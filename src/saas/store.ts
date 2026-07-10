@@ -1,22 +1,14 @@
 import { useSyncExternalStore } from 'react'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount } from './types'
 import { clerkEnabled } from './config'
+import type { RemoteAuth } from './db/api'
 import {
   listFunnels as rListFunnels,
   createFunnel as rCreateFunnel,
   updateFunnel as rUpdateFunnel,
   deleteFunnel as rDeleteFunnel,
   setLeadStatusRemote as rSetLeadStatus,
-} from './db/remote'
-import {
-  getAgencySettings,
-  listSubAccounts,
-  saveAgencySettingsRemote as rSaveAgencySettings,
-  createSubAccountRemote as rCreateSubAccount,
-  deleteSubAccountRemote as rDeleteSubAccount,
-} from './db/agency'
-import { getOrCreateWorkspace, updateWorkspaceRemote as rUpdateWorkspace } from './db/workspace'
+} from './db/api'
 
 const BASE_KEY = 'virlo:state:v1'
 /** Marks that the one-time anonymous → first-signed-in-user migration has already run. */
@@ -45,13 +37,24 @@ let state: State = empty
 let hydrated = false
 const listeners = new Set<() => void>()
 
-/** When set, mutations persist to Supabase (optimistic) and localStorage is bypassed. */
-let remote: { sb: SupabaseClient } | null = null
+/**
+ * When set, funnel mutations persist to the shared Neon backend (via api/,
+ * optimistic) in addition to localStorage. Set only after a successful probe of
+ * `GET /api/funnels` on sign-in (see `bridgeClerkSession`) — there's no static
+ * client-side signal for "is Neon configured" the way there was for Supabase.
+ *
+ * Session/agency/workspace state is NOT part of this — see `saveAgencySettings` /
+ * `setPlan` / `setRegion` below: those were Supabase-backed before Phase 2 and
+ * weren't carried over to Neon (out of scope; see docs/SETUP.md), so they always
+ * stay in the per-user-namespaced localStorage blob, remote funnels or not.
+ */
+let remote: RemoteAuth | null = null
 
 /**
- * Which localStorage key reads/writes go to. Stays BASE_KEY for anonymous/demo sessions;
- * becomes user-namespaced when a Clerk session is bridged without Supabase configured, so
- * two different Clerk users on one browser never see each other's funnels.
+ * Which localStorage key reads/writes go to. Stays BASE_KEY for anonymous/demo
+ * sessions; becomes user-namespaced once a Clerk session is bridged, so two
+ * different Clerk users on one browser never see each other's funnels/agency
+ * settings/workspace — independent of whether funnels are also Neon-backed.
  */
 let activeKey = BASE_KEY
 
@@ -66,8 +69,11 @@ function load(key: string = activeKey): State {
 }
 
 function persist() {
-  if (remote || typeof window === 'undefined') return // remote mode: DB is the source of truth
+  if (typeof window === 'undefined') return
   try {
+    // Always cache to localStorage, even in remote-funnels mode: session/agency/
+    // workspace have no Neon backing (see `remote` doc above), and a cached copy
+    // of funnels is a harmless bonus (overwritten the moment the Neon list loads).
     window.localStorage.setItem(activeKey, JSON.stringify(state))
   } catch {
     /* ignore quota */
@@ -85,8 +91,8 @@ function set(next: Partial<State>) {
 }
 
 function ensureHydrated() {
-  // Clerk-backed sessions hydrate explicitly (via configureRemote or setBridgedSession),
-  // once the signed-in user (and therefore the right localStorage/Supabase key) is known.
+  // Clerk-backed sessions hydrate explicitly via bridgeClerkSession, once the
+  // signed-in user (and therefore the right localStorage key) is known.
   if (!hydrated && typeof window !== 'undefined' && !clerkEnabled) {
     state = load()
     hydrated = true
@@ -99,9 +105,9 @@ function subscribe(cb: () => void) {
   return () => listeners.delete(cb)
 }
 
-function syncRemote(fn: (sb: SupabaseClient) => Promise<void>) {
+function syncRemote(fn: (auth: RemoteAuth) => Promise<void>) {
   if (!remote) return
-  fn(remote.sb).catch((e) => console.error('[remote sync]', e))
+  fn(remote).catch((e) => console.error('[remote sync]', e))
 }
 
 // ---------- ids ----------
@@ -135,19 +141,19 @@ export function useAgency(): AgencyState {
 }
 
 // ---------- agency / white-label ----------
+// Local-only: agency settings / sub-accounts were Supabase-backed before Phase 2 and
+// weren't carried over to Neon (out of scope for the funnels/leads/publish migration —
+// see docs/SETUP.md). They persist to the per-user-namespaced localStorage blob only.
 export function saveAgencySettings(patch: Partial<AgencySettings>) {
   ensureHydrated()
   const settings: AgencySettings = { hideBadge: true, ...state.agency.settings, ...patch }
   set({ agency: { ...state.agency, settings } })
-  const ownerId = state.session?.user.id
-  if (ownerId) syncRemote((sb) => rSaveAgencySettings(sb, ownerId, settings))
 }
 
 export function createSubAccount(name: string, contactEmail?: string): SubAccount {
   ensureHydrated()
   const sa: SubAccount = { id: uid('sa_'), name, contactEmail, createdAt: Date.now() }
   set({ agency: { ...state.agency, subAccounts: [...state.agency.subAccounts, sa] } })
-  syncRemote((sb) => rCreateSubAccount(sb, sa))
   return sa
 }
 
@@ -155,7 +161,6 @@ export function deleteSubAccount(id: string) {
   ensureHydrated()
   const activeSubAccountId = state.agency.activeSubAccountId === id ? null : state.agency.activeSubAccountId
   set({ agency: { ...state.agency, subAccounts: state.agency.subAccounts.filter((s) => s.id !== id), activeSubAccountId } })
-  syncRemote((sb) => rDeleteSubAccount(sb, id))
 }
 
 export function setActiveSubAccount(id: string | null) {
@@ -164,48 +169,21 @@ export function setActiveSubAccount(id: string | null) {
 }
 
 // ---------- remote lifecycle (called by the Clerk bridge) ----------
-export async function configureRemote(sb: SupabaseClient, session: Session) {
-  remote = { sb }
-  hydrated = true
-  set({ session })
-  try {
-    const [funnels, settings, subAccounts, workspace] = await Promise.all([
-      rListFunnels(sb),
-      getAgencySettings(sb).catch(() => null),
-      listSubAccounts(sb).catch(() => []),
-      getOrCreateWorkspace(sb, session.workspace).catch(() => session.workspace),
-    ])
-    state = { ...state, session: { ...session, workspace }, funnels, agency: { ...state.agency, settings, subAccounts } }
-    emit()
-  } catch (e) {
-    console.error('[remote load]', e)
-  }
-}
-
-export function teardownRemote() {
-  remote = null
-  activeKey = BASE_KEY
-  hydrated = false
-  state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
-  emit()
-}
-
-/** The active Supabase client in remote mode (for feature modules like WhatsApp settings), else null. */
-export function getDb(): SupabaseClient | null {
-  return remote?.sb ?? null
-}
 
 /**
- * Bridge a Clerk identity into the local session shape (demo-parity) without Supabase.
- * Switches localStorage to a key namespaced by the Clerk user id, so two different users
- * signing into the same browser never read/write each other's funnels. The very first
- * time any user signs in on a given browser, pre-existing anonymous/demo data (if any) is
- * migrated into that user's namespace once; later sign-ins (same or different user) never
- * repeat the migration.
+ * Bridges a Clerk identity into the store. Always does the local, per-user-
+ * namespaced hydration first (demo-parity, one-time anonymous→user migration —
+ * same as the old `setBridgedSession`), then probes the Neon backend by calling
+ * `GET /api/funnels`:
+ *  - probe succeeds → remote mode: `state.funnels` is replaced by the Neon list,
+ *    and subsequent funnel mutations sync to `api/` too.
+ *  - probe fails (network error, 501 not-configured, 401, not yet deployed, ...)
+ *    → stays in plain localStorage mode; this is the expected/normal path whenever
+ *    the Neon backend isn't configured, so it's logged with `console.info`, not
+ *    `console.error`.
  */
-export function setBridgedSession(session: Session) {
-  const userId = session.user.id
-  const nsKey = keyFor(userId)
+export async function bridgeClerkSession(session: Session, auth: RemoteAuth) {
+  const nsKey = keyFor(session.user.id)
   activeKey = nsKey
   if (typeof window !== 'undefined') {
     try {
@@ -222,7 +200,30 @@ export function setBridgedSession(session: Session) {
   }
   state = load(nsKey)
   hydrated = true
+  remote = null
   set({ session })
+
+  try {
+    const funnels = await rListFunnels(auth)
+    remote = auth
+    set({ funnels })
+  } catch (e) {
+    console.info('[remote funnels] backend unavailable, staying in localStorage mode:', e instanceof Error ? e.message : e)
+  }
+}
+
+export function teardownRemote() {
+  remote = null
+  activeKey = BASE_KEY
+  hydrated = false
+  state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
+  emit()
+}
+
+/** The active remote auth handle in remote-funnels mode (for feature modules like
+ * WhatsApp settings — none of which have a Neon backing yet), else null. */
+export function getDb(): RemoteAuth | null {
+  return remote
 }
 
 // ---------- auth (demo mode) ----------
@@ -248,17 +249,13 @@ export function signOut() {
 export function setPlan(plan: PlanId) {
   ensureHydrated()
   if (!state.session) return
-  const id = state.session.workspace.id
   set({ session: { ...state.session, workspace: { ...state.session.workspace, plan } } })
-  syncRemote((sb) => rUpdateWorkspace(sb, id, { plan }))
 }
 
 export function setRegion(region: Region) {
   ensureHydrated()
   if (!state.session) return
-  const id = state.session.workspace.id
   set({ session: { ...state.session, workspace: { ...state.session.workspace, region } } })
-  syncRemote((sb) => rUpdateWorkspace(sb, id, { region }))
 }
 
 // ---------- funnels ----------
@@ -275,7 +272,7 @@ export function createFunnel(f: Funnel) {
   while (slugs.has(slug)) slug = `${f.slug}-${i++}`
   const funnel = { ...f, slug, subAccountId: f.subAccountId ?? state.agency.activeSubAccountId ?? undefined }
   set({ funnels: [funnel, ...state.funnels] })
-  syncRemote((sb) => rCreateFunnel(sb, funnel))
+  syncRemote((auth) => rCreateFunnel(auth, funnel))
 }
 
 export function updateFunnel(id: string, patch: Partial<Funnel>) {
@@ -284,7 +281,7 @@ export function updateFunnel(id: string, patch: Partial<Funnel>) {
   // leads are persisted via their own path; don't push them through the funnel row.
   const rest: Partial<Funnel> = { ...patch }
   delete rest.leads
-  syncRemote((sb) => rUpdateFunnel(sb, id, rest))
+  syncRemote((auth) => rUpdateFunnel(auth, id, rest))
 }
 
 export function updateSpec(id: string, mutate: (spec: Funnel['spec']) => Funnel['spec']) {
@@ -297,13 +294,13 @@ export function updateSpec(id: string, mutate: (spec: Funnel['spec']) => Funnel[
       return { ...f, spec: nextSpec, updatedAt: Date.now() }
     }),
   })
-  if (nextSpec) syncRemote((sb) => rUpdateFunnel(sb, id, { spec: nextSpec }))
+  if (nextSpec) syncRemote((auth) => rUpdateFunnel(auth, id, { spec: nextSpec }))
 }
 
 export function deleteFunnel(id: string) {
   ensureHydrated()
   set({ funnels: state.funnels.filter((f) => f.id !== id) })
-  syncRemote((sb) => rDeleteFunnel(sb, id))
+  syncRemote((auth) => rDeleteFunnel(auth, id))
 }
 
 export function publishFunnel(id: string) {
@@ -329,7 +326,7 @@ export function setLeadStatus(funnelId: string, leadId: string, status: Lead['st
       f.id === funnelId ? { ...f, leads: f.leads.map((l) => (l.id === leadId ? { ...l, status } : l)) } : f,
     ),
   })
-  syncRemote((sb) => rSetLeadStatus(sb, leadId, status))
+  syncRemote((auth) => rSetLeadStatus(auth, leadId, status))
 }
 
 /** Seed demo leads so the CRM/analytics never look empty. Demo mode only. */

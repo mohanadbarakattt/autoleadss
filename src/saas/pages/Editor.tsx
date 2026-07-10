@@ -267,13 +267,16 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
 
   useEffect(() => {
     const sb = getDb()
-    if (!sb) return
+    // Custom domains aren't migrated to the Neon backend yet (remoteEnabled is
+    // hardcoded false — see src/saas/config.ts); skip the call entirely rather than
+    // hitting a stub that always throws/returns empty.
+    if (!sb || !remoteEnabled) return
     listDomains(sb, funnel.id).then(setDomains).catch(() => {})
   }, [funnel.id])
 
   async function add() {
     const sb = getDb()
-    if (!sb || !host.trim()) return
+    if (!sb || !remoteEnabled || !host.trim()) return
     setBusy(true)
     try {
       await addDomain(sb, funnel.id, host)
@@ -286,7 +289,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
   }
   async function remove(domId: string) {
     const sb = getDb()
-    if (!sb) return
+    if (!sb || !remoteEnabled) return
     await deleteDomain(sb, domId)
     setDomains(await listDomains(sb, funnel.id))
   }
@@ -310,7 +313,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
       <div className="mt-4 rounded-2xl border border-border bg-card p-6">
         <p className="font-display font-semibold">{isRTL ? 'نطاق مخصّص' : 'Custom domain'}</p>
         {!remoteEnabled ? (
-          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة تُفعّل بعد ربط قاعدة البيانات (Phase 3). راجع docs/SETUP.md.' : 'Custom domains activate once the database is connected (Phase 3). See docs/SETUP.md.'}</p>
+          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة غير متاحة بعد في هذا الإصدار. راجع docs/SETUP.md.' : 'Custom domains aren’t available yet in this version. See docs/SETUP.md.'}</p>
         ) : (
           <>
             <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أضف نطاقك ثم وجّه سجل CNAME إلى cname.vercel-dns.com' : 'Add your domain, then point a CNAME record to cname.vercel-dns.com'}</p>
