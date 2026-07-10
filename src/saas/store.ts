@@ -18,7 +18,14 @@ import {
 } from './db/agency'
 import { getOrCreateWorkspace, updateWorkspaceRemote as rUpdateWorkspace } from './db/workspace'
 
-const KEY = 'virlo:state:v1'
+const BASE_KEY = 'virlo:state:v1'
+/** Marks that the one-time anonymous → first-signed-in-user migration has already run. */
+const MIGRATED_FLAG = 'virlo:state:v1:migrated'
+
+/** localStorage key for a given Clerk user id (undefined/null = anonymous/demo key). */
+function keyFor(userId?: string | null): string {
+  return userId ? `${BASE_KEY}:${userId}` : BASE_KEY
+}
 
 interface AgencyState {
   settings: AgencySettings | null
@@ -41,10 +48,17 @@ const listeners = new Set<() => void>()
 /** When set, mutations persist to Supabase (optimistic) and localStorage is bypassed. */
 let remote: { sb: SupabaseClient } | null = null
 
-function load(): State {
+/**
+ * Which localStorage key reads/writes go to. Stays BASE_KEY for anonymous/demo sessions;
+ * becomes user-namespaced when a Clerk session is bridged without Supabase configured, so
+ * two different Clerk users on one browser never see each other's funnels.
+ */
+let activeKey = BASE_KEY
+
+function load(key: string = activeKey): State {
   if (typeof window === 'undefined') return empty
   try {
-    const raw = window.localStorage.getItem(KEY)
+    const raw = window.localStorage.getItem(key)
     return raw ? { ...empty, ...JSON.parse(raw) } : empty
   } catch {
     return empty
@@ -54,7 +68,7 @@ function load(): State {
 function persist() {
   if (remote || typeof window === 'undefined') return // remote mode: DB is the source of truth
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(state))
+    window.localStorage.setItem(activeKey, JSON.stringify(state))
   } catch {
     /* ignore quota */
   }
@@ -71,7 +85,8 @@ function set(next: Partial<State>) {
 }
 
 function ensureHydrated() {
-  // Clerk-backed sessions load from Supabase (via configureRemote), never localStorage.
+  // Clerk-backed sessions hydrate explicitly (via configureRemote or setBridgedSession),
+  // once the signed-in user (and therefore the right localStorage/Supabase key) is known.
   if (!hydrated && typeof window !== 'undefined' && !clerkEnabled) {
     state = load()
     hydrated = true
@@ -169,6 +184,8 @@ export async function configureRemote(sb: SupabaseClient, session: Session) {
 
 export function teardownRemote() {
   remote = null
+  activeKey = BASE_KEY
+  hydrated = false
   state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
   emit()
 }
@@ -178,8 +195,33 @@ export function getDb(): SupabaseClient | null {
   return remote?.sb ?? null
 }
 
-/** Bridge a Clerk identity into the local session shape (demo-parity) without Supabase. */
-export function setBridgedSession(session: Session | null) {
+/**
+ * Bridge a Clerk identity into the local session shape (demo-parity) without Supabase.
+ * Switches localStorage to a key namespaced by the Clerk user id, so two different users
+ * signing into the same browser never read/write each other's funnels. The very first
+ * time any user signs in on a given browser, pre-existing anonymous/demo data (if any) is
+ * migrated into that user's namespace once; later sign-ins (same or different user) never
+ * repeat the migration.
+ */
+export function setBridgedSession(session: Session) {
+  const userId = session.user.id
+  const nsKey = keyFor(userId)
+  activeKey = nsKey
+  if (typeof window !== 'undefined') {
+    try {
+      const alreadyMigrated = window.localStorage.getItem(MIGRATED_FLAG)
+      const nsRaw = window.localStorage.getItem(nsKey)
+      if (!nsRaw && !alreadyMigrated) {
+        const anonRaw = window.localStorage.getItem(BASE_KEY)
+        if (anonRaw) window.localStorage.setItem(nsKey, anonRaw)
+      }
+      window.localStorage.setItem(MIGRATED_FLAG, '1')
+    } catch {
+      /* ignore quota/storage errors — falls back to an empty namespaced state */
+    }
+  }
+  state = load(nsKey)
+  hydrated = true
   set({ session })
 }
 

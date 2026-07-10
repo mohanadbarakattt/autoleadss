@@ -30,8 +30,13 @@ Routing: landing copy → Sonnet/Fable, ads+social → Sonnet, WhatsApp bot → 
 ## Phase 3 — Database & Clerk auth  ✅ code shipped
 
 Funnels/leads persist to Supabase (RLS-scoped by Clerk user id), with optimistic UI and a
-localStorage fallback. Auth is Clerk. All gated: set the three env vars and it activates;
-without them the app stays in demo mode.
+per-user-namespaced localStorage fallback when Supabase isn't configured. Auth is Clerk.
+All gated: set the env vars and it activates; without them the app stays in demo mode.
+
+`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is the canonical shared variable name across every MBAI
+product (see `~/projects/mbai-ecosystem/docs/ENV-CONTRACT.md`) — never rename it or add a
+`VITE_` variant. This repo is a pure client-side SPA and needs only the publishable key;
+`CLERK_SECRET_KEY` is server-only and must never be added here.
 
 **Go live:**
 1. **Clerk** → create an app at https://clerk.com, copy the **Publishable key**.
@@ -41,14 +46,17 @@ without them the app stays in demo mode.
    ```bash
    supabase db push          # runs supabase/migrations/0001_saas.sql
    ```
-4. Add env vars to **Vercel** (and `.env` locally), then redeploy:
+4. Add env vars to **Vercel** (and `.env.local` locally), then redeploy:
    ```
-   VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxxx
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxxx
    VITE_SUPABASE_URL=...            # already set
    VITE_SUPABASE_PUBLISHABLE_KEY=... # already set
    ```
 Now `/login` /`/signup` use Clerk, funnels persist per-user in Postgres (RLS enforced), and the
 public `/p/:slug` page reads + captures leads via SECURITY DEFINER RPCs (no broad table access).
+If Supabase isn't configured, funnels still work — persisted to localStorage under a key
+namespaced by the Clerk user id, with any pre-existing anonymous/demo data migrated once to
+the first user who signs in on that browser.
 
 _Note: workspace plan/region sync to the DB lands with Phase 4 (billing)._
 
@@ -169,9 +177,10 @@ a full cross-tenant admin console (service-role dashboards); SSR/prerender for o
 
 ---
 
-### Env reference (`.env` / Vercel)
+### Env reference (`.env.local` / Vercel)
 | Var | Used by | Status |
 |---|---|---|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk auth (`/login`, `/signup`, `/app`) | ⛔ add to go live |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | client + edge calls | ✅ set |
 | `ANTHROPIC_API_KEY` (Supabase secret) | `generate-funnel` | ⛔ add to go live |
 | `ANTHROPIC_MODEL_*` (Supabase secret) | model routing | optional |
