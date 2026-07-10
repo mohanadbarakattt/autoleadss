@@ -92,7 +92,7 @@ function AgencyInner() {
       {/* sub-accounts */}
       <div className="mt-6 rounded-2xl border border-border bg-card p-6">
         <p className="mb-1 font-display font-semibold">{isRTL ? 'حسابات العملاء' : 'Client sub-accounts'}</p>
-        <p className="mb-4 text-sm text-muted-fg">{isRTL ? 'افصل قمم كل عميل. القمم الجديدة تُسنَد للحساب النشط.' : 'Separate each client’s funnels. New funnels attach to the active account.'}</p>
+        <p className="mb-4 text-sm text-muted-fg">{isRTL ? 'افصل أقماع كل عميل. الأقماع الجديدة تُسنَد للحساب النشط.' : 'Separate each client’s funnels. New funnels attach to the active account.'}</p>
 
         <div className="flex flex-col gap-2.5 sm:flex-row">
           <input value={subName} onChange={(e) => setSubName(e.target.value)} placeholder={isRTL ? 'اسم العميل' : 'Client name'} className={input} />
@@ -117,7 +117,7 @@ function SubRow({ active, onSelect, onDelete, name, email, count, isRTL, allRow 
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10"><Users size={16} className="text-accent" /></span>
       <button onClick={onSelect} className="flex-1 text-start">
         <p className="text-sm font-semibold text-foreground">{name}</p>
-        <p className="text-xs text-muted-fg">{email ? `${email} · ` : ''}{count} {isRTL ? 'قمع' : count === 1 ? 'funnel' : 'funnels'}</p>
+        <p className="text-xs text-muted-fg">{email ? `${email} · ` : ''}{count} {isRTL ? (count === 1 ? 'قمع' : 'أقماع') : count === 1 ? 'funnel' : 'funnels'}</p>
       </button>
       {active && <span className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-semibold text-white">{isRTL ? 'نشط' : 'Active'}</span>}
       {!allRow && onDelete && <button onClick={onDelete} className="text-muted-fg hover:text-red-500"><Trash2 size={14} /></button>}

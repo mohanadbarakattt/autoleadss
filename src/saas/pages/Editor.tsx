@@ -298,7 +298,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
     <div className="mx-auto max-w-2xl">
       <div className="rounded-2xl border border-border bg-card p-6">
         <p className="font-display font-semibold">{isRTL ? 'النطاق الفرعي المجاني' : 'Free subdomain'}</p>
-        <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'قممك المنشورة متاحة هنا فوراً.' : 'Your published funnel goes live here.'}</p>
+        <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أقماعك المنشورة متاحة هنا فوراً.' : 'Your published funnel goes live here.'}</p>
         <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
           <Globe size={14} className="text-accent" />
           <code className="flex-1 text-sm" dir="ltr">{subdomain}</code>
@@ -313,7 +313,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
       <div className="mt-4 rounded-2xl border border-border bg-card p-6">
         <p className="font-display font-semibold">{isRTL ? 'نطاق مخصّص' : 'Custom domain'}</p>
         {!remoteEnabled ? (
-          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة غير متاحة بعد في هذا الإصدار. راجع docs/SETUP.md.' : 'Custom domains aren’t available yet in this version. See docs/SETUP.md.'}</p>
+          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة غير متاحة بعد — قريباً.' : 'Custom domains aren’t available yet in this version — coming soon.'}</p>
         ) : (
           <>
             <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أضف نطاقك ثم وجّه سجل CNAME إلى cname.vercel-dns.com' : 'Add your domain, then point a CNAME record to cname.vercel-dns.com'}</p>
@@ -331,7 +331,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-xs text-muted-fg">{isRTL ? 'أضف النطاق أيضاً في مشروع Vercel ليصدر شهادة SSL.' : 'Also add the domain in your Vercel project so it issues an SSL cert (see docs/SETUP.md).'}</p>
+            <p className="mt-3 text-xs text-muted-fg">{isRTL ? 'أضف النطاق أيضاً في مشروع الاستضافة ليصدر شهادة SSL.' : 'Also add the domain in your hosting project so it issues an SSL cert.'}</p>
           </>
         )}
       </div>

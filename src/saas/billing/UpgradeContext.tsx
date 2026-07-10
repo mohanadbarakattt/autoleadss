@@ -10,9 +10,9 @@ import { planName, TIERS, priceFor } from '../pricing'
 type Reason = Feature | 'maxFunnels'
 
 const COPY: Record<Reason, { en: [string, string]; ar: [string, string] }> = {
-  maxFunnels: { en: ['You’ve hit your funnel limit', 'Upgrade to build more funnels and scale your pipeline.'], ar: ['وصلت إلى حدّ القمم', 'رقِّ باقتك لبناء المزيد من القمم وتوسيع مبيعاتك.'] },
+  maxFunnels: { en: ['You’ve hit your funnel limit', 'Upgrade to build more funnels and scale your pipeline.'], ar: ['وصلت إلى حدّ الأقماع', 'رقِّ باقتك لبناء المزيد من الأقماع وتوسيع مبيعاتك.'] },
   whatsappBot: { en: ['WhatsApp AI bot is a Growth feature', 'Answer every lead in seconds, 24/7 — upgrade to switch it on.'], ar: ['بوت واتساب من مزايا Growth', 'ردّ على كل عميل خلال ثوانٍ، 24/7 — رقِّ لتفعيله.'] },
-  removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل قممك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
+  removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل أقماعك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
   adSocialGen: { en: ['Ad & social generation is a Growth feature', 'Generate ready-to-run ads and social posts — upgrade to unlock.'], ar: ['توليد الإعلانات والسوشيال من Growth', 'ولّد إعلانات ومنشورات جاهزة — رقِّ لفتحها.'] },
   priorityAI: { en: ['Priority AI is a Pro feature', 'Faster generations and advanced analytics — upgrade to Pro.'], ar: ['الذكاء الاصطناعي بأولوية من Pro', 'توليد أسرع وتحليلات متقدّمة — رقِّ إلى Pro.'] },
   whiteLabel: { en: ['White-label is an Agency plan', 'Resell AutoLeadss as your own with sub-accounts and your branding.'], ar: ['وايت ليبل من باقة الوكالات', 'أعد بيع AutoLeadss باسمك مع حسابات فرعية وهويتك.'] },

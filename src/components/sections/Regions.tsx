@@ -28,7 +28,7 @@ export default function Regions() {
       {/* ambient glow */}
       <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: 'radial-gradient(ellipse 60% 50% at 70% 45%, rgba(255,92,42,0.18) 0%, transparent 70%)' }} />
       <div className="content-width relative z-10">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[38%_62%]">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[38fr_62fr]">
           {/* copy */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -65,7 +65,7 @@ function DashboardInner() {
       {ent.maxFunnels !== Infinity && (
         <div className="mt-4 rounded-2xl border border-border bg-card p-5">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium">{isRTL ? 'استهلاك القمم' : 'Funnel usage'}</span>
+            <span className="font-medium">{isRTL ? 'استهلاك الأقماع' : 'Funnel usage'}</span>
             <span className="text-muted-fg">{allFunnels.length} / {ent.maxFunnels}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -73,7 +73,7 @@ function DashboardInner() {
           </div>
           {atCap && (
             <button onClick={() => openUpgrade('maxFunnels')} className="mt-3 text-xs font-medium text-accent hover:underline">
-              {isRTL ? 'رقِّ لمزيد من القمم ←' : 'Upgrade for more funnels →'}
+              {isRTL ? 'رقِّ لمزيد من الأقماع ←' : 'Upgrade for more funnels →'}
             </button>
           )}
         </div>

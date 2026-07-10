@@ -10,9 +10,14 @@ import {
   setLeadStatusRemote as rSetLeadStatus,
 } from './db/api'
 
-const BASE_KEY = 'virlo:state:v1'
+const BASE_KEY = 'autoleadss:state:v1'
 /** Marks that the one-time anonymous → first-signed-in-user migration has already run. */
-const MIGRATED_FLAG = 'virlo:state:v1:migrated'
+const MIGRATED_FLAG = 'autoleadss:state:v1:migrated'
+
+/** Pre-rebrand keys (this SaaS was ported from the "Virlo" project name). Read-only —
+ * `load()` falls back to these so existing users' data survives the rename below. */
+const LEGACY_BASE_KEY = 'virlo:state:v1'
+const LEGACY_MIGRATED_FLAG = 'virlo:state:v1:migrated'
 
 /** localStorage key for a given Clerk user id (undefined/null = anonymous/demo key). */
 function keyFor(userId?: string | null): string {
@@ -58,10 +63,31 @@ let remote: RemoteAuth | null = null
  */
 let activeKey = BASE_KEY
 
+/** For the anonymous/demo key only, a legacy 'virlo:*' key holding the same data may
+ * still exist from before the rename — read it once and copy it forward so existing
+ * users don't lose their funnels. Per-user-namespaced keys never had a legacy form
+ * (Clerk auth + the Neon backend both post-date the rename), so no lookup needed there. */
+function legacyKeyFor(key: string): string | null {
+  if (key === BASE_KEY) return LEGACY_BASE_KEY
+  return null
+}
+
 function load(key: string = activeKey): State {
   if (typeof window === 'undefined') return empty
   try {
-    const raw = window.localStorage.getItem(key)
+    let raw = window.localStorage.getItem(key)
+    if (!raw) {
+      const legacyKey = legacyKeyFor(key)
+      const legacyRaw = legacyKey ? window.localStorage.getItem(legacyKey) : null
+      if (legacyRaw) {
+        raw = legacyRaw
+        try {
+          window.localStorage.setItem(key, legacyRaw)
+        } catch {
+          /* ignore quota/storage errors — still usable in-memory this session */
+        }
+      }
+    }
     return raw ? { ...empty, ...JSON.parse(raw) } : empty
   } catch {
     return empty
@@ -187,10 +213,10 @@ export async function bridgeClerkSession(session: Session, auth: RemoteAuth) {
   activeKey = nsKey
   if (typeof window !== 'undefined') {
     try {
-      const alreadyMigrated = window.localStorage.getItem(MIGRATED_FLAG)
+      const alreadyMigrated = window.localStorage.getItem(MIGRATED_FLAG) || window.localStorage.getItem(LEGACY_MIGRATED_FLAG)
       const nsRaw = window.localStorage.getItem(nsKey)
       if (!nsRaw && !alreadyMigrated) {
-        const anonRaw = window.localStorage.getItem(BASE_KEY)
+        const anonRaw = window.localStorage.getItem(BASE_KEY) || window.localStorage.getItem(LEGACY_BASE_KEY)
         if (anonRaw) window.localStorage.setItem(nsKey, anonRaw)
       }
       window.localStorage.setItem(MIGRATED_FLAG, '1')

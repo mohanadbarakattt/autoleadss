@@ -49,7 +49,7 @@ const STRINGS = {
       of: 'of',
       industryQ: 'What kind of business is this?',
       nameQ: 'What’s your business called?',
-      namePh: 'e.g. Marina Heights Realty',
+      namePh: 'e.g. Marina Heights Realty', // fallback only — the wizard actually shows an industry-specific placeholder (see industries.ts)
       langQ: 'Which language should the funnel be in?',
       regionQ: 'Where are your customers?',
       goalQ: 'What’s the #1 goal of this funnel?',
@@ -168,11 +168,11 @@ const STRINGS = {
     },
     tones: { bold: 'جريء', friendly: 'ودّي', luxury: 'فاخر', professional: 'احترافي' },
     dash: {
-      title: 'قممك',
-      empty: 'لا توجد قمم بعد',
+      title: 'أقماعك',
+      empty: 'لا توجد أقماع بعد',
       emptySub: 'أنشئ أول قمع مبيعات بالذكاء الاصطناعي في أقل من دقيقة.',
       overview: 'نظرة عامة',
-      totalFunnels: 'القمم',
+      totalFunnels: 'الأقماع',
       totalLeads: 'إجمالي العملاء',
       totalVisits: 'إجمالي الزيارات',
       live: 'مباشر',
@@ -207,12 +207,31 @@ export type Dict = (typeof STRINGS)['en']
 
 const Ctx = createContext<{ locale: Locale; t: Dict; setLocale: (l: Locale) => void; isRTL: boolean } | null>(null)
 
+const LOCALE_KEY = 'autoleadss:locale'
+/** Pre-rebrand key (this SaaS was ported from the "Virlo" project name). Read-only —
+ * we migrate it into LOCALE_KEY on first load so returning users keep their choice. */
+const LEGACY_LOCALE_KEY = 'virlo:locale'
+
+function readStoredLocale(): Locale | null {
+  if (typeof window === 'undefined') return null
+  const saved = window.localStorage.getItem(LOCALE_KEY)
+  if (saved === 'ar' || saved === 'en') return saved
+  const legacy = window.localStorage.getItem(LEGACY_LOCALE_KEY)
+  if (legacy === 'ar' || legacy === 'en') {
+    try {
+      window.localStorage.setItem(LOCALE_KEY, legacy)
+    } catch {}
+    return legacy
+  }
+  return null
+}
+
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en')
 
   useEffect(() => {
-    const saved = (typeof window !== 'undefined' && window.localStorage.getItem('virlo:locale')) as Locale | null
-    if (saved === 'ar' || saved === 'en') setLocaleState(saved)
+    const saved = readStoredLocale()
+    if (saved) setLocaleState(saved)
   }, [])
 
   useEffect(() => {
@@ -224,7 +243,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const setLocale = (l: Locale) => {
     setLocaleState(l)
     try {
-      window.localStorage.setItem('virlo:locale', l)
+      window.localStorage.setItem(LOCALE_KEY, l)
     } catch {}
   }
 

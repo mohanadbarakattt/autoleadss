@@ -25,9 +25,9 @@ export const MbaiBadge: React.FC<MbaiBadgeProps> = ({ variant = 'light', classNa
       style={{ display: 'inline-flex', textDecoration: 'none' }}
     >
       <svg
-        width="150"
+        width="182"
         height="28"
-        viewBox="0 0 150 28"
+        viewBox="0 0 182 28"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         role="img"

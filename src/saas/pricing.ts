@@ -32,13 +32,13 @@ export const TIERS: Tier[] = [
   },
   {
     id: 'growth',
-    name: { en: 'Growth', ar: 'جروث' },
+    name: { en: 'Growth', ar: 'Growth' },
     priceEgypt: '3,000 EGP',
     priceGulf: '$149',
     popular: true,
     tagline: { en: 'Scale what works.', ar: 'وسّع ما ينجح.' },
     features: [
-      { en: '5 funnels', ar: '5 قمم' },
+      { en: '5 funnels', ar: '5 أقماع' },
       { en: 'WhatsApp AI bot', ar: 'بوت واتساب ذكي' },
       { en: 'Ad + social generation', ar: 'توليد إعلانات وسوشيال' },
       { en: 'Remove badge · CRM · A/B test', ar: 'إزالة الشارة · CRM · اختبار A/B' },
@@ -51,7 +51,7 @@ export const TIERS: Tier[] = [
     priceGulf: '$349',
     tagline: { en: 'Maximum output.', ar: 'أقصى إنتاجية.' },
     features: [
-      { en: 'Unlimited funnels', ar: 'قمم غير محدودة' },
+      { en: 'Unlimited funnels', ar: 'أقماع غير محدودة' },
       { en: 'Team seats', ar: 'مقاعد للفريق' },
       { en: 'Priority AI + analytics', ar: 'ذكاء اصطناعي أولوية + تحليلات' },
       { en: 'Integrations', ar: 'تكاملات' },

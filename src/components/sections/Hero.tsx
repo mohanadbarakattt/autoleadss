@@ -77,7 +77,7 @@ export default function Hero() {
       </div>
 
       <div className="content-width relative z-10 min-h-screen flex flex-col justify-center pt-32 pb-10 md:pt-36">
-        <div className="grid grid-cols-1 lg:grid-cols-[54%_46%] gap-14 lg:gap-8 items-center flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-[54fr_46fr] gap-14 lg:gap-8 items-center flex-1">
           {/* ── Copy ── */}
           <div className="flex flex-col gap-7">
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show"

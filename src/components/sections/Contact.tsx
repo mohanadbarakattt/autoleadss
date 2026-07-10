@@ -107,7 +107,7 @@ export default function Contact() {
   return (
     <section id="contact" className="section-padding bg-background">
       <div className="content-width">
-        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[42%_58%] md:gap-14">
+        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[42fr_58fr] md:gap-14">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}

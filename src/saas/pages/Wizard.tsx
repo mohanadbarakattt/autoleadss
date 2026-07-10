@@ -8,7 +8,7 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n } from '../i18n'
 import { useSession, useFunnels, createFunnel, seedDemoLeads, uid, slugify } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
-import { INDUSTRIES } from '../industries'
+import { INDUSTRIES, industryNamePlaceholder } from '../industries'
 import { generateFunnel } from '../ai/generateLive'
 import type { Industry, Tone, WizardInput, FunnelSpec, Funnel } from '../types'
 
@@ -155,7 +155,7 @@ export default function Wizard() {
 
               {step === 1 && (
                 <StepWrap title={t.wizard.nameQ}>
-                  <input autoFocus value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder={t.wizard.namePh} className="w-full rounded-xl border border-border bg-card px-5 py-4 font-display text-xl font-semibold outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+                  <input autoFocus value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder={industryNamePlaceholder(industry, locale)} className="w-full rounded-xl border border-border bg-card px-5 py-4 font-display text-xl font-semibold outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
                   <div className="mt-6">
                     <p className="mb-2 text-xs font-medium text-muted-fg">{t.wizard.langQ}</p>
                     <div className="grid grid-cols-2 gap-2">

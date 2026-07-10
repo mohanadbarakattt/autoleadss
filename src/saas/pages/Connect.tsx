@@ -100,7 +100,7 @@ function ConnectInner() {
 
       {!remoteEnabled && (
         <p className="mt-6 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          {isRTL ? 'وضع العرض: حفظ إعدادات واتساب غير متاح بعد في هذا الإصدار. راجع docs/SETUP.md.' : 'Demo mode: saving a WhatsApp connection isn’t available yet in this version. See docs/SETUP.md.'}
+          {isRTL ? 'وضع العرض: حفظ إعدادات واتساب غير متاح بعد — قريباً.' : 'Demo mode: saving a WhatsApp connection isn’t available yet — coming soon.'}
         </p>
       )}
 
