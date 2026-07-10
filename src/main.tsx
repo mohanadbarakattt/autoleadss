@@ -16,6 +16,7 @@ import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import Editor from './saas/pages/Editor'
 import Connect from './saas/pages/Connect'
+import Agency from './saas/pages/Agency'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
 
@@ -53,6 +54,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/funnel/:id" element={withSaas(<Editor />)} />
           <Route path="/app/connect" element={withSaas(<Connect />)} />
+          <Route path="/app/agency" element={withSaas(<Agency />)} />
 
           {/* Published funnels */}
           <Route path="/p/:slug" element={withSaas(<Published />)} />

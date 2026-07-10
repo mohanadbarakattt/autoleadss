@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { useI18n } from '../i18n'
-import { useFunnels } from '../store'
+import { useFunnels, useAgency } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 
@@ -17,12 +17,14 @@ export default function Dashboard() {
 
 function DashboardInner() {
   const { t, locale, isRTL } = useI18n()
-  const funnels = useFunnels()
+  const allFunnels = useFunnels()
+  const { activeSubAccountId } = useAgency()
+  const funnels = activeSubAccountId ? allFunnels.filter((f) => f.subAccountId === activeSubAccountId) : allFunnels
   const navigate = useNavigate()
   const ent = useEntitlements()
   const openUpgrade = useUpgrade()
 
-  const atCap = funnels.length >= ent.maxFunnels
+  const atCap = allFunnels.length >= ent.maxFunnels
   function handleNew() {
     if (atCap) openUpgrade('maxFunnels')
     else navigate('/app/new')
@@ -64,10 +66,10 @@ function DashboardInner() {
         <div className="mt-4 rounded-2xl border border-border bg-card p-5">
           <div className="mb-2 flex items-center justify-between text-sm">
             <span className="font-medium">{isRTL ? 'استهلاك القمم' : 'Funnel usage'}</span>
-            <span className="text-muted-fg">{funnels.length} / {ent.maxFunnels}</span>
+            <span className="text-muted-fg">{allFunnels.length} / {ent.maxFunnels}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${Math.min(100, (funnels.length / ent.maxFunnels) * 100)}%` }} />
+            <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${Math.min(100, (allFunnels.length / ent.maxFunnels) * 100)}%` }} />
           </div>
           {atCap && (
             <button onClick={() => openUpgrade('maxFunnels')} className="mt-3 text-xs font-medium text-accent hover:underline">

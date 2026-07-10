@@ -133,7 +133,20 @@ host-based rendering (subdomains + custom domains) and SEO/OG meta on published 
 
 _SSR is not enabled (SPA) — helmet meta covers OG/unfurls and basic SEO; add prerender/SSR in Phase 8 if organic SEO becomes a priority._
 
-## Phase 7 — White-label / agency mode
+## Phase 7 — White-label / agency mode  ✅ code shipped
+
+Agencies on the **white-label** plan get client **sub-accounts** + their own **branding**.
+Managed at **/app/agency** (gated to the whitelabel plan). New funnels attach to the active
+sub-account; the dashboard filters by it; the published-page badge respects the agency's
+branding (hide, or "Made with {brand}").
+
+- Apply the migration: `supabase db push` (adds `0004_agency.sql` — `agency_settings`,
+  `sub_accounts`, `funnels.sub_account_id`, RLS).
+- Set a workspace to the whitelabel plan (via billing / admin) to unlock the Agency tab.
+
+_Follow-ups (Phase 8): propagate agency branding to remote public pages (embed brand in the
+published payload), per-sub-account seats/roles, and reseller billing rails._
+
 ## Phase 8 — Analytics, admin, hardening
 
 ---

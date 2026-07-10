@@ -59,6 +59,23 @@ export interface Funnel {
   updatedAt: number
   visits: number
   leads: Lead[]
+  subAccountId?: string
+}
+
+/** White-label branding for an agency (tier D). */
+export interface AgencySettings {
+  brandName?: string
+  accent?: string
+  logoUrl?: string
+  hideBadge: boolean
+}
+
+/** A client account managed by a white-label agency. */
+export interface SubAccount {
+  id: string
+  name: string
+  contactEmail?: string
+  createdAt: number
 }
 
 export interface Workspace {

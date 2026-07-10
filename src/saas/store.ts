@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Funnel, Lead, Session, Workspace, User, PlanId, Region } from './types'
+import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount } from './types'
 import { clerkEnabled } from './config'
 import {
   listFunnels as rListFunnels,
@@ -9,15 +9,29 @@ import {
   deleteFunnel as rDeleteFunnel,
   setLeadStatusRemote as rSetLeadStatus,
 } from './db/remote'
+import {
+  getAgencySettings,
+  listSubAccounts,
+  saveAgencySettingsRemote as rSaveAgencySettings,
+  createSubAccountRemote as rCreateSubAccount,
+  deleteSubAccountRemote as rDeleteSubAccount,
+} from './db/agency'
 
 const KEY = 'virlo:state:v1'
+
+interface AgencyState {
+  settings: AgencySettings | null
+  subAccounts: SubAccount[]
+  activeSubAccountId: string | null
+}
 
 interface State {
   session: Session | null
   funnels: Funnel[]
+  agency: AgencyState
 }
 
-const empty: State = { session: null, funnels: [] }
+const empty: State = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
 
 let state: State = empty
 let hydrated = false
@@ -100,14 +114,51 @@ export function useFunnel(id: string): Funnel | undefined {
   return useFunnels().find((f) => f.id === id)
 }
 
+export function useAgency(): AgencyState {
+  return useSyncExternalStore(subscribe, () => state.agency, () => empty.agency)
+}
+
+// ---------- agency / white-label ----------
+export function saveAgencySettings(patch: Partial<AgencySettings>) {
+  ensureHydrated()
+  const settings: AgencySettings = { hideBadge: true, ...state.agency.settings, ...patch }
+  set({ agency: { ...state.agency, settings } })
+  const ownerId = state.session?.user.id
+  if (ownerId) syncRemote((sb) => rSaveAgencySettings(sb, ownerId, settings))
+}
+
+export function createSubAccount(name: string, contactEmail?: string): SubAccount {
+  ensureHydrated()
+  const sa: SubAccount = { id: uid('sa_'), name, contactEmail, createdAt: Date.now() }
+  set({ agency: { ...state.agency, subAccounts: [...state.agency.subAccounts, sa] } })
+  syncRemote((sb) => rCreateSubAccount(sb, sa))
+  return sa
+}
+
+export function deleteSubAccount(id: string) {
+  ensureHydrated()
+  const activeSubAccountId = state.agency.activeSubAccountId === id ? null : state.agency.activeSubAccountId
+  set({ agency: { ...state.agency, subAccounts: state.agency.subAccounts.filter((s) => s.id !== id), activeSubAccountId } })
+  syncRemote((sb) => rDeleteSubAccount(sb, id))
+}
+
+export function setActiveSubAccount(id: string | null) {
+  ensureHydrated()
+  set({ agency: { ...state.agency, activeSubAccountId: id } })
+}
+
 // ---------- remote lifecycle (called by the Clerk bridge) ----------
 export async function configureRemote(sb: SupabaseClient, session: Session) {
   remote = { sb }
   hydrated = true
   set({ session })
   try {
-    const funnels = await rListFunnels(sb)
-    state = { ...state, funnels }
+    const [funnels, settings, subAccounts] = await Promise.all([
+      rListFunnels(sb),
+      getAgencySettings(sb).catch(() => null),
+      listSubAccounts(sb).catch(() => []),
+    ])
+    state = { ...state, funnels, agency: { ...state.agency, settings, subAccounts } }
     emit()
   } catch (e) {
     console.error('[remote load]', e)
@@ -116,7 +167,7 @@ export async function configureRemote(sb: SupabaseClient, session: Session) {
 
 export function teardownRemote() {
   remote = null
-  state = { session: null, funnels: [] }
+  state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
   emit()
 }
 
@@ -174,7 +225,7 @@ export function createFunnel(f: Funnel) {
   let slug = f.slug
   let i = 2
   while (slugs.has(slug)) slug = `${f.slug}-${i++}`
-  const funnel = { ...f, slug }
+  const funnel = { ...f, slug, subAccountId: f.subAccountId ?? state.agency.activeSubAccountId ?? undefined }
   set({ funnels: [funnel, ...state.funnels] })
   syncRemote((sb) => rCreateFunnel(sb, funnel))
 }

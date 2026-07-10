@@ -15,6 +15,7 @@ const COPY: Record<Reason, { en: [string, string]; ar: [string, string] }> = {
   removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل قممك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
   adSocialGen: { en: ['Ad & social generation is a Growth feature', 'Generate ready-to-run ads and social posts — upgrade to unlock.'], ar: ['توليد الإعلانات والسوشيال من Growth', 'ولّد إعلانات ومنشورات جاهزة — رقِّ لفتحها.'] },
   priorityAI: { en: ['Priority AI is a Pro feature', 'Faster generations and advanced analytics — upgrade to Pro.'], ar: ['الذكاء الاصطناعي بأولوية من Pro', 'توليد أسرع وتحليلات متقدّمة — رقِّ إلى Pro.'] },
+  whiteLabel: { en: ['White-label is an Agency plan', 'Resell AutoLeadss as your own with sub-accounts and your branding.'], ar: ['وايت ليبل من باقة الوكالات', 'أعد بيع AutoLeadss باسمك مع حسابات فرعية وهويتك.'] },
 }
 
 const Ctx = createContext<{ openUpgrade: (r: Reason) => void } | null>(null)

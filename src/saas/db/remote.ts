@@ -18,6 +18,7 @@ interface FunnelRow {
   visits: number | null
   created_at: string | null
   updated_at: string | null
+  sub_account_id?: string | null
   leads?: LeadRow[] | null
 }
 
@@ -83,6 +84,7 @@ function funnelFromRow(r: FunnelRow): Funnel {
     visits: r.visits ?? 0,
     createdAt: toMillis(r.created_at),
     updatedAt: toMillis(r.updated_at),
+    subAccountId: r.sub_account_id ?? undefined,
     leads,
   }
 }
@@ -100,10 +102,11 @@ function funnelToRow(patch: Partial<Funnel>): Record<string, unknown> {
   if (patch.visits !== undefined) row.visits = patch.visits
   if (patch.createdAt !== undefined) row.created_at = toIso(patch.createdAt)
   if (patch.updatedAt !== undefined) row.updated_at = toIso(patch.updatedAt)
+  if (patch.subAccountId !== undefined) row.sub_account_id = patch.subAccountId ?? null
   return row
 }
 
-const FUNNEL_SELECT = 'id,name,slug,industry,language,status,accent,spec,visits,created_at,updated_at,leads(*)'
+const FUNNEL_SELECT = 'id,name,slug,industry,language,status,accent,spec,visits,created_at,updated_at,sub_account_id,leads(*)'
 
 function fail(context: string, error: { message: string } | null): void {
   if (error) throw new Error(`remote.${context}: ${error.message}`)

@@ -1,15 +1,17 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { LayoutGrid, Plus, CreditCard, Globe, MessageCircle } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, Globe, MessageCircle, Building2 } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
-import { useSession } from '../store'
+import { useSession, useAgency } from '../store'
 import { planName } from '../pricing'
+import { entitlementFor } from '../entitlements'
 import LogoutButton from '../auth/LogoutButton'
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t, locale, setLocale, isRTL } = useI18n()
   const session = useSession()
+  const agency = useAgency()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [mounted, setMounted] = useState(false)
@@ -27,10 +29,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
     )
   }
 
+  const isAgency = entitlementFor(session.workspace.plan).whiteLabel
+  const activeSub = agency.subAccounts.find((s) => s.id === agency.activeSubAccountId)
   const nav = [
     { label: t.nav.dashboard, href: '/app', icon: LayoutGrid },
     { label: t.common.new, href: '/app/new', icon: Plus },
     { label: 'WhatsApp', href: '/app/connect', icon: MessageCircle },
+    ...(isAgency ? [{ label: isRTL ? 'الوكالة' : 'Agency', href: '/app/agency', icon: Building2 }] : []),
     { label: isRTL ? 'الأسعار' : 'Pricing', href: '/pricing', icon: CreditCard },
   ]
 
@@ -56,6 +61,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <div className="rounded-xl border border-border bg-muted/50 p-3">
             <p className="text-xs text-muted-fg">{session.workspace.name}</p>
             <p className="mt-0.5 text-sm font-semibold text-foreground">{planName(session.workspace.plan, locale)} · {session.workspace.region === 'egypt' ? '🇪🇬' : '🇦🇪'}</p>
+            {isAgency && activeSub && <p className="mt-1 truncate text-[11px] font-medium text-accent">▸ {activeSub.name}</p>}
           </div>
           <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:bg-muted hover:text-foreground">
             <Globe size={17} /> {t.lang.switch}

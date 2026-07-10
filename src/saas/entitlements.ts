@@ -7,15 +7,16 @@ export interface Entitlement {
   removeBadge: boolean
   adSocialGen: boolean
   priorityAI: boolean
+  whiteLabel: boolean
   teamSeats: number
 }
 
 export const ENTITLEMENTS: Record<PlanId, Entitlement> = {
-  starter: { maxFunnels: 1, whatsappBot: false, removeBadge: false, adSocialGen: false, priorityAI: false, teamSeats: 1 },
-  growth: { maxFunnels: 5, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: false, teamSeats: 1 },
-  pro: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, teamSeats: 5 },
-  dwy: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, teamSeats: 25 },
-  whitelabel: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, teamSeats: 999 },
+  starter: { maxFunnels: 1, whatsappBot: false, removeBadge: false, adSocialGen: false, priorityAI: false, whiteLabel: false, teamSeats: 1 },
+  growth: { maxFunnels: 5, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: false, whiteLabel: false, teamSeats: 1 },
+  pro: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, whiteLabel: false, teamSeats: 5 },
+  dwy: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, whiteLabel: false, teamSeats: 25 },
+  whitelabel: { maxFunnels: Infinity, whatsappBot: true, removeBadge: true, adSocialGen: true, priorityAI: true, whiteLabel: true, teamSeats: 999 },
 }
 
 export type Feature = keyof Omit<Entitlement, 'maxFunnels' | 'teamSeats'>
