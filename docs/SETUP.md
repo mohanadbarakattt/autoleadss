@@ -147,7 +147,25 @@ branding (hide, or "Made with {brand}").
 _Follow-ups (Phase 8): propagate agency branding to remote public pages (embed brand in the
 published payload), per-sub-account seats/roles, and reseller billing rails._
 
-## Phase 8 — Analytics, admin, hardening
+## Phase 8 — Analytics, inbox, billing webhook & hardening  ✅ code shipped
+
+- **Per-funnel analytics**: editor → **Insights** tab — visits / leads / conversion / won KPIs, a
+  14-day leads bar chart, and a lead-source breakdown (works in demo from lead data).
+- **WhatsApp lite inbox**: recent conversations per contact on the WhatsApp tab (reads
+  `whatsapp_messages`; remote only).
+- **Billing webhook** (closes Phase 4): `stripe-webhook` flips `workspaces.plan` after payment.
+  The workspace plan now loads from and persists to Postgres, so upgrades stick across devices.
+  ```bash
+  supabase functions deploy stripe-webhook --no-verify-jwt
+  supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx STRIPE_SECRET_KEY=sk_live_xxx
+  # point a Stripe webhook at .../functions/v1/stripe-webhook for checkout.session.completed + customer.subscription.deleted
+  ```
+- **Hardening**: agency white-label branding now propagates to **remote public pages**
+  (`0005_public_branding.sql` extends the published RPCs), so the badge is hidden/rebranded for
+  real visitors, not just in demo. Apply with `supabase db push`.
+
+_Remaining hardening ideas: encrypt the WhatsApp `access_token` with Supabase Vault/pgsodium;
+a full cross-tenant admin console (service-role dashboards); SSR/prerender for organic SEO._
 
 ---
 

@@ -19,6 +19,8 @@ interface FunnelRow {
   created_at: string | null
   updated_at: string | null
   sub_account_id?: string | null
+  brand_name?: string | null
+  hide_badge?: boolean | null
   leads?: LeadRow[] | null
 }
 
@@ -85,6 +87,7 @@ function funnelFromRow(r: FunnelRow): Funnel {
     createdAt: toMillis(r.created_at),
     updatedAt: toMillis(r.updated_at),
     subAccountId: r.sub_account_id ?? undefined,
+    brand: r.hide_badge != null || r.brand_name != null ? { brandName: r.brand_name ?? undefined, hideBadge: !!r.hide_badge } : undefined,
     leads,
   }
 }

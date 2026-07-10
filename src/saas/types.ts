@@ -60,6 +60,8 @@ export interface Funnel {
   visits: number
   leads: Lead[]
   subAccountId?: string
+  /** Owner's white-label branding, attached on public published fetches. */
+  brand?: { brandName?: string; hideBadge: boolean }
 }
 
 /** White-label branding for an agency (tier D). */

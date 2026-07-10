@@ -5,7 +5,7 @@ import { useI18n } from '../i18n'
 import { useFunnels, uid, getDb } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 import { SUPABASE_URL, remoteEnabled } from '../config'
-import { getConnectionForFunnel, saveConnection, type WhatsAppConnection } from '../db/whatsapp'
+import { getConnectionForFunnel, saveConnection, listConversations, type WhatsAppConnection, type Conversation } from '../db/whatsapp'
 
 export default function Connect() {
   return (
@@ -24,6 +24,7 @@ function ConnectInner() {
   const [funnelId, setFunnelId] = useState(funnels[0]?.id ?? '')
   const [form, setForm] = useState({ phoneNumberId: '', wabaId: '', accessToken: '', displayPhone: '', verifyToken: uid('vt_') })
   const [existing, setExisting] = useState<WhatsAppConnection | null>(null)
+  const [convos, setConvos] = useState<Conversation[]>([])
   const [saved, setSaved] = useState(false)
   const [busy, setBusy] = useState(false)
 
@@ -38,6 +39,7 @@ function ConnectInner() {
         if (c) setForm((f) => ({ ...f, phoneNumberId: c.phoneNumberId, wabaId: c.wabaId ?? '', accessToken: c.accessToken, displayPhone: c.displayPhone ?? '', verifyToken: c.verifyToken }))
       })
       .catch(() => {})
+    listConversations(sb, funnelId).then(setConvos).catch(() => {})
   }, [funnelId])
 
   if (!ent.whatsappBot) {
@@ -136,6 +138,28 @@ function ConnectInner() {
           {saved ? <><Check size={15} /> {isRTL ? 'تم الحفظ' : 'Saved'}</> : isRTL ? 'حفظ الاتصال' : 'Save connection'}
         </button>
       </div>
+
+      {/* lite shared inbox */}
+      {remoteEnabled && (
+        <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <p className="mb-4 font-display font-semibold">{isRTL ? 'المحادثات الأخيرة' : 'Recent conversations'}</p>
+          {convos.length === 0 ? (
+            <p className="text-sm text-muted-fg">{isRTL ? 'لا محادثات بعد.' : 'No conversations yet — they appear here once messages arrive.'}</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {convos.map((c) => (
+                <div key={c.waId} className="flex items-center gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: '#25D366' }}>{(c.name ?? c.waId).charAt(0).toUpperCase()}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{c.name ?? c.waId}</p>
+                    <p className="truncate text-xs text-muted-fg">{c.lastDirection === 'out' ? '↩ ' : ''}{c.lastBody}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

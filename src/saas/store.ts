@@ -16,6 +16,7 @@ import {
   createSubAccountRemote as rCreateSubAccount,
   deleteSubAccountRemote as rDeleteSubAccount,
 } from './db/agency'
+import { getOrCreateWorkspace, updateWorkspaceRemote as rUpdateWorkspace } from './db/workspace'
 
 const KEY = 'virlo:state:v1'
 
@@ -153,12 +154,13 @@ export async function configureRemote(sb: SupabaseClient, session: Session) {
   hydrated = true
   set({ session })
   try {
-    const [funnels, settings, subAccounts] = await Promise.all([
+    const [funnels, settings, subAccounts, workspace] = await Promise.all([
       rListFunnels(sb),
       getAgencySettings(sb).catch(() => null),
       listSubAccounts(sb).catch(() => []),
+      getOrCreateWorkspace(sb, session.workspace).catch(() => session.workspace),
     ])
-    state = { ...state, funnels, agency: { ...state.agency, settings, subAccounts } }
+    state = { ...state, session: { ...session, workspace }, funnels, agency: { ...state.agency, settings, subAccounts } }
     emit()
   } catch (e) {
     console.error('[remote load]', e)
@@ -204,13 +206,17 @@ export function signOut() {
 export function setPlan(plan: PlanId) {
   ensureHydrated()
   if (!state.session) return
+  const id = state.session.workspace.id
   set({ session: { ...state.session, workspace: { ...state.session.workspace, plan } } })
+  syncRemote((sb) => rUpdateWorkspace(sb, id, { plan }))
 }
 
 export function setRegion(region: Region) {
   ensureHydrated()
   if (!state.session) return
+  const id = state.session.workspace.id
   set({ session: { ...state.session, workspace: { ...state.session.workspace, region } } })
+  syncRemote((sb) => rUpdateWorkspace(sb, id, { region }))
 }
 
 // ---------- funnels ----------

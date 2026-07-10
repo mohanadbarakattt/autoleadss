@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus,
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
+import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
@@ -14,7 +15,7 @@ import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
 import type { FunnelSpec, Lead, Funnel } from '../types'
 
-type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'domain'
+type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'insights' | 'domain'
 
 export default function Editor() {
   return (
@@ -71,6 +72,7 @@ function EditorInner() {
     { id: 'chatbot', label: t.editor.tabs.chatbot },
     { id: 'social', label: t.editor.tabs.social },
     { id: 'leads', label: `${t.editor.tabs.leads} (${funnel.leads.length})` },
+    { id: 'insights', label: isRTL ? 'التحليلات' : 'Insights' },
     { id: 'domain', label: isRTL ? 'النطاق' : 'Domain' },
   ]
 
@@ -205,6 +207,8 @@ function EditorInner() {
         )}
 
         {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={locale} isRTL={isRTL} />}
+
+        {tab === 'insights' && <FunnelAnalytics funnel={funnel} isRTL={isRTL} />}
 
         {tab === 'domain' && <DomainPanel funnel={funnel} isRTL={isRTL} />}
       </div>

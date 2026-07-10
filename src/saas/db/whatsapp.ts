@@ -53,3 +53,28 @@ export async function deleteConnection(sb: SupabaseClient, id: string): Promise<
   const { error } = await sb.from('whatsapp_connections').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
+
+export interface Conversation {
+  waId: string
+  name?: string
+  lastBody: string
+  lastDirection: 'in' | 'out'
+  at: number
+}
+
+/** Latest message per contact for a funnel (a lite shared inbox). */
+export async function listConversations(sb: SupabaseClient, funnelId: string, limit = 100): Promise<Conversation[]> {
+  const { data, error } = await sb
+    .from('whatsapp_messages')
+    .select('wa_id,profile_name,body,direction,created_at')
+    .eq('funnel_id', funnelId)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) throw new Error(error.message)
+  const seen = new Map<string, Conversation>()
+  for (const r of data ?? []) {
+    if (seen.has(r.wa_id)) continue
+    seen.set(r.wa_id, { waId: r.wa_id, name: r.profile_name ?? undefined, lastBody: r.body ?? '', lastDirection: r.direction, at: Date.parse(r.created_at) || 0 })
+  }
+  return [...seen.values()]
+}

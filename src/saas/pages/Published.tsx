@@ -86,16 +86,19 @@ export default function Published() {
         <meta name="theme-color" content={funnel.accent} />
       </Helmet>
       <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
-      {!brand?.hideBadge &&
-        (brand?.brandName ? (
+      {(() => {
+        const b = funnel.brand ?? brand
+        return !b?.hideBadge &&
+        (b?.brandName ? (
           <span className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full bg-[#0A0A0B] px-3 py-2 text-[11px] font-medium text-white shadow-lg">
-            Made with {brand.brandName}
+            Made with {b.brandName}
           </span>
         ) : (
           <a href="https://autoleadss.com" target="_blank" rel="noopener noreferrer" className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full bg-[#0A0A0B] px-3 py-2 text-[11px] font-medium text-white shadow-lg">
             <LogoMark size={16} /> Made with AutoLeadss
           </a>
-        ))}
+        ))
+      })()}
     </div>
   )
 }
