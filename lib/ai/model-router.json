@@ -1,9 +1,9 @@
 {
   "routes": [
-    { "task": "funnel_copy", "model": "claude-sonnet-5", "fallback": "claude-fable-5", "rationale": "High-quality bilingual long-form landing/funnel copy." },
-    { "task": "ad_social_copy", "model": "claude-sonnet-5", "fallback": "claude-haiku-4-5-20251001", "rationale": "Balanced quality/cost for ad and social variants." },
-    { "task": "chatbot_reply", "model": "claude-haiku-4-5-20251001", "fallback": "claude-sonnet-5", "rationale": "Cheap, fast, high-volume WhatsApp replies." },
-    { "task": "lead_qualification", "model": "claude-haiku-4-5-20251001", "fallback": "claude-haiku-4-5-20251001", "rationale": "Simple classification — cheapest model." }
+    { "task": "funnel_copy", "provider": "anthropic", "model": "claude-sonnet-5", "fallback": "claude-fable-5", "rationale": "High-quality bilingual long-form landing/funnel copy — keep on Claude (brand voice + nuanced Arabic, low volume)." },
+    { "task": "ad_social_copy", "provider": "anthropic", "model": "claude-sonnet-5", "fallback": "google/gemma-4-31b-it", "rationale": "Balanced quality/cost; trial Gemma once eval'd." },
+    { "task": "chatbot_reply", "provider": "gemma", "model": "google/gemma-4-26b-a4b-it", "fallback": "claude-haiku-4-5-20251001", "rationale": "Highest-volume path (WhatsApp bot) — Gemma 4 via OpenAI-compatible endpoint is ~10x cheaper, fast, self-hostable, Arabic-capable." },
+    { "task": "lead_qualification", "provider": "gemma", "model": "google/gemma-4-e4b-it", "fallback": "claude-haiku-4-5-20251001", "rationale": "Trivial classification — cheapest/edge Gemma." }
   ],
-  "notes": "Cheap-first, escalate on failure. Wired in supabase/functions/generate-funnel (env overrides: ANTHROPIC_MODEL_FUNNEL / _ADSOCIAL / _CHATBOT). Prompt-cache the brand/system context in production."
+  "notes": "Hybrid: Gemma 4 for high-volume/low-nuance (chatbot, qualification); Claude Sonnet/Fable for funnel copy. Chatbot routing lives in supabase/functions/whatsapp-webhook (env: GEMMA_API_KEY / GEMMA_BASE_URL / GEMMA_MODEL). Eval Gulf + Egyptian Arabic before flipping the bot."
 }

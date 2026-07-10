@@ -101,6 +101,22 @@ The webhook runs the funnel's generated bot flow live, auto-replies, captures le
 _Note: `access_token` is stored in an RLS-protected table; encrypt with Supabase Vault/pgsodium for
 extra hardening. A shared-inbox UI over `whatsapp_messages` is a nice Phase-8 add._
 
+## Phase 5.5 — Gemma-powered WhatsApp bot  ✅ code shipped
+
+The webhook now generates **dynamic** replies with Gemma 4 (grounded in the funnel's chatbot
+spec + recent conversation history), falling back to the deterministic flow if unconfigured.
+Gemma is ~10× cheaper than Claude Haiku on this highest-volume path — protecting margin as
+WhatsApp usage scales.
+
+**Go live** (any OpenAI-compatible Gemma host — DeepInfra / Together / Groq, or self-hosted vLLM/Ollama):
+```bash
+supabase secrets set GEMMA_API_KEY=<key>
+supabase secrets set GEMMA_BASE_URL=https://api.deepinfra.com/v1/openai   # or your endpoint
+supabase secrets set GEMMA_MODEL=google/gemma-4-26b-a4b-it               # adjust to the host's id
+```
+Without these, the bot uses the rule-based flow (still works). **Before flipping it on, run the
+eval harness on Gulf + Egyptian Arabic** (see `docs/AI_MODEL_EVAL.md`).
+
 ## Phase 6 — Custom domains / real publishing
 ## Phase 7 — White-label / agency mode
 ## Phase 8 — Analytics, admin, hardening

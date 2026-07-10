@@ -23,6 +23,49 @@ function botReply(chatbot: any, text: string): string {
   return chatbot?.bookingMessage ?? chatbot?.greeting ?? 'Thanks — a team member will reach out shortly.'
 }
 
+/**
+ * Dynamic reply via Gemma 4 (OpenAI-compatible endpoint, e.g. DeepInfra / Together / Groq).
+ * Grounded in the funnel's own chatbot spec + recent history. Returns null if unconfigured
+ * or on error, so the caller falls back to the deterministic flow (botReply).
+ */
+async function llmReply(
+  chatbot: any,
+  businessName: string,
+  lang: string,
+  history: { role: 'user' | 'assistant'; content: string }[],
+  incoming: string,
+): Promise<string | null> {
+  const key = Deno.env.get('GEMMA_API_KEY')
+  if (!key) return null
+  const base = Deno.env.get('GEMMA_BASE_URL') ?? 'https://api.deepinfra.com/v1/openai'
+  const model = Deno.env.get('GEMMA_MODEL') ?? 'google/gemma-4-26b-a4b-it'
+  const language = lang === 'ar' ? 'Arabic (natural, MENA market)' : 'English'
+  const flow = (chatbot?.flow ?? []).map((f: any) => `- ${f.trigger}: ${f.response}`).join('\n')
+  const system =
+    `You are the WhatsApp sales assistant for ${businessName}. Reply in ${language}, concise (under 60 words), warm and human, and steer toward booking a call/visit. ` +
+    `Greeting: "${chatbot?.greeting ?? ''}". Qualifying questions you may ask: ${(chatbot?.qualifyingQuestions ?? []).join(' | ')}. ` +
+    `Known answers:\n${flow}\nWhen the lead is ready, say: "${chatbot?.bookingMessage ?? ''}". ` +
+    `Never invent prices or facts you don't have — offer to connect them to the team instead.`
+  try {
+    const res = await fetch(`${base}/chat/completions`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        max_tokens: 220,
+        temperature: 0.6,
+        messages: [{ role: 'system', content: system }, ...history.slice(-6), { role: 'user', content: incoming }],
+      }),
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    const text = data.choices?.[0]?.message?.content
+    return typeof text === 'string' && text.trim() ? text.trim() : null
+  } catch {
+    return null
+  }
+}
+
 async function sendText(phoneNumberId: string, token: string, to: string, body: string) {
   await fetch(`${GRAPH}/${phoneNumberId}/messages`, {
     method: 'POST',
@@ -72,7 +115,10 @@ Deno.serve(async (req) => {
         const conn = conns?.[0]
         if (!conn) continue
         const { data: funnels } = await admin.from('funnels').select('spec').eq('id', conn.funnel_id).limit(1)
-        const chatbot = (funnels?.[0]?.spec ?? {}).chatbot ?? {}
+        const spec = funnels?.[0]?.spec ?? {}
+        const chatbot = spec.chatbot ?? {}
+        const businessName = spec.businessName ?? 'our team'
+        const lang = spec.language ?? 'en'
         const profileName = value.contacts?.[0]?.profile?.name ?? null
 
         for (const m of messages) {
@@ -97,7 +143,19 @@ Deno.serve(async (req) => {
             })
           }
 
-          const reply = botReply(chatbot, inbound)
+          // Recent history for context (Gemma), oldest→newest.
+          const { data: hist } = await admin
+            .from('whatsapp_messages')
+            .select('direction,body')
+            .eq('funnel_id', conn.funnel_id)
+            .eq('wa_id', from)
+            .order('created_at', { ascending: false })
+            .limit(6)
+          const history = (hist ?? [])
+            .reverse()
+            .map((h: any) => ({ role: h.direction === 'out' ? ('assistant' as const) : ('user' as const), content: h.body ?? '' }))
+
+          const reply = (await llmReply(chatbot, businessName, lang, history, inbound)) ?? botReply(chatbot, inbound)
           await sendText(phoneNumberId, conn.access_token, from, reply)
           await admin.from('whatsapp_messages').insert({
             owner_id: conn.owner_id, funnel_id: conn.funnel_id, wa_id: from, profile_name: profileName, direction: 'out', body: reply,
