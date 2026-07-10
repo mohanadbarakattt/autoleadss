@@ -11,7 +11,7 @@ import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 export default function Dashboard() {
   return (
     <AppShell>
-      <Helmet>
+      <Helmet defer={false}>
         <title>Dashboard — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

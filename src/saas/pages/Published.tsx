@@ -92,7 +92,7 @@ export default function Published() {
   const hero = funnel.spec.page.hero
   return (
     <div className="relative">
-      <Helmet>
+      <Helmet defer={false}>
         <html lang={funnel.language} dir={funnel.language === 'ar' ? 'rtl' : 'ltr'} />
         <title>{funnel.name} — {hero.eyebrow}</title>
         <meta name="description" content={hero.subhead} />

@@ -118,7 +118,7 @@ export default function Wizard() {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="relative min-h-screen overflow-hidden bg-background">
-      <Helmet>
+      <Helmet defer={false}>
         <title>{t.wizard.title} — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

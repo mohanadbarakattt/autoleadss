@@ -17,7 +17,7 @@ export default function ClerkAuth({ mode }: { mode: 'signin' | 'signup' }) {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="grid min-h-screen lg:grid-cols-2">
-      <Helmet>
+      <Helmet defer={false}>
         <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <link rel="canonical" href={`https://autoleadss.com/${isSignup ? 'signup' : 'login'}`} />

@@ -46,6 +46,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
+          <Route path="/fr-eg/*" element={<LocaleProvider locale="fr-eg"><App /></LocaleProvider>} />
 
           {/* Self-serve platform (the AI funnel builder) */}
           <Route path="/pricing" element={withSaas(<Pricing />)} />

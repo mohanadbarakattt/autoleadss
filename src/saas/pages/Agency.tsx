@@ -11,7 +11,7 @@ const ACCENTS = ['#FF5C2A', '#2563EB', '#7C3AED', '#059669', '#E11D48', '#0A0A0B
 export default function Agency() {
   return (
     <AppShell>
-      <Helmet>
+      <Helmet defer={false}>
         <title>Agency — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

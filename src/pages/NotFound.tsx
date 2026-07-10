@@ -9,7 +9,7 @@ import Logo from '../components/Logo'
 export default function NotFound() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center" style={{ background: '#0A0A0B' }}>
-      <Helmet>
+      <Helmet defer={false}>
         <title>Page not found — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

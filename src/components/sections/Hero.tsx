@@ -36,9 +36,10 @@ export default function Hero() {
     my.set((e.clientY - r.top) / r.height)
   }
 
-  const titleLines = isAr
-    ? [{ t: 'توقّف عن مطاردة العملاء.', c: 'white' }, { t: 'ابدأ في استقبالهم.', c: 'accent' }]
-    : [{ t: 'Stop chasing customers.', c: 'white' }, { t: 'Start receiving them.', c: 'accent' }]
+  const titleLines = [
+    { t: t.hero.titleA, c: 'white' as const },
+    { t: t.hero.titleB, c: 'accent' as const },
+  ]
 
   const marqueeItems = [...t.hero.marquee, ...t.hero.marquee]
 
@@ -223,7 +224,7 @@ export default function Hero() {
                     </span>
                     <div>
                       <p className="text-white text-xs font-medium">WhatsApp</p>
-                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : 'Auto-reply · 12s'}</p>
+                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : locale === 'fr-eg' ? 'Radd otomatiky · 12s' : 'Auto-reply · 12s'}</p>
                     </div>
                   </div>
                 </div>

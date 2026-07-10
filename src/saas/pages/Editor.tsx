@@ -37,7 +37,7 @@ function EditorInner() {
   if (!funnel) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-        <Helmet>
+        <Helmet defer={false}>
           <title>{isRTL ? 'القمع غير موجود' : 'Funnel not found'} — AutoLeadss</title>
           <meta name="robots" content="noindex" />
         </Helmet>
@@ -83,7 +83,7 @@ function EditorInner() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 md:px-10">
-      <Helmet>
+      <Helmet defer={false}>
         <title>{funnel.name} — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

@@ -63,7 +63,7 @@ export default function Pricing() {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-background">
-      <Helmet>
+      <Helmet defer={false}>
         <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <meta name="description" content={description} />

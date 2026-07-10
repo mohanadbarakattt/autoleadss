@@ -11,7 +11,7 @@ import { getConnectionForFunnel, saveConnection, listConversations, type WhatsAp
 export default function Connect() {
   return (
     <AppShell>
-      <Helmet>
+      <Helmet defer={false}>
         <title>Connect WhatsApp — AutoLeadss</title>
         <meta name="robots" content="noindex" />
       </Helmet>

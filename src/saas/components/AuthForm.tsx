@@ -27,7 +27,7 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="grid min-h-screen lg:grid-cols-2">
-      <Helmet>
+      <Helmet defer={false}>
         <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <meta name="description" content={isSignup ? t.auth.signupSub : t.auth.loginSub} />

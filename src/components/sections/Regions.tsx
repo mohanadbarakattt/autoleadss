@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useT } from '../../i18n/LocaleProvider'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
 
 /** City pins positioned on an abstract dotted map of the UAE + Egypt corridor. */
 const CITIES = [
@@ -21,7 +21,8 @@ for (let r = 0; r < 14; r++) {
 
 export default function Regions() {
   const t = useT()
-  const isAr = t.regions.title === 'حيث نعمل'
+  const { locale } = useLocale()
+  const isAr = locale === 'ar'
 
   return (
     <section className="relative overflow-hidden py-24" style={{ background: '#0A0A0B' }}>

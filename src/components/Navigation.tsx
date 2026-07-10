@@ -2,9 +2,33 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocale, useT } from '../i18n/LocaleProvider'
+import type { Locale } from '../i18n/translations'
 import Logo from './Logo'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
+const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR', 'fr-eg': 'FRN' }
+const LOCALES: Locale[] = ['en', 'ar', 'fr-eg']
+
+/** Compact 3-way EN / AR / Franco pill switcher — replaces the old binary toggle. */
+function LocaleSwitcher({ locale, switchLocale, size = 'md' }: { locale: Locale; switchLocale: (l: Locale) => void; size?: 'md' | 'sm' }) {
+  return (
+    <div className={`flex items-center gap-0.5 rounded-full border border-white/20 ${size === 'sm' ? 'p-0.5' : 'p-1'}`}>
+      {LOCALES.map((l) => (
+        <button
+          key={l}
+          onClick={() => switchLocale(l)}
+          aria-label={`Switch language to ${LOCALE_LABEL[l]}`}
+          aria-current={locale === l}
+          className={`rounded-full font-sans font-bold tracking-wider transition-colors ${size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'} ${
+            locale === l ? 'bg-white text-[#0A0A0B]' : 'text-white/70 hover:text-white'
+          }`}
+        >
+          {LOCALE_LABEL[l]}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function Navigation() {
   const t = useT()
@@ -70,35 +94,23 @@ export default function Navigation() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => switchLocale(locale === 'ar' ? 'en' : 'ar')}
-              aria-label="Switch language"
-              className="rounded-full border border-white/20 px-3 py-1.5 font-sans text-xs font-bold tracking-wider text-white/80 transition-colors hover:border-white/50 hover:text-white"
-            >
-              {locale === 'ar' ? 'EN' : 'العربية'}
-            </button>
+            <LocaleSwitcher locale={locale} switchLocale={switchLocale} />
             <a
               href="/login"
               className="text-sm font-medium text-white/80 transition-colors hover:text-white"
             >
-              {locale === 'ar' ? 'دخول' : 'Log in'}
+              {locale === 'ar' ? 'دخول' : locale === 'fr-eg' ? 'Login' : 'Log in'}
             </a>
             <a
               href="/signup"
               className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:shadow-[0_10px_28px_-8px_rgba(255,92,42,0.7)] hover:-translate-y-0.5"
             >
-              {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
+              {locale === 'ar' ? 'جرّب المنشئ' : locale === 'fr-eg' ? 'Jarrab el builder' : 'Try the builder'}
             </a>
           </div>
 
           <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={() => switchLocale(locale === 'ar' ? 'en' : 'ar')}
-              aria-label="Switch language"
-              className="rounded-full border border-white/20 px-2.5 py-1 font-sans text-xs font-bold tracking-wider text-white/80"
-            >
-              {locale === 'ar' ? 'EN' : 'AR'}
-            </button>
+            <LocaleSwitcher locale={locale} switchLocale={switchLocale} size="sm" />
             <button className="p-2 text-white" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu">
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -141,7 +153,7 @@ export default function Navigation() {
                 href="/signup"
                 className="rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-white"
               >
-                {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
+                {locale === 'ar' ? 'جرّب المنشئ' : locale === 'fr-eg' ? 'Jarrab el builder' : 'Try the builder'}
               </a>
               <a
                 href={CAL_URL}
