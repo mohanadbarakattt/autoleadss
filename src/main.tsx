@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App'
@@ -19,6 +19,7 @@ import Connect from './saas/pages/Connect'
 import Agency from './saas/pages/Agency'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
+import NotFound from './pages/NotFound'
 
 // Every SaaS route: optional Clerk provider → locale → Clerk↔store bridge → page.
 const withSaas = (el: React.ReactNode) => (
@@ -59,7 +60,7 @@ createRoot(document.getElementById('root')!).render(
           {/* Published funnels */}
           <Route path="/p/:slug" element={withSaas(<Published />)} />
 
-          <Route path="*" element={<Navigate to="/en" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         )}
       </BrowserRouter>
