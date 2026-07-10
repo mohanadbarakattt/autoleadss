@@ -47,7 +47,7 @@ const en = {
         tag: 'Google & Paid Ads',
         title: 'Show up first.',
         body: 'Google, Meta, and TikTok campaigns that put you in front of buyers the moment they’re searching.',
-        points: ['Top of the search results', 'Every dirham tracked', 'Optimized every day'],
+        points: ['Top of the search results', 'Every cent tracked', 'Optimized every day'],
       },
       {
         tag: 'Social Media',
@@ -319,7 +319,7 @@ const ar: Dict = {
         tag: 'إعلانات جوجل والمدفوعة',
         title: 'اظهر أوّلاً.',
         body: 'حملات جوجل وميتا وتيك توك تضعك أمام المشترين لحظة بحثهم عمّا تبيعه.',
-        points: ['أعلى نتائج البحث', 'كل درهم متتبَّع', 'تحسين يومي'],
+        points: ['أعلى نتائج البحث', 'كل جنيه ودرهم متتبَّع', 'تحسين يومي'],
       },
       {
         tag: 'السوشيال ميديا',
