@@ -117,7 +117,22 @@ supabase secrets set GEMMA_MODEL=google/gemma-4-26b-a4b-it               # adjus
 Without these, the bot uses the rule-based flow (still works). **Before flipping it on, run the
 eval harness on Gulf + Egyptian Arabic** (see `docs/AI_MODEL_EVAL.md`).
 
-## Phase 6 — Custom domains / real publishing
+## Phase 6 — Custom domains / real publishing  ✅ code shipped
+
+Once Phase 3 is live, published funnels already work cross-device via `/p/:slug`. Phase 6 adds
+host-based rendering (subdomains + custom domains) and SEO/OG meta on published pages.
+
+- **Free subdomains** `{slug}.autoleadss.site`: register `autoleadss.site`, add it (and a wildcard
+  `*.autoleadss.site`) to the Vercel project, and point DNS at Vercel. Any such host renders that
+  funnel at `/`. Override the root via `VITE_FUNNEL_DOMAIN` if you use a different domain.
+- **Custom domains**: in the editor → **Domain** tab, add the customer's hostname (writes to the
+  `domains` table); they point a **CNAME → cname.vercel-dns.com**; add the domain in the Vercel
+  project so it issues SSL. The public page resolves host → funnel via `get_published_funnel_by_host`.
+- **SEO/OG**: published pages emit `<title>/description/OG/lang/dir/theme-color` from the funnel spec.
+- Apply the migration: `supabase db push` (adds `0003_domains.sql`).
+
+_SSR is not enabled (SPA) — helmet meta covers OG/unfurls and basic SEO; add prerender/SSR in Phase 8 if organic SEO becomes a priority._
+
 ## Phase 7 — White-label / agency mode
 ## Phase 8 — Analytics, admin, hardening
 

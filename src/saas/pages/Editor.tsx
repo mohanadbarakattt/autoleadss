@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n } from '../i18n'
-import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus } from '../store'
+import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
-import type { FunnelSpec, Lead } from '../types'
+import { remoteEnabled } from '../config'
+import { FUNNEL_ROOT } from '../publish/host'
+import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
+import type { FunnelSpec, Lead, Funnel } from '../types'
 
-type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads'
+type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'domain'
 
 export default function Editor() {
   return (
@@ -68,6 +71,7 @@ function EditorInner() {
     { id: 'chatbot', label: t.editor.tabs.chatbot },
     { id: 'social', label: t.editor.tabs.social },
     { id: 'leads', label: `${t.editor.tabs.leads} (${funnel.leads.length})` },
+    { id: 'domain', label: isRTL ? 'النطاق' : 'Domain' },
   ]
 
   return (
@@ -201,6 +205,8 @@ function EditorInner() {
         )}
 
         {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={locale} isRTL={isRTL} />}
+
+        {tab === 'domain' && <DomainPanel funnel={funnel} isRTL={isRTL} />}
       </div>
     </div>
   )
@@ -245,6 +251,83 @@ function LeadsTable({ funnelId, leads, locale, isRTL }: { funnelId: string; lead
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
+  const subdomain = `${funnel.slug}.${FUNNEL_ROOT}`
+  const [domains, setDomains] = useState<Domain[]>([])
+  const [host, setHost] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    const sb = getDb()
+    if (!sb) return
+    listDomains(sb, funnel.id).then(setDomains).catch(() => {})
+  }, [funnel.id])
+
+  async function add() {
+    const sb = getDb()
+    if (!sb || !host.trim()) return
+    setBusy(true)
+    try {
+      await addDomain(sb, funnel.id, host)
+      setHost('')
+      setDomains(await listDomains(sb, funnel.id))
+    } catch (e) {
+      console.error(e)
+    }
+    setBusy(false)
+  }
+  async function remove(domId: string) {
+    const sb = getDb()
+    if (!sb) return
+    await deleteDomain(sb, domId)
+    setDomains(await listDomains(sb, funnel.id))
+  }
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <p className="font-display font-semibold">{isRTL ? 'النطاق الفرعي المجاني' : 'Free subdomain'}</p>
+        <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'قممك المنشورة متاحة هنا فوراً.' : 'Your published funnel goes live here.'}</p>
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
+          <Globe size={14} className="text-accent" />
+          <code className="flex-1 text-sm" dir="ltr">{subdomain}</code>
+          {funnel.status === 'published' ? (
+            <a href={`https://${subdomain}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-accent">{isRTL ? 'زيارة ↗' : 'Visit ↗'}</a>
+          ) : (
+            <span className="text-xs text-muted-fg">{isRTL ? 'انشر أولاً' : 'publish first'}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-card p-6">
+        <p className="font-display font-semibold">{isRTL ? 'نطاق مخصّص' : 'Custom domain'}</p>
+        {!remoteEnabled ? (
+          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة تُفعّل بعد ربط قاعدة البيانات (Phase 3). راجع docs/SETUP.md.' : 'Custom domains activate once the database is connected (Phase 3). See docs/SETUP.md.'}</p>
+        ) : (
+          <>
+            <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أضف نطاقك ثم وجّه سجل CNAME إلى cname.vercel-dns.com' : 'Add your domain, then point a CNAME record to cname.vercel-dns.com'}</p>
+            <div className="mt-3 flex gap-2">
+              <input value={host} onChange={(e) => setHost(e.target.value)} placeholder="funnel.yourbrand.com" dir="ltr" className="flex-1 rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent" />
+              <button onClick={add} disabled={busy || !host.trim()} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"><Plus size={15} /> {isRTL ? 'أضف' : 'Add'}</button>
+            </div>
+            <div className="mt-4 flex flex-col gap-2">
+              {domains.map((d) => (
+                <div key={d.id} className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+                  <span className={`h-1.5 w-1.5 rounded-full ${d.verified ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+                  <code className="flex-1 text-sm" dir="ltr">{d.hostname}</code>
+                  <span className="text-[11px] text-muted-fg">{d.verified ? (isRTL ? 'مفعّل' : 'live') : (isRTL ? 'بانتظار DNS' : 'pending DNS')}</span>
+                  <button onClick={() => remove(d.id)} className="text-muted-fg hover:text-red-500"><Trash2 size={14} /></button>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-muted-fg">{isRTL ? 'أضف النطاق أيضاً في مشروع Vercel ليصدر شهادة SSL.' : 'Also add the domain in your Vercel project so it issues an SSL cert (see docs/SETUP.md).'}</p>
+          </>
+        )}
+      </div>
     </div>
   )
 }

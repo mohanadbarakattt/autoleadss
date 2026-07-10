@@ -11,6 +11,7 @@ import AuthRoute from './saas/auth/AuthRoute'
 import RemoteBridge from './saas/auth/RemoteBridge'
 import { UpgradeProvider } from './saas/billing/UpgradeContext'
 import { clerkEnabled } from './saas/config'
+import { isFunnelHost } from './saas/publish/host'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import Editor from './saas/pages/Editor'
@@ -32,6 +33,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
       <BrowserRouter>
+        {isFunnelHost() ? (
+          // On a {slug}.autoleadss.site subdomain or a mapped custom domain, the whole site is the funnel.
+          <Routes>
+            <Route path="*" element={withSaas(<Published />)} />
+          </Routes>
+        ) : (
         <Routes>
           {/* Marketing site (agency / done-with-you) */}
           <Route path="/" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
@@ -52,6 +59,7 @@ createRoot(document.getElementById('root')!).render(
 
           <Route path="*" element={<Navigate to="/en" replace />} />
         </Routes>
+        )}
       </BrowserRouter>
     </HelmetProvider>
   </StrictMode>,

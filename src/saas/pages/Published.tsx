@@ -1,26 +1,34 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import FunnelRenderer from '../components/FunnelRenderer'
 import { LogoMark } from '../../components/Logo'
 import { getFunnelBySlug, recordVisit, addLead } from '../store'
 import { remoteEnabled } from '../config'
 import { getAnonSupabase } from '../db/client'
-import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/remote'
+import { getPublishedFunnel, getPublishedFunnelByHost, recordVisitRemote, captureLeadRemote } from '../db/remote'
+import { subdomainSlug, isFunnelHost, currentHost } from '../publish/host'
 import type { Funnel } from '../types'
 
 export default function Published() {
-  const { slug = '' } = useParams()
+  const { slug: routeSlug } = useParams()
   const [funnel, setFunnel] = useState<Funnel | null | undefined>(undefined)
   const sb = useMemo(() => (remoteEnabled ? getAnonSupabase() : null), [])
+
+  // Slug source: /p/:slug param, or a {slug}.autoleadss.site subdomain.
+  const subSlug = subdomainSlug()
+  const slug = routeSlug ?? subSlug ?? ''
+  // On a custom-domain host with no slug, resolve the host itself.
+  const byHost = !slug && isFunnelHost()
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       if (sb) {
         try {
-          const f = await getPublishedFunnel(sb, slug)
+          const f = byHost ? await getPublishedFunnelByHost(sb, currentHost()) : await getPublishedFunnel(sb, slug)
           if (!cancelled) setFunnel(f ?? null)
-          if (f) recordVisitRemote(sb, slug).catch(() => {})
+          if (f) recordVisitRemote(sb, f.slug).catch(() => {})
         } catch {
           if (!cancelled) setFunnel(null)
         }
@@ -34,13 +42,14 @@ export default function Published() {
     return () => {
       cancelled = true
     }
-  }, [slug, sb])
+  }, [slug, byHost, sb])
 
   function handleLead(d: { name: string; phone: string; extra?: string }) {
+    const targetSlug = funnel?.slug ?? slug
     if (sb) {
-      captureLeadRemote(sb, slug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' }).catch(() => {})
+      captureLeadRemote(sb, targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' }).catch(() => {})
     } else {
-      addLead(slug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' })
+      addLead(targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' })
     }
   }
 
@@ -63,12 +72,22 @@ export default function Published() {
     )
   }
 
+  const hero = funnel.spec.page.hero
   return (
     <div className="relative">
+      <Helmet>
+        <html lang={funnel.language} dir={funnel.language === 'ar' ? 'rtl' : 'ltr'} />
+        <title>{funnel.name} — {hero.eyebrow}</title>
+        <meta name="description" content={hero.subhead} />
+        <meta property="og:title" content={`${funnel.name} — ${hero.headline}`} />
+        <meta property="og:description" content={hero.subhead} />
+        <meta property="og:type" content="website" />
+        <meta name="theme-color" content={funnel.accent} />
+      </Helmet>
       <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
-      <Link to="/" target="_blank" className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full bg-[#0A0A0B] px-3 py-2 text-[11px] font-medium text-white shadow-lg">
+      <a href="https://autoleadss.com" target="_blank" rel="noopener noreferrer" className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full bg-[#0A0A0B] px-3 py-2 text-[11px] font-medium text-white shadow-lg">
         <LogoMark size={16} /> Made with AutoLeadss
-      </Link>
+      </a>
     </div>
   )
 }

@@ -159,6 +159,14 @@ export async function getPublishedFunnel(sb: SupabaseClient, slug: string): Prom
   return row ? funnelFromRow(row) : null
 }
 
+/** Resolve a custom domain / subdomain host to its published funnel. */
+export async function getPublishedFunnelByHost(sb: SupabaseClient, host: string): Promise<Funnel | null> {
+  const { data, error } = await sb.rpc('get_published_funnel_by_host', { p_host: host })
+  fail('getPublishedFunnelByHost', error)
+  const row = (Array.isArray(data) ? data[0] : data) as FunnelRow | null | undefined
+  return row ? funnelFromRow(row) : null
+}
+
 export async function recordVisitRemote(sb: SupabaseClient, slug: string): Promise<void> {
   const { error } = await sb.rpc('increment_visit', { p_slug: slug })
   fail('recordVisitRemote', error)
