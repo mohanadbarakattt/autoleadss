@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
@@ -36,6 +37,10 @@ function EditorInner() {
   if (!funnel) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+        <Helmet>
+          <title>{isRTL ? 'القمع غير موجود' : 'Funnel not found'} — AutoLeadss</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
         <p className="text-muted-fg">{isRTL ? 'القمع غير موجود.' : 'Funnel not found.'}</p>
         <Link to="/app" className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white">{t.nav.dashboard}</Link>
       </div>
@@ -78,6 +83,10 @@ function EditorInner() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 md:px-10">
+      <Helmet>
+        <title>{funnel.name} — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link to="/app" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">

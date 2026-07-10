@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { X, ArrowRight, ArrowLeft, Check, Sparkles, Loader2 } from 'lucide-react'
 import Logo from '../../components/Logo'
@@ -117,6 +118,10 @@ export default function Wizard() {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="relative min-h-screen overflow-hidden bg-background">
+      <Helmet>
+        <title>{t.wizard.title} — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div aria-hidden className="absolute inset-0 grid-bg" style={{ maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)' }} />
 
       <div className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">

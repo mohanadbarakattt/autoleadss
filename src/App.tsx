@@ -48,8 +48,11 @@ export default function App() {
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
         <meta property="og:locale" content={isAr ? 'ar_AE' : 'en_US'} />
+        <meta property="og:image" content="https://autoleadss.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://autoleadss.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
       <ScrollProgress />

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Building2, Plus, Trash2, Check, Users } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { useI18n } from '../i18n'
@@ -10,6 +11,10 @@ const ACCENTS = ['#FF5C2A', '#2563EB', '#7C3AED', '#059669', '#E11D48', '#0A0A0B
 export default function Agency() {
   return (
     <AppShell>
+      <Helmet>
+        <title>Agency — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <AgencyInner />
     </AppShell>
   )

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp } from 'lucide-react'
 import AppShell from '../components/AppShell'
@@ -10,6 +11,10 @@ import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 export default function Dashboard() {
   return (
     <AppShell>
+      <Helmet>
+        <title>Dashboard — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <DashboardInner />
     </AppShell>
   )

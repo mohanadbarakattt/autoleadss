@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Copy, Check, Lock, MessageCircle } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { useI18n } from '../i18n'
@@ -10,6 +11,10 @@ import { getConnectionForFunnel, saveConnection, listConversations, type WhatsAp
 export default function Connect() {
   return (
     <AppShell>
+      <Helmet>
+        <title>Connect WhatsApp — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <ConnectInner />
     </AppShell>
   )

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Logo from '../../components/Logo'
@@ -37,8 +38,45 @@ export default function Pricing() {
     navigate('/app')
   }
 
+  const title = isRTL ? 'الأسعار — AutoLeadss' : 'Pricing — AutoLeadss'
+  const description = isRTL
+    ? 'أسعار AutoLeadss لمنشئ القمع بالذكاء الاصطناعي — باقات لمصر والخليج، من التجربة المجانية إلى وضع الوكالة.'
+    : 'AutoLeadss pricing for the self-serve AI funnel builder — plans for Egypt and the Gulf, from a free start to white-label agency.'
+
+  // Only the tiers with a fixed, published price (not "contact us" tiers) go into
+  // structured data — no fabricated/estimated prices for the done-with-you or
+  // white-label tiers, which are scoped per engagement.
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'AutoLeadss — AI funnel builder',
+    description: 'Self-serve AI funnel builder: landing pages, ads, WhatsApp bot, and social content generated from a short wizard.',
+    brand: { '@type': 'Brand', name: 'AutoLeadss' },
+    offers: TIERS.filter((t) => !t.contact).map((t) => ({
+      '@type': 'Offer',
+      name: t.name.en,
+      priceCurrency: 'USD',
+      price: t.priceGulf.replace(/[^0-9.]/g, ''),
+      url: 'https://autoleadss.com/pricing',
+    })),
+  }
+
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-background">
+      <Helmet>
+        <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href="https://autoleadss.com/pricing" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content="https://autoleadss.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content="https://autoleadss.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
+      </Helmet>
       {/* header */}
       <header className="fixed inset-x-0 top-0 z-40 px-4 pt-4">
         <div className="glass-dark mx-auto flex h-14 max-w-[1200px] items-center justify-between rounded-2xl px-5">

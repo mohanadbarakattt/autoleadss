@@ -99,6 +99,8 @@ export default function Published() {
         <meta property="og:title" content={`${funnel.name} — ${hero.headline}`} />
         <meta property="og:description" content={hero.subhead} />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://autoleadss.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content={funnel.accent} />
       </Helmet>
       <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
