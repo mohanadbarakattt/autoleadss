@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, Camera, Music2, MessageCircle } from 'lucide-react'
 import { useT } from '../i18n/LocaleProvider'
 import Logo from './Logo'
+import MbaiBadge from './MbaiBadge'
 
 const socials = [
   { icon: Camera, href: 'https://instagram.com/autoleadss', label: 'Instagram' },
@@ -69,10 +70,13 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
           <p className="text-xs text-[#8A857D]">{t.footer.copyright}</p>
-          <p className="flex items-center gap-1.5 text-xs text-[#8A857D]">
-            <span className="h-1 w-1 rounded-full bg-accent" />
-            {t.footer.cities}
-          </p>
+          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+            <p className="flex items-center gap-1.5 text-xs text-[#8A857D]">
+              <span className="h-1 w-1 rounded-full bg-accent" />
+              {t.footer.cities}
+            </p>
+            <MbaiBadge variant="dark" />
+          </div>
         </div>
       </div>
     </footer>

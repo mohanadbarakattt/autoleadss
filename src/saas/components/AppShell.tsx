@@ -7,6 +7,7 @@ import { useSession, useAgency } from '../store'
 import { planName } from '../pricing'
 import { entitlementFor } from '../entitlements'
 import LogoutButton from '../auth/LogoutButton'
+import SaasFooter from './SaasFooter'
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t, locale, setLocale, isRTL } = useI18n()
@@ -70,15 +71,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/90 px-5 py-3 backdrop-blur lg:hidden">
-        <Link to="/app"><Logo size={26} /></Link>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="rounded-full border border-border px-2.5 py-1 text-xs font-bold text-muted-fg">{t.lang.label === 'EN' ? 'AR' : 'EN'}</button>
-          <Link to="/app/new" className="rounded-full bg-accent px-4 py-1.5 text-xs font-medium text-white">{t.common.new}</Link>
+      <div className="flex flex-col">
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card/90 px-5 py-3 backdrop-blur lg:hidden">
+          <Link to="/app"><Logo size={26} /></Link>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setLocale(locale === 'ar' ? 'en' : 'ar')} className="rounded-full border border-border px-2.5 py-1 text-xs font-bold text-muted-fg">{t.lang.label === 'EN' ? 'AR' : 'EN'}</button>
+            <Link to="/app/new" className="rounded-full bg-accent px-4 py-1.5 text-xs font-medium text-white">{t.common.new}</Link>
+          </div>
         </div>
-      </div>
 
-      <main className="min-w-0">{children}</main>
+        <main className="min-w-0 flex-1">{children}</main>
+
+        <SaasFooter />
+      </div>
     </div>
   )
 }
