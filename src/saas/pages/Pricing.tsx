@@ -6,6 +6,7 @@ import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
 import { TIERS, priceFor } from '../pricing'
 import { useSession, setPlan, setRegion } from '../store'
+import { billingEnabled, startCheckout } from '../billing/checkout'
 import type { Region } from '../types'
 
 export default function Pricing() {
@@ -14,7 +15,7 @@ export default function Pricing() {
   const navigate = useNavigate()
   const [region, setRegionState] = useState<Region>(session?.workspace.region ?? 'gulf')
 
-  function choose(id: (typeof TIERS)[number]['id'], contact?: boolean) {
+  async function choose(id: (typeof TIERS)[number]['id'], contact?: boolean) {
     if (contact) {
       window.open('https://wa.me/201100054278', '_blank')
       return
@@ -23,6 +24,14 @@ export default function Pricing() {
       navigate('/signup')
       return
     }
+    if (billingEnabled) {
+      const url = await startCheckout(id, region, session.user.id)
+      if (url) {
+        window.location.href = url
+        return
+      }
+    }
+    // demo / billing-not-configured: set the plan locally
     setRegion(region)
     setPlan(id)
     navigate('/app')

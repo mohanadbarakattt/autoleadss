@@ -9,6 +9,7 @@ import { LocaleProvider as SaasLocaleProvider } from './saas/i18n'
 import AuthProvider from './saas/auth/AuthProvider'
 import AuthRoute from './saas/auth/AuthRoute'
 import RemoteBridge from './saas/auth/RemoteBridge'
+import { UpgradeProvider } from './saas/billing/UpgradeContext'
 import { clerkEnabled } from './saas/config'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
@@ -21,7 +22,7 @@ const withSaas = (el: React.ReactNode) => (
   <AuthProvider>
     <SaasLocaleProvider>
       {clerkEnabled && <RemoteBridge />}
-      {el}
+      <UpgradeProvider>{el}</UpgradeProvider>
     </SaasLocaleProvider>
   </AuthProvider>
 )

@@ -6,7 +6,8 @@ import Logo from '../../components/Logo'
 import FunnelRenderer from '../components/FunnelRenderer'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n } from '../i18n'
-import { useSession, createFunnel, seedDemoLeads, uid, slugify } from '../store'
+import { useSession, useFunnels, createFunnel, seedDemoLeads, uid, slugify } from '../store'
+import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 import { INDUSTRIES } from '../industries'
 import { generateFunnel } from '../ai/generateLive'
 import type { Industry, Tone, WizardInput, FunnelSpec, Funnel } from '../types'
@@ -22,6 +23,9 @@ const GEN_STEPS = {
 export default function Wizard() {
   const { t, locale, isRTL } = useI18n()
   const session = useSession()
+  const funnels = useFunnels()
+  const ent = useEntitlements()
+  const openUpgrade = useUpgrade()
   const navigate = useNavigate()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -59,6 +63,10 @@ export default function Wizard() {
 
   async function generate() {
     if (!session || !industry) return
+    if (funnels.length >= ent.maxFunnels) {
+      openUpgrade('maxFunnels')
+      return
+    }
     setPhase('generating')
     setLiveSteps([])
     const input: WizardInput = {

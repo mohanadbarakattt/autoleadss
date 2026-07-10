@@ -52,8 +52,33 @@ public `/p/:slug` page reads + captures leads via SECURITY DEFINER RPCs (no broa
 
 _Note: workspace plan/region sync to the DB lands with Phase 4 (billing)._
 
-## Phase 4 — Billing (Stripe + Paymob/Tap)
-Dual-region checkout + plan entitlements + upgrade gates. _Steps added when it lands._
+## Phase 4 — Billing (Stripe + Paymob)  ✅ code shipped
+
+Plan entitlements, usage meters, and contextual upgrade gates work today (client-side).
+Real checkout is dual-region and env-gated: Gulf → Stripe, Egypt → Paymob.
+
+**Entitlements** (`src/saas/entitlements.ts`): Starter = 1 funnel; Growth = 5 + WhatsApp bot +
+ad/social gen + remove badge; Pro = unlimited + priority AI. Hitting a cap/feature opens a
+branded upgrade modal (`UpgradeContext`).
+
+**Go live (checkout):**
+1. Deploy the function: `supabase functions deploy create-checkout`
+2. Set secrets:
+   ```bash
+   # Gulf / USD
+   supabase secrets set STRIPE_SECRET_KEY=sk_live_xxx
+   supabase secrets set STRIPE_PRICE_GROWTH_GULF=price_xxx STRIPE_PRICE_PRO_GULF=price_xxx
+   # Egypt / EGP (amounts in piastres: 3,000 EGP = 300000)
+   supabase secrets set PAYMOB_SECRET_KEY=xxx PAYMOB_PUBLIC_KEY=xxx
+   supabase secrets set PAYMOB_PRICE_GROWTH_EGYPT=300000 PAYMOB_PRICE_PRO_EGYPT=750000
+   ```
+3. Add `VITE_STRIPE_PUBLISHABLE_KEY=pk_live_xxx` to Vercel (flips `billingEnabled` on the client).
+4. **Webhook (to flip the plan after payment):** add a `stripe-webhook` / `paymob-webhook`
+   edge function that, on a successful subscription event, updates `workspaces.plan` for the
+   `client_reference_id` (Clerk user id). Until then, checkout redirects work but the plan
+   won't auto-upgrade. _(Stub to add next; low-risk once you have live keys to test against.)_
+
+Without these, "Choose plan" sets the plan locally (demo) — the whole flow stays usable.
 
 ## Phase 5 — WhatsApp Cloud API (BYO WABA)
 ## Phase 6 — Custom domains / real publishing
