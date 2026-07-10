@@ -80,7 +80,27 @@ branded upgrade modal (`UpgradeContext`).
 
 Without these, "Choose plan" sets the plan locally (demo) — the whole flow stays usable.
 
-## Phase 5 — WhatsApp Cloud API (BYO WABA)
+## Phase 5 — WhatsApp Cloud API (BYO WABA)  ✅ code shipped
+
+Each funnel connects the customer's **own** WhatsApp number (pass-through — protects margin).
+The webhook runs the funnel's generated bot flow live, auto-replies, captures leads (source
+`whatsapp`), and logs the conversation. Managed from **/app/connect** (Growth+ only).
+
+**Go live:**
+1. `supabase db push` (adds `whatsapp_connections` + `whatsapp_messages`, from `0002_whatsapp.sql`).
+2. Deploy the **public** webhook (Meta sends no apikey):
+   ```bash
+   supabase functions deploy whatsapp-webhook --no-verify-jwt
+   supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<service-role-key>   # SUPABASE_URL is auto-set
+   ```
+3. In the app → **WhatsApp** tab: pick a funnel, copy the **Webhook URL + Verify token** into your
+   Meta app's WhatsApp → Configuration → Webhook, subscribe to the **messages** field, then paste your
+   **phone number ID** and a **permanent access token** and Save.
+4. Message the number — the bot replies from your funnel's flow and a lead appears in the CRM.
+
+_Note: `access_token` is stored in an RLS-protected table; encrypt with Supabase Vault/pgsodium for
+extra hardening. A shared-inbox UI over `whatsapp_messages` is a nice Phase-8 add._
+
 ## Phase 6 — Custom domains / real publishing
 ## Phase 7 — White-label / agency mode
 ## Phase 8 — Analytics, admin, hardening

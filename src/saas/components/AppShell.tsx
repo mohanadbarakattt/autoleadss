@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { LayoutGrid, Plus, CreditCard, Globe } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, Globe, MessageCircle } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
 import { useSession } from '../store'
@@ -30,6 +30,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const nav = [
     { label: t.nav.dashboard, href: '/app', icon: LayoutGrid },
     { label: t.common.new, href: '/app/new', icon: Plus },
+    { label: 'WhatsApp', href: '/app/connect', icon: MessageCircle },
     { label: isRTL ? 'الأسعار' : 'Pricing', href: '/pricing', icon: CreditCard },
   ]
 

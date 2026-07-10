@@ -14,6 +14,7 @@ import { clerkEnabled } from './saas/config'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import Editor from './saas/pages/Editor'
+import Connect from './saas/pages/Connect'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
 
@@ -44,6 +45,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/app" element={withSaas(<Dashboard />)} />
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/funnel/:id" element={withSaas(<Editor />)} />
+          <Route path="/app/connect" element={withSaas(<Connect />)} />
 
           {/* Published funnels */}
           <Route path="/p/:slug" element={withSaas(<Published />)} />

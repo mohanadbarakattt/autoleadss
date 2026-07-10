@@ -120,6 +120,11 @@ export function teardownRemote() {
   emit()
 }
 
+/** The active Supabase client in remote mode (for feature modules like WhatsApp settings), else null. */
+export function getDb(): SupabaseClient | null {
+  return remote?.sb ?? null
+}
+
 /** Bridge a Clerk identity into the local session shape (demo-parity) without Supabase. */
 export function setBridgedSession(session: Session | null) {
   set({ session })
