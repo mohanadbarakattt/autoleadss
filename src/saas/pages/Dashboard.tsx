@@ -7,6 +7,8 @@ import { useI18n, toContentLocale } from '../i18n'
 import { useFunnels, useAgency } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
+import { useCapGate } from '../billing/usage'
+import type { CapGate } from '../billing/usage'
 
 export default function Dashboard() {
   return (
@@ -28,6 +30,8 @@ function DashboardInner() {
   const navigate = useNavigate()
   const ent = useEntitlements()
   const openUpgrade = useUpgrade()
+  const whatsappGate = useCapGate('whatsapp')
+  const aiActionGate = useCapGate('aiAction')
 
   const atCap = allFunnels.length >= ent.maxFunnels
   function handleNew() {
@@ -82,6 +86,23 @@ function DashboardInner() {
             </button>
           )}
         </div>
+      )}
+
+      {whatsappGate.status && (
+        <CapUsageBar
+          label={isRTL ? 'محادثات واتساب الذكي' : 'WhatsApp-AI conversations'}
+          gate={whatsappGate}
+          isRTL={isRTL}
+          onUpgrade={() => openUpgrade('whatsappCap')}
+        />
+      )}
+      {aiActionGate.status && (
+        <CapUsageBar
+          label={isRTL ? 'توليد الذكاء الاصطناعي' : 'AI generations'}
+          gate={aiActionGate}
+          isRTL={isRTL}
+          onUpgrade={() => openUpgrade('aiActionCap')}
+        />
       )}
 
       {funnels.length === 0 ? (
@@ -146,6 +167,39 @@ function Metric({ value, label }: { value: string | number; label: string }) {
     <div className="rounded-lg bg-muted/50 py-2">
       <p className="font-display text-lg font-bold">{value}</p>
       <p className="text-[10px] text-muted-fg">{label}</p>
+    </div>
+  )
+}
+
+/**
+ * Friendly usage bar for a WhatsApp-AI/AI-action cap. Hard caps (Growth) get an
+ * "upgrade for more" CTA once hit, matching the funnel-usage bar above. Soft caps
+ * (Pro) never block — past 100% they just switch to an advisory note, per
+ * PRICING-SPEC-DRAFT.md §2.2 ("don't throttle the power users").
+ */
+function CapUsageBar({ label, gate, isRTL, onUpgrade }: { label: string; gate: CapGate; isRTL: boolean; onUpgrade: () => void }) {
+  const status = gate.status
+  if (!status) return null
+  const pct = Math.min(100, (status.used / status.limit) * 100)
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-card p-5">
+      <div className="mb-2 flex items-center justify-between text-sm">
+        <span className="font-medium">{label}</span>
+        <span className="text-muted-fg">{status.used} / {status.limit}</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
+        <div className={`h-full rounded-full transition-all ${status.hit && status.type === 'hard' ? 'bg-red-500' : 'bg-accent'}`} style={{ width: `${pct}%` }} />
+      </div>
+      {status.hit && status.type === 'hard' && (
+        <button onClick={onUpgrade} className="mt-3 text-xs font-medium text-accent hover:underline">
+          {isRTL ? 'رقِّ لمزيد ←' : 'Upgrade for more →'}
+        </button>
+      )}
+      {status.hit && status.type === 'soft' && (
+        <p className="mt-3 text-xs text-muted-fg">
+          {isRTL ? 'أنت من المستخدمين الأقوياء — لا تقييد على باقة Pro.' : 'You’re a power user — no throttling on Pro.'}
+        </p>
+      )}
     </div>
   )
 }

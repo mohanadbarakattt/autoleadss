@@ -9,6 +9,7 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useFunnels, createFunnel, seedDemoLeads, uid, slugify } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
+import { useCapGate } from '../billing/usage'
 import { INDUSTRIES, industryNamePlaceholder } from '../industries'
 import { generateFunnel } from '../ai/generateLive'
 import type { Industry, Tone, WizardInput, FunnelSpec, Funnel } from '../types'
@@ -27,6 +28,7 @@ export default function Wizard() {
   const funnels = useFunnels()
   const ent = useEntitlements()
   const openUpgrade = useUpgrade()
+  const aiActionGate = useCapGate('aiAction')
   const navigate = useNavigate()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -69,6 +71,10 @@ export default function Wizard() {
       openUpgrade('maxFunnels')
       return
     }
+    if (aiActionGate.status?.hit && aiActionGate.status.type === 'hard') {
+      openUpgrade('aiActionCap')
+      return
+    }
     setPhase('generating')
     setLiveSteps([])
     const input: WizardInput = {
@@ -81,11 +87,14 @@ export default function Wizard() {
       accent,
     }
     const started = Date.now()
-    const { spec: resultSpec } = await generateFunnel(
+    const { spec: resultSpec, engine } = await generateFunnel(
       input,
       (label) => setLiveSteps((s) => (s.includes(label) ? s : [...s, label])),
       GEN_STEPS[contentLocale],
     )
+    // Only the real gateway call (engine === 'ai') costs anything — the
+    // template fallback is free, so it doesn't count against the AI-action cap.
+    if (engine === 'ai') aiActionGate.record()
     const wait = Math.max(0, 2400 - (Date.now() - started))
     await new Promise((r) => setTimeout(r, wait))
 

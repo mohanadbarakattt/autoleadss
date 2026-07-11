@@ -2,20 +2,42 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, Check } from 'lucide-react'
-import { useI18n, toContentLocale } from '../i18n'
+import { useI18n, toContentLocale, type UILocale } from '../i18n'
 import { useSession } from '../store'
-import { entitlementFor, nextPlanFor, type Feature } from '../entitlements'
+import { entitlementFor, nextPlanFor, type Feature, type CapFeature } from '../entitlements'
 import { planName, TIERS, priceFor } from '../pricing'
 
-type Reason = Feature | 'maxFunnels'
+type Reason = Feature | 'maxFunnels' | CapFeature
 
-const COPY: Record<Reason, { en: [string, string]; ar: [string, string] }> = {
+const COPY: Record<Feature | 'maxFunnels', { en: [string, string]; ar: [string, string] }> = {
   maxFunnels: { en: ['You’ve hit your funnel limit', 'Upgrade to build more funnels and scale your pipeline.'], ar: ['وصلت إلى حدّ الأقماع', 'رقِّ باقتك لبناء المزيد من الأقماع وتوسيع مبيعاتك.'] },
   whatsappBot: { en: ['WhatsApp AI bot is a Growth feature', 'Answer every lead in seconds, 24/7 — upgrade to switch it on.'], ar: ['بوت واتساب من مزايا Growth', 'ردّ على كل عميل خلال ثوانٍ، 24/7 — رقِّ لتفعيله.'] },
   removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل أقماعك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
   adSocialGen: { en: ['Ad & social generation is a Growth feature', 'Generate ready-to-run ads and social posts — upgrade to unlock.'], ar: ['توليد الإعلانات والسوشيال من Growth', 'ولّد إعلانات ومنشورات جاهزة — رقِّ لفتحها.'] },
   priorityAI: { en: ['Priority AI is a Pro feature', 'Faster generations and advanced analytics — upgrade to Pro.'], ar: ['الذكاء الاصطناعي بأولوية من Pro', 'توليد أسرع وتحليلات متقدّمة — رقِّ إلى Pro.'] },
   whiteLabel: { en: ['White-label is an Agency plan', 'Resell AutoLeadss as your own with sub-accounts and your branding.'], ar: ['وايت ليبل من باقة الوكالات', 'أعد بيع AutoLeadss باسمك مع حسابات فرعية وهويتك.'] },
+}
+
+/** Cap-hit copy gets genuine text in all three UI locales (unlike `COPY` above,
+ * which falls back Franco→English via `toContentLocale` like the rest of this
+ * file's "formal Record<Locale,...>" lookups) — these are the two newest,
+ * highest-traffic upsell prompts (PRICING-SPEC-DRAFT.md §2.2's hard caps), so they
+ * warrant the same full-Franco treatment as `i18n.tsx`'s STRINGS dict. */
+const CAP_COPY: Record<CapFeature, Record<UILocale, [string, string]>> = {
+  whatsappCap: {
+    en: ['You’ve hit your WhatsApp-AI limit', 'Growth includes 300 AI-answered conversations a month — upgrade to Pro for 800, or buy a top-up pack below.'],
+    ar: ['وصلت إلى حدّ محادثات واتساب الذكي', 'باقة Growth تشمل 300 محادثة يردّ عليها الذكاء الاصطناعي شهرياً — رقِّ إلى Pro لتصل إلى 800، أو اشترِ باقة إضافية.'],
+    'fr-eg': ['Wasalt le limit bta3et WhatsApp AI', 'Plan Growth beyeddeek 300 mokalma be AI kol shahr — ra22i le Pro 3ashan tewsal le 800, aw eshtery top-up pack.'],
+  },
+  aiActionCap: {
+    en: ['You’ve hit your AI-generation limit', 'Growth includes 2,000 ad/social/page-copy generations a month — upgrade to Pro for 10,000, or buy a top-up pack below.'],
+    ar: ['وصلت إلى حدّ توليد الذكاء الاصطناعي', 'باقة Growth تشمل 2,000 توليد إعلانات وسوشيال وصفحات شهرياً — رقِّ إلى Pro لتصل إلى 10,000، أو اشترِ باقة إضافية.'],
+    'fr-eg': ['Wasalt le limit bta3et AI generation', 'Plan Growth beyeddeek 2,000 generation (ads/social/page copy) kol shahr — ra22i le Pro 3ashan tewsal le 10,000, aw eshtery top-up pack.'],
+  },
+}
+
+function isCapReason(r: Reason): r is CapFeature {
+  return r === 'whatsappCap' || r === 'aiActionCap'
 }
 
 const Ctx = createContext<{ openUpgrade: (r: Reason) => void } | null>(null)
@@ -31,7 +53,7 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
   const region = session?.workspace.region ?? 'gulf'
   const target = reason ? nextPlanFor(reason, plan) : 'growth'
   const tier = TIERS.find((x) => x.id === target)
-  const copy = reason ? COPY[reason][contentLocale] : ['', '']
+  const copy = reason ? (isCapReason(reason) ? CAP_COPY[reason][locale] : COPY[reason][contentLocale]) : ['', '']
 
   return (
     <Ctx.Provider value={{ openUpgrade: setReason }}>

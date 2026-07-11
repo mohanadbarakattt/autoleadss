@@ -22,7 +22,9 @@ export interface RemoteAuth {
   getToken: () => Promise<string | null>
 }
 
-async function authedRequest<T>(auth: RemoteAuth, path: string, init: RequestInit = {}): Promise<T> {
+/** Exported so other db/* modules (e.g. db/usage.ts) can reuse the same
+ * Clerk-token-attaching fetch wrapper instead of duplicating it. */
+export async function authedRequest<T>(auth: RemoteAuth, path: string, init: RequestInit = {}): Promise<T> {
   const token = await auth.getToken()
   if (!token) throw new Error(`api${path}: no Clerk token available`)
   return request<T>(path, { ...init, headers: { ...init.headers, authorization: `Bearer ${token}` } })

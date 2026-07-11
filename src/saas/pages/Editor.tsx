@@ -11,6 +11,8 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
+import { useUpgrade } from '../billing/UpgradeContext'
+import { useCapGate } from '../billing/usage'
 import { remoteEnabled } from '../config'
 import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
@@ -33,6 +35,8 @@ function EditorInner() {
   const [tab, setTab] = useState<Tab>('page')
   const [copied, setCopied] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
+  const openUpgrade = useUpgrade()
+  const whatsappGate = useCapGate('whatsapp')
 
   if (!funnel) {
     return (
@@ -182,7 +186,16 @@ function EditorInner() {
           <div className="grid items-start gap-8 lg:grid-cols-[380px_1fr]">
             <div>
               <p className="mb-3 text-xs font-medium text-muted-fg">{t.editor.simulator}</p>
-              <ChatSimulator spec={spec} accent={accent} />
+              <ChatSimulator
+                spec={spec}
+                accent={accent}
+                locked={whatsappGate.status?.hit && whatsappGate.status.type === 'hard'}
+                lockedMessage={isRTL ? 'وصلت لحد محادثات واتساب الذكي لهذا الشهر — رقِّ باقتك لمزيد من المحادثات.' : 'This month’s WhatsApp-AI conversation limit has been reached — upgrade for more.'}
+                onConversationStart={() => {
+                  const ok = whatsappGate.record()
+                  if (!ok) openUpgrade('whatsappCap')
+                }}
+              />
             </div>
             <div className="flex flex-col gap-4">
               <FieldGroup title={isRTL ? 'رسالة الترحيب' : 'Greeting'}>

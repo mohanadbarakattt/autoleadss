@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n, toContentLocale } from '../i18n'
-import { TIERS, priceFor } from '../pricing'
+import { TIERS, TOPUP_PACKS, priceFor } from '../pricing'
 import { useSession, setPlan, setRegion } from '../store'
 import { billingEnabled, startCheckout } from '../billing/checkout'
+import { useEntitlements } from '../billing/UpgradeContext'
+import { purchaseTopup } from '../billing/usage'
 import type { Region } from '../types'
 import LocaleSwitcher from '../components/LocaleSwitcher'
 
@@ -16,7 +18,17 @@ export default function Pricing() {
   const contentLocale = toContentLocale(locale)
   const session = useSession()
   const navigate = useNavigate()
+  const ent = useEntitlements()
   const [region, setRegionState] = useState<Region>(session?.workspace.region ?? 'gulf')
+  const [bought, setBought] = useState<Set<string>>(new Set())
+
+  function buyTopup(id: (typeof TOPUP_PACKS)[number]['id']) {
+    // Demo-mode only — see purchaseTopup's doc comment in billing/usage.ts for why
+    // this doesn't call a backend endpoint.
+    purchaseTopup(session?.user.id, id)
+    setBought((s) => new Set(s).add(id))
+    setTimeout(() => setBought((s) => { const n = new Set(s); n.delete(id); return n }), 2400)
+  }
 
   async function choose(id: (typeof TIERS)[number]['id'], contact?: boolean) {
     if (contact) {
@@ -150,6 +162,33 @@ export default function Pricing() {
               </div>
             ))}
           </div>
+
+          {session && (ent.whatsappCap || ent.aiActionCap) && (
+            <div className="mt-14">
+              <div className="text-center">
+                <p className="font-display text-xl font-bold">{isRTL ? 'باقات إضافية' : 'Top-up packs'}</p>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-fg">
+                  {isRTL ? 'وصلت لحدّك الشهري؟ اشترِ محادثات واتساب وتوليدات إضافية تُستخدم خلال 90 يوماً.' : isFranco ? 'Wasalt le limit el shahr? Eshtery mokalmat WhatsApp w generations extra, sale7a le 90 youm.' : 'Hit your monthly cap? Buy extra WhatsApp-AI conversations and AI generations, valid for 90 days.'}
+                </p>
+              </div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                {TOPUP_PACKS.map((pack) => (
+                  <div key={pack.id} className="flex flex-col rounded-2xl border border-border bg-card p-5">
+                    <p className="font-display font-semibold">{pack.name[contentLocale]}</p>
+                    <p className="mt-2 font-display text-2xl font-bold">{region === 'egypt' ? pack.priceEgypt : pack.priceGulf}</p>
+                    <ul className="mt-3 flex flex-1 flex-col gap-1.5 text-sm text-muted-fg">
+                      <li>+{pack.whatsapp} {isRTL ? 'محادثة واتساب' : 'WhatsApp conversations'}</li>
+                      <li>+{pack.aiAction.toLocaleString()} {isRTL ? 'توليد ذكاء اصطناعي' : 'AI generations'}</li>
+                      <li>{isRTL ? `صالحة ${pack.expiryDays} يوماً` : `valid ${pack.expiryDays} days`}</li>
+                    </ul>
+                    <button onClick={() => buyTopup(pack.id)} className="mt-4 rounded-full border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent">
+                      {bought.has(pack.id) ? (isRTL ? 'تمّت الإضافة ✓' : 'Added ✓') : (isRTL ? 'شراء' : 'Buy')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-12 text-center">
             <Link to="/" className="text-sm text-muted-fg hover:text-foreground">← {isRTL ? 'العودة إلى AutoLeadss' : isFranco ? 'Erga3 le AutoLeadss' : 'Back to AutoLeadss'}</Link>
