@@ -96,8 +96,13 @@ export function useUsage(): UsagePeriod {
 }
 
 /** Records one unit of usage for `metric`, both locally (always) and against the
- * Neon-backed counter (best-effort, when the funnels backend is live). */
-export function recordUsage(userId: string | null | undefined, metric: UsageMetric) {
+ * Neon-backed counter (best-effort, when the funnels backend is live) — unless
+ * `skipRemote` is set, e.g. when the caller already had the server record this
+ * same action for it (see Wizard.tsx's `generate()`, which passes this when
+ * `/api/ai-generate`'s cap backstop already incremented the counter, so a
+ * successful AI generation isn't counted twice). The local counter always
+ * updates regardless, so demo-mode metering is unaffected. */
+export function recordUsage(userId: string | null | undefined, metric: UsageMetric, opts?: { skipRemote?: boolean }) {
   const uid = userId ?? null
   const key = keyFor(USAGE_KEY_PREFIX, uid)
   const next = { ...readUsageCached(uid) }
@@ -105,6 +110,8 @@ export function recordUsage(userId: string | null | undefined, metric: UsageMetr
   usageCache.set(key, next)
   persistUsageLocal(uid, next)
   emitUsage()
+
+  if (opts?.skipRemote) return
 
   const auth = getDb()
   if (auth) {
@@ -209,8 +216,10 @@ function activeBonus(grants: TopupGrant[], metric: UsageMetric): number {
 export interface CapGate {
   status: CapStatus | null
   /** Returns `false` (and does not record) when a hard cap is already hit —
-   * callers should show the upgrade prompt instead of proceeding. */
-  record: () => boolean
+   * callers should show the upgrade prompt instead of proceeding. Pass
+   * `{ skipRemote: true }` when the server already recorded this action itself
+   * (see `recordUsage`'s `skipRemote` option). */
+  record: (opts?: { skipRemote?: boolean }) => boolean
 }
 
 /**
@@ -235,9 +244,9 @@ export function useCapGate(metric: UsageMetric): CapGate {
   const cap = baseCap ? { limit: baseCap.limit + bonus, type: baseCap.type } : null
   const status = capStatus(cap, usage[metric])
 
-  function record(): boolean {
+  function record(opts?: { skipRemote?: boolean }): boolean {
     if (isCapHit(status)) return false
-    recordUsage(session?.user.id, metric)
+    recordUsage(session?.user.id, metric, opts)
     return true
   }
 

@@ -88,14 +88,17 @@ export default function Wizard() {
       plan: session.workspace.plan,
     }
     const started = Date.now()
-    const { spec: resultSpec, engine, capExceeded } = await generateFunnel(
+    const { spec: resultSpec, engine, capExceeded, usageRecorded } = await generateFunnel(
       input,
       (label) => setLiveSteps((s) => (s.includes(label) ? s : [...s, label])),
       GEN_STEPS[contentLocale],
     )
     // Only the real gateway call (engine === 'ai') costs anything — the
     // template fallback is free, so it doesn't count against the AI-action cap.
-    if (engine === 'ai') aiActionGate.record()
+    // When the server's cap backstop (api/ai-generate.ts) already incremented
+    // the counter for this call, skip the redundant client-side /api/usage POST
+    // so a successful generation is recorded exactly once.
+    if (engine === 'ai') aiActionGate.record({ skipRemote: usageRecorded })
     // The server's own cap backstop (api/ai-generate.ts) rejected this call — show
     // the same upgrade prompt the client-side gate above would have, even though
     // the funnel below still completes via the free template fallback.

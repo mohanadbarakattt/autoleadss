@@ -16,6 +16,11 @@ interface LiveResult {
    * template below, but the wizard uses this to show the same upgrade prompt its
    * own client-side gate would have. */
   capExceeded?: boolean
+  /** True when `/api/ai-generate` already incremented `autoleadss.usage_counters`
+   * for this call (its server-side cap backstop ran) — `generateFunnel` forwards
+   * this so the wizard can skip its own redundant `/api/usage` POST and avoid
+   * double-counting a single successful generation. */
+  usageRecorded?: boolean
 }
 
 /**
@@ -57,9 +62,11 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
   if (!res.ok) return { spec: null }
 
   let copy: AiHeroCopy | null = null
+  let usageRecorded = false
   try {
-    const data = (await res.json()) as { text?: string }
+    const data = (await res.json()) as { text?: string; usageRecorded?: boolean }
     if (data.text) copy = JSON.parse(data.text) as AiHeroCopy
+    usageRecorded = data.usageRecorded === true
   } catch {
     return { spec: null }
   }
@@ -74,7 +81,7 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
     ctaPrimary: copy.ctaPrimary || spec.page.hero.ctaPrimary,
   }
   spec.page.finalCta = { ...spec.page.finalCta, cta: spec.page.hero.ctaPrimary }
-  return { spec }
+  return { spec, usageRecorded }
 }
 
 /**
@@ -86,9 +93,9 @@ export async function generateFunnel(
   input: WizardInput,
   onStep: (label: string) => void,
   fallbackSteps: string[],
-): Promise<{ spec: FunnelSpec; engine: 'ai' | 'template'; capExceeded?: boolean }> {
+): Promise<{ spec: FunnelSpec; engine: 'ai' | 'template'; capExceeded?: boolean; usageRecorded?: boolean }> {
   const live = await generateLive(input, onStep)
-  if (live.spec) return { spec: live.spec, engine: 'ai' }
+  if (live.spec) return { spec: live.spec, engine: 'ai', usageRecorded: live.usageRecorded }
 
   for (const s of fallbackSteps) {
     onStep(s)

@@ -30,6 +30,12 @@ interface AiGenerateBody {
  * Also enforces the AI-action cap server-side once the Neon usage backend is live
  * (see the "AI-action cap backstop" block below) — this is the real enforcement
  * point, not just the wizard's client-side gate.
+ *
+ * The 200 response includes `usageRecorded`: true whenever this call already
+ * incremented `autoleadss.usage_counters` (the backstop below ran). The wizard
+ * (generateLive.ts / Wizard.tsx's `generate()`) uses that to skip its own
+ * post-generation `/api/usage` POST so a successful generation is counted
+ * exactly once, with the server authoritative when it did the counting.
  */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST'])
@@ -70,11 +76,13 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   // checkout isn't wired yet; see billing/checkout.ts's `billingEnabled`). An
   // unrecognized/missing plan falls back to Growth's cap rather than "uncapped".
   const sql = getSql()
+  let usageRecorded = false
   if (sql) {
     const plan: PlanId = KNOWN_PLANS.includes(body.plan as PlanId) ? (body.plan as PlanId) : 'growth'
     const cap = entitlementFor(plan).aiActionCap
     if (cap) {
       const usage = await incrementUsageCounter(sql, userId, 'aiAction')
+      usageRecorded = true
       if (cap.type === 'hard' && usage.aiAction > cap.limit) {
         return sendJson(res, 429, {
           error: 'ai_action_cap_exceeded',
@@ -128,5 +136,5 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (!text) return sendJson(res, 502, { error: 'Gateway returned no content.' })
 
-  return sendJson(res, 200, { text })
+  return sendJson(res, 200, { text, usageRecorded })
 }
