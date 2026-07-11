@@ -9,7 +9,7 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useFunnels, createFunnel, seedDemoLeads, uid, slugify } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
-import { useCapGate } from '../billing/usage'
+import { useCapGate, isCapHit } from '../billing/usage'
 import { INDUSTRIES, industryNamePlaceholder } from '../industries'
 import { generateFunnel } from '../ai/generateLive'
 import type { Industry, Tone, WizardInput, FunnelSpec, Funnel } from '../types'
@@ -71,7 +71,7 @@ export default function Wizard() {
       openUpgrade('maxFunnels')
       return
     }
-    if (aiActionGate.status?.hit && aiActionGate.status.type === 'hard') {
+    if (isCapHit(aiActionGate.status)) {
       openUpgrade('aiActionCap')
       return
     }
@@ -85,9 +85,10 @@ export default function Wizard() {
       goal,
       tone,
       accent,
+      plan: session.workspace.plan,
     }
     const started = Date.now()
-    const { spec: resultSpec, engine } = await generateFunnel(
+    const { spec: resultSpec, engine, capExceeded } = await generateFunnel(
       input,
       (label) => setLiveSteps((s) => (s.includes(label) ? s : [...s, label])),
       GEN_STEPS[contentLocale],
@@ -95,6 +96,10 @@ export default function Wizard() {
     // Only the real gateway call (engine === 'ai') costs anything — the
     // template fallback is free, so it doesn't count against the AI-action cap.
     if (engine === 'ai') aiActionGate.record()
+    // The server's own cap backstop (api/ai-generate.ts) rejected this call — show
+    // the same upgrade prompt the client-side gate above would have, even though
+    // the funnel below still completes via the free template fallback.
+    if (capExceeded) openUpgrade('aiActionCap')
     const wait = Math.max(0, 2400 - (Date.now() - started))
     await new Promise((r) => setTimeout(r, wait))
 

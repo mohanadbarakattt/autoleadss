@@ -1,5 +1,11 @@
 import { requireClerkUser } from './_lib/auth'
+import { getSql } from './_lib/db'
+import { incrementUsageCounter } from './_lib/usage'
 import { methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from './_lib/http'
+import { entitlementFor } from '../src/saas/entitlements'
+import type { PlanId } from '../src/saas/types'
+
+const KNOWN_PLANS: readonly PlanId[] = ['starter', 'growth', 'pro', 'dwy', 'whitelabel']
 
 interface AiGenerateBody {
   businessName?: string
@@ -7,6 +13,7 @@ interface AiGenerateBody {
   language?: string
   goal?: string
   tone?: string
+  plan?: string
 }
 
 /**
@@ -19,6 +26,10 @@ interface AiGenerateBody {
  * MBAI_GATEWAY_URL / MBAI_GATEWAY_KEY aren't both set, responds 503 so the wizard
  * falls back to its existing template-only generation — that fallback path must
  * stay byte-for-byte identical to today's demo experience.
+ *
+ * Also enforces the AI-action cap server-side once the Neon usage backend is live
+ * (see the "AI-action cap backstop" block below) — this is the real enforcement
+ * point, not just the wizard's client-side gate.
  */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST'])
@@ -41,6 +52,39 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (!businessName || !industry) {
     return sendJson(res, 400, { error: 'businessName and industry are required.' })
+  }
+
+  // --- Server-side AI-action cap backstop (the actual enforcement point) -------
+  // The wizard's client-side gate (src/saas/pages/Wizard.tsx's `aiActionGate`) is
+  // only a UX nicety — anyone who calls this endpoint directly bypasses it
+  // entirely. When the Neon usage backend is live, every call increments the same
+  // `autoleadss.usage_counters` row the client reads (api/usage), atomically, and
+  // a hard cap being exceeded is refused here with a 429 before the (costly)
+  // gateway call is ever made. In demo mode (no DATABASE_URL) this block is a
+  // no-op and the client-only metering in src/saas/billing/usage.ts is the sole
+  // gate, exactly as before this backstop existed.
+  //
+  // The plan itself is still reported by the authenticated caller (honor system —
+  // same trust level as the rest of this app's billing: Pricing.tsx's "upgrade"
+  // flow already lets a signed-in user set their own plan for free, since real
+  // checkout isn't wired yet; see billing/checkout.ts's `billingEnabled`). An
+  // unrecognized/missing plan falls back to Growth's cap rather than "uncapped".
+  const sql = getSql()
+  if (sql) {
+    const plan: PlanId = KNOWN_PLANS.includes(body.plan as PlanId) ? (body.plan as PlanId) : 'growth'
+    const cap = entitlementFor(plan).aiActionCap
+    if (cap) {
+      const usage = await incrementUsageCounter(sql, userId, 'aiAction')
+      if (cap.type === 'hard' && usage.aiAction > cap.limit) {
+        return sendJson(res, 429, {
+          error: 'ai_action_cap_exceeded',
+          message: `This month's AI-action limit (${cap.limit}) has been reached.`,
+          period: usage.period,
+          used: usage.aiAction,
+          limit: cap.limit,
+        })
+      }
+    }
   }
 
   const system =

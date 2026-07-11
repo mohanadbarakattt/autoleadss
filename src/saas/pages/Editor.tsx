@@ -12,7 +12,7 @@ import { useI18n, toContentLocale } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
 import { useUpgrade } from '../billing/UpgradeContext'
-import { useCapGate } from '../billing/usage'
+import { useCapGate, isCapHit } from '../billing/usage'
 import { remoteEnabled } from '../config'
 import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
@@ -189,7 +189,7 @@ function EditorInner() {
               <ChatSimulator
                 spec={spec}
                 accent={accent}
-                locked={whatsappGate.status?.hit && whatsappGate.status.type === 'hard'}
+                locked={isCapHit(whatsappGate.status)}
                 lockedMessage={isRTL ? 'وصلت لحد محادثات واتساب الذكي لهذا الشهر — رقِّ باقتك لمزيد من المحادثات.' : 'This month’s WhatsApp-AI conversation limit has been reached — upgrade for more.'}
                 onConversationStart={() => {
                   const ok = whatsappGate.record()

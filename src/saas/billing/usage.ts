@@ -213,6 +213,18 @@ export interface CapGate {
   record: () => boolean
 }
 
+/**
+ * THE enforcement point for "is this hard cap reached, and should further usage of
+ * this metric be blocked?" — used by the WhatsApp-AI simulator's client-side gate
+ * (Editor.tsx → ChatSimulator's `locked` prop) today, and the one place a future
+ * real WhatsApp webhook (once it exists, server-side) must reproduce the same
+ * semantics against `autoleadss.usage_counters` before letting the AI bot answer
+ * another conversation. Soft caps (Pro) never block — `hit` there is advisory only.
+ */
+export function isCapHit(status: CapStatus | null): boolean {
+  return !!status && status.hit && status.type === 'hard'
+}
+
 export function useCapGate(metric: UsageMetric): CapGate {
   const session = useSession()
   const usage = useUsage()
@@ -224,7 +236,7 @@ export function useCapGate(metric: UsageMetric): CapGate {
   const status = capStatus(cap, usage[metric])
 
   function record(): boolean {
-    if (status?.hit && status.type === 'hard') return false
+    if (isCapHit(status)) return false
     recordUsage(session?.user.id, metric)
     return true
   }

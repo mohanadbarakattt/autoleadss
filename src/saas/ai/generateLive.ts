@@ -9,23 +9,32 @@ interface AiHeroCopy {
   ctaPrimary?: string
 }
 
+interface LiveResult {
+  spec: FunnelSpec | null
+  /** True when `/api/ai-generate` refused the call with its server-side AI-action
+   * cap backstop (HTTP 429) — `generateFunnel` still falls back to the free
+   * template below, but the wizard uses this to show the same upgrade prompt its
+   * own client-side gate would have. */
+  capExceeded?: boolean
+}
+
 /**
  * Optional AI-copy path, proxied through `/api/ai-generate` (which in turn talks to
  * the shared MBAI Model Gateway server-side — the SPA never holds
  * MBAI_GATEWAY_KEY; see ~/projects/mbai-ecosystem/docs/ENV-CONTRACT.md).
  *
- * Returns `null` — same as always — whenever there's no signed-in remote session,
- * no Clerk token, the gateway isn't configured (503), or anything about the call
- * fails. That keeps the demo-mode / no-key experience byte-for-byte identical to
- * before this was added: `generateFunnel` below falls back to the template
- * generator exactly as it did when this always returned `null`.
+ * Returns a null `spec` — same as always — whenever there's no signed-in remote
+ * session, no Clerk token, the gateway isn't configured (503), or anything about
+ * the call fails. That keeps the demo-mode / no-key experience byte-for-byte
+ * identical to before this was added: `generateFunnel` below falls back to the
+ * template generator exactly as it did when this always returned `null`.
  */
-export async function generateLive(input: WizardInput, _onStep: (label: string) => void): Promise<FunnelSpec | null> {
+export async function generateLive(input: WizardInput, _onStep: (label: string) => void): Promise<LiveResult> {
   const remote = getDb()
-  if (!remote) return null
+  if (!remote) return { spec: null }
 
   const token = await remote.getToken()
-  if (!token) return null
+  if (!token) return { spec: null }
 
   let res: Response
   try {
@@ -38,21 +47,23 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
         language: input.language,
         goal: input.goal,
         tone: input.tone,
+        plan: input.plan,
       }),
     })
   } catch {
-    return null
+    return { spec: null }
   }
-  if (!res.ok) return null
+  if (res.status === 429) return { spec: null, capExceeded: true }
+  if (!res.ok) return { spec: null }
 
   let copy: AiHeroCopy | null = null
   try {
     const data = (await res.json()) as { text?: string }
     if (data.text) copy = JSON.parse(data.text) as AiHeroCopy
   } catch {
-    return null
+    return { spec: null }
   }
-  if (!copy || !copy.headline) return null
+  if (!copy || !copy.headline) return { spec: null }
 
   const spec = generateFromTemplate(input)
   spec.page.hero = {
@@ -63,7 +74,7 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
     ctaPrimary: copy.ctaPrimary || spec.page.hero.ctaPrimary,
   }
   spec.page.finalCta = { ...spec.page.finalCta, cta: spec.page.hero.ctaPrimary }
-  return spec
+  return { spec }
 }
 
 /**
@@ -75,13 +86,13 @@ export async function generateFunnel(
   input: WizardInput,
   onStep: (label: string) => void,
   fallbackSteps: string[],
-): Promise<{ spec: FunnelSpec; engine: 'ai' | 'template' }> {
+): Promise<{ spec: FunnelSpec; engine: 'ai' | 'template'; capExceeded?: boolean }> {
   const live = await generateLive(input, onStep)
-  if (live) return { spec: live, engine: 'ai' }
+  if (live.spec) return { spec: live.spec, engine: 'ai' }
 
   for (const s of fallbackSteps) {
     onStep(s)
     await new Promise((r) => setTimeout(r, 480))
   }
-  return { spec: generateFromTemplate(input), engine: 'template' }
+  return { spec: generateFromTemplate(input), engine: 'template', capExceeded: live.capExceeded }
 }

@@ -7,7 +7,7 @@ import { useI18n, toContentLocale } from '../i18n'
 import { useFunnels, useAgency } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
-import { useCapGate } from '../billing/usage'
+import { useCapGate, isCapHit } from '../billing/usage'
 import type { CapGate } from '../billing/usage'
 
 export default function Dashboard() {
@@ -188,9 +188,9 @@ function CapUsageBar({ label, gate, isRTL, onUpgrade }: { label: string; gate: C
         <span className="text-muted-fg">{status.used} / {status.limit}</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
-        <div className={`h-full rounded-full transition-all ${status.hit && status.type === 'hard' ? 'bg-red-500' : 'bg-accent'}`} style={{ width: `${pct}%` }} />
+        <div className={`h-full rounded-full transition-all ${isCapHit(status) ? 'bg-red-500' : 'bg-accent'}`} style={{ width: `${pct}%` }} />
       </div>
-      {status.hit && status.type === 'hard' && (
+      {isCapHit(status) && (
         <button onClick={onUpgrade} className="mt-3 text-xs font-medium text-accent hover:underline">
           {isRTL ? 'رقِّ لمزيد ←' : 'Upgrade for more →'}
         </button>
