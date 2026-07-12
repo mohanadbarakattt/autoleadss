@@ -1,18 +1,22 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { useT, useLocale } from '../../i18n/LocaleProvider'
 import { toContentLocale } from '../../saas/i18n'
-import { TIERS, priceFor } from '../../saas/pricing'
+import { TIERS, priceFor, detectRegion } from '../../saas/pricing'
+import type { Region } from '../../saas/types'
 
 /** Teaser for the SaaS pricing page (/pricing) — the marketing homepage had no way
  * to reach it before this. Reuses the SaaS's own TIERS data so the numbers can't
- * drift between the two pages. Always shows Gulf ($) pricing here; the full
- * region toggle (Gulf/Egypt) lives on /pricing itself. */
+ * drift between the two pages. Defaults to EGP for Egyptian visitors (see
+ * `detectRegion`) and Gulf ($) otherwise, with the same Gulf/Egypt toggle /pricing
+ * itself uses. */
 export default function PricingTeaser() {
   const t = useT()
   const { locale } = useLocale()
   const contentLocale = toContentLocale(locale)
   const tiers = TIERS.slice(0, 3)
+  const [region, setRegion] = useState<Region>(detectRegion)
 
   return (
     <section className="relative overflow-hidden bg-background py-24">
@@ -34,6 +38,18 @@ export default function PricingTeaser() {
             {t.pricingTeaser.title}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-fg">{t.pricingTeaser.sub}</p>
+          <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1">
+            {(['gulf', 'egypt'] as Region[]).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRegion(r)}
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${region === r ? 'bg-accent text-white' : 'text-muted-fg hover:text-foreground'}`}
+              >
+                {r === 'gulf' ? `🇦🇪 ${t.pricingTeaser.gulf}` : `🇪🇬 ${t.pricingTeaser.egypt}`}
+              </button>
+            ))}
+          </div>
         </motion.div>
 
         <div className="grid gap-5 md:grid-cols-3">
@@ -50,7 +66,7 @@ export default function PricingTeaser() {
               <p className="font-display text-lg font-bold text-foreground">{tier.name[contentLocale]}</p>
               <p className="mt-1 text-sm text-muted-fg">{tier.tagline[contentLocale]}</p>
               <p className="mt-5 font-display text-3xl font-bold text-foreground">
-                {priceFor(tier, 'gulf')}
+                {priceFor(tier, region)}
                 <span className="text-sm font-normal text-muted-fg">{t.pricingTeaser.mo}</span>
               </p>
               <ul className="mt-5 flex flex-1 flex-col gap-2">

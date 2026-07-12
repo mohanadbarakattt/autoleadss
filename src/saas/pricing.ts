@@ -89,6 +89,18 @@ export function priceFor(tier: Tier, region: Region): string {
   return region === 'egypt' ? tier.priceEgypt : tier.priceGulf
 }
 
+/** Best-effort region guess for a visitor with no session/workspace yet (e.g. the
+ * marketing homepage). There's no server-side geo-IP in this app, so we use the
+ * browser's IANA timezone as a free, keyless proxy for "is this an Egyptian
+ * visitor" — falls back to 'gulf', matching the /pricing page's own default. */
+export function detectRegion(): Region {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone === 'Africa/Cairo' ? 'egypt' : 'gulf'
+  } catch {
+    return 'gulf'
+  }
+}
+
 export function planName(id: PlanId, locale: Locale): string {
   const t = TIERS.find((x) => x.id === id)
   return t ? t.name[locale] : id

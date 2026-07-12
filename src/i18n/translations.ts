@@ -203,6 +203,8 @@ const en = {
     sub: 'From a single funnel to a full agency system — see what fits your business.',
     mo: '/mo',
     cta: 'See full pricing',
+    egypt: 'Egypt',
+    gulf: 'Gulf / UAE',
   },
   footer: {
     tagline: 'The complete growth system. Serving UAE & Egypt.',
@@ -468,6 +470,8 @@ const ar: Dict = {
     sub: 'من قمع واحد إلى نظام وكالة كامل — شاهد ما يناسب عملك.',
     mo: '/شهرياً',
     cta: 'شاهد كل الأسعار',
+    egypt: 'مصر',
+    gulf: 'الخليج / الإمارات',
   },
   footer: {
     tagline: 'منظومة النمو الكاملة. نخدم الإمارات ومصر.',
@@ -738,6 +742,8 @@ const francoEg: Dict = {
     sub: 'Men funnel wahed le nizam agency kamel — shoof elly yenasbek.',
     mo: '/shahr',
     cta: 'Shoof kol el as3ar',
+    egypt: 'Masr',
+    gulf: 'El Khaleeg / El Emarat',
   },
   footer: {
     tagline: 'El nizam el kamel lel nomo. Bnkhdem El Emarat w Masr.',
