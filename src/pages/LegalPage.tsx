@@ -31,6 +31,10 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
         <title>{doc.title} — AutoLeadss</title>
         <meta name="description" content={doc.intro} />
         <link rel="canonical" href={`https://autoleadss.com${localePath(`/${kind}`)}`} />
+        <meta property="og:title" content={`${doc.title} — AutoLeadss`} />
+        <meta property="og:description" content={doc.intro} />
+        <meta property="og:url" content={`https://autoleadss.com${localePath(`/${kind}`)}`} />
+        <meta property="og:type" content="website" />
       </Helmet>
       <Navigation />
       <main className="section-padding pt-40">

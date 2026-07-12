@@ -66,9 +66,11 @@ export default function Pricing() {
   // white-label tiers, which are scoped per engagement.
   const productJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
+    '@type': 'SoftwareApplication',
     name: 'AutoLeadss — AI funnel builder',
     description: 'Self-serve AI funnel builder: landing pages, ads, WhatsApp bot, and social content generated from a short wizard.',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
     brand: { '@type': 'Brand', name: 'AutoLeadss' },
     offers: TIERS.filter((t) => !t.contact).map((t) => ({
       '@type': 'Offer',
@@ -88,6 +90,8 @@ export default function Pricing() {
         <link rel="canonical" href="https://autoleadss.com/pricing" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
+        <meta property="og:url" content="https://autoleadss.com/pricing" />
+        <meta property="og:type" content="website" />
         <meta property="og:image" content="https://autoleadss.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
