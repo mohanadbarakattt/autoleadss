@@ -25,7 +25,7 @@ Strategy (from `docs/SAAS_BUILD_PROMPT.md`): **B** self-serve builder = front do
   store (`src/saas/store.ts`, `useSyncExternalStore` + localStorage). Generation is client-side
   from a bilingual template library (`src/saas/content/templates.ts`, 5 industries × EN/AR).
   Core data type is `FunnelSpec` (`src/saas/types.ts`): landing page + ads + chatbot + social.
-- Contact form → Supabase edge function `send-contact-email`.
+- Contact → WhatsApp marketplace connector (`src/components/sections/WhatsAppMarketplace.tsx`), no backend — every listing deep-links straight to wa.me.
 - Business docs: `docs/SAAS_BUILD_PROMPT.md`, `docs/COMPETITOR_STUDY.md`, `docs/AI_MODEL_EVAL.md`,
   `lib/ai/model-router.json` (funnel copy → claude-fable-5, chat/qualify → haiku, ad/social → sonnet).
 

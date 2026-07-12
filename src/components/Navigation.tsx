@@ -91,6 +91,9 @@ export default function Navigation() {
                 )}
               </a>
             ))}
+            <a href="/pricing" className="text-sm font-medium text-white/70 transition-colors duration-200 hover:text-white">
+              {t.nav.pricing}
+            </a>
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -147,6 +150,13 @@ export default function Navigation() {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="/pricing"
+                onClick={() => setMenuOpen(false)}
+                className="font-display text-xl font-semibold text-white transition-colors hover:text-accent"
+              >
+                {t.nav.pricing}
+              </a>
             </nav>
             <div className="mt-auto flex flex-col gap-3">
               <a

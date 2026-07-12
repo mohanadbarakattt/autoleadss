@@ -13,6 +13,7 @@ export interface FunnelRow {
   accent: string | null
   spec: FunnelSpec
   visits: number
+  visits_by_day: Record<string, number> | null
   created_at: string
   updated_at: string
 }
@@ -59,6 +60,7 @@ export function funnelFromRow(r: FunnelRow, leads: LeadRow[] = []): Funnel {
     accent: r.accent ?? '#FF5C2A',
     spec: r.spec,
     visits: r.visits ?? 0,
+    visitsByDay: r.visits_by_day ?? undefined,
     createdAt: toMillis(r.created_at),
     updatedAt: toMillis(r.updated_at),
     leads: leads.map(leadFromRow).sort((a, b) => b.createdAt - a.createdAt),
@@ -77,6 +79,7 @@ export interface FunnelPatch {
   accent?: string | null
   spec?: FunnelSpec
   visits?: number
+  visitsByDay?: Record<string, number>
 }
 
 export function isFunnelPatch(body: unknown): body is FunnelPatch {

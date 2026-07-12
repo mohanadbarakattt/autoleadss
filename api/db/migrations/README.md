@@ -18,6 +18,7 @@ for runtime queries only):
 ```bash
 psql "$DIRECT_URL" -f api/db/migrations/0001_autoleadss_schema.sql
 psql "$DIRECT_URL" -f api/db/migrations/0002_usage_counters.sql
+psql "$DIRECT_URL" -f api/db/migrations/0003_visits_by_day.sql
 ```
 
 Each file is idempotent (`create table/schema/index if not exists`) — safe to re-run.
@@ -26,6 +27,7 @@ Each file is idempotent (`create table/schema/index if not exists`) — safe to 
 |---|---|
 | `0001_autoleadss_schema.sql` | `autoleadss.funnels`, `autoleadss.leads` — the funnel/lead persistence backing `api/funnels/*`, `api/leads/*`, `api/published/*` |
 | `0002_usage_counters.sql` | `autoleadss.usage_counters` — per-user, per-month WhatsApp-AI/AI-action usage counts backing `api/usage` and the entitlement caps in `src/saas/entitlements.ts` |
+| `0003_visits_by_day.sql` | `autoleadss.funnels.visits_by_day` — daily visit rollup backing the visits trend chart in `src/saas/components/FunnelAnalytics.tsx` |
 
 Not yet migrated (see `docs/SETUP.md` "Out of scope"): workspaces, agency settings,
 sub-accounts, domains, WhatsApp connections/messages, top-up grants (`TOPUP_PACKS`

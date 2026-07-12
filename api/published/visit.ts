@@ -11,6 +11,17 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const body = (req.body ?? {}) as { slug?: string }
   if (!body.slug) return sendJson(res, 400, { error: 'slug is required.' })
 
-  await sql`update autoleadss.funnels set visits = visits + 1 where slug = ${body.slug} and status = 'published'`
+  // Bump both the running total and today's (UTC) slot in the daily rollup —
+  // jsonb_set + coalesce so a never-visited day starts at 0 rather than erroring.
+  await sql`
+    update autoleadss.funnels
+    set visits = visits + 1,
+        visits_by_day = jsonb_set(
+          visits_by_day,
+          array[to_char(now() at time zone 'utc', 'YYYY-MM-DD')],
+          to_jsonb(coalesce((visits_by_day ->> to_char(now() at time zone 'utc', 'YYYY-MM-DD'))::int, 0) + 1)
+        )
+    where slug = ${body.slug} and status = 'published'
+  `
   return sendJson(res, 200, { ok: true })
 }

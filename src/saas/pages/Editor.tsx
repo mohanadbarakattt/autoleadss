@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2, FlaskConical, Info } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2, FlaskConical, Info, Download } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
@@ -18,7 +18,7 @@ import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
 import type { FunnelSpec, Lead, Funnel } from '../types'
 
-type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'insights' | 'domain'
+type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'insights' | 'settings' | 'domain'
 
 export default function Editor() {
   return (
@@ -82,6 +82,7 @@ function EditorInner() {
     { id: 'social', label: t.editor.tabs.social },
     { id: 'leads', label: `${t.editor.tabs.leads} (${funnel.leads.length})` },
     { id: 'insights', label: isRTL ? 'التحليلات' : 'Insights' },
+    { id: 'settings', label: isRTL ? 'الإعدادات' : 'Settings' },
     { id: 'domain', label: isRTL ? 'النطاق' : 'Domain' },
   ]
 
@@ -237,6 +238,16 @@ function EditorInner() {
         {tab === 'leads' && (
           <>
             {hasSampleData(funnel) && <SampleDataBanner funnelId={id} isRTL={isRTL} />}
+            {funnel.leads.length > 0 && (
+              <div className="mb-4 flex justify-end">
+                <button
+                  onClick={() => downloadLeadsCsv(funnel.name, funnel.leads)}
+                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground"
+                >
+                  <Download size={14} /> {isRTL ? 'تصدير CSV' : 'Export CSV'}
+                </button>
+              </div>
+            )}
             <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />
           </>
         )}
@@ -248,8 +259,79 @@ function EditorInner() {
           </>
         )}
 
+        {tab === 'settings' && <SettingsPanel spec={spec} set={set} isRTL={isRTL} />}
+
         {tab === 'domain' && <DomainPanel funnel={funnel} isRTL={isRTL} />}
       </div>
+    </div>
+  )
+}
+
+function csvEscape(value: string): string {
+  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
+}
+
+/** Client-side CSV export — leads already live fully in `funnel.leads`, no API call needed. */
+function downloadLeadsCsv(funnelName: string, leads: Lead[]) {
+  const header = ['Name', 'Phone', 'Email', 'Source', 'Status', 'Created At']
+  const rows = leads.map((l) => [l.name, l.phone, l.email ?? '', l.source, l.status, new Date(l.createdAt).toISOString()])
+  const csv = [header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${funnelName.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'leads'}-leads.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function SettingsPanel({ spec, set, isRTL }: { spec: FunnelSpec; set: (mutate: (s: FunnelSpec) => FunnelSpec) => void; isRTL: boolean }) {
+  const thankYou = spec.page.thankYou
+  return (
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      <FieldGroup title={isRTL ? 'تتبّع التحويل' : 'Conversion tracking'}>
+        <p className="-mt-1 mb-1 text-xs text-muted-fg">
+          {isRTL ? 'أضف معرّفات البكسل/GA4 لتتبّع أداء الإعلانات على هذه الصفحة.' : 'Add your pixel/GA4 IDs to measure ad performance on this page.'}
+        </p>
+        <EditField
+          label="Meta Pixel ID"
+          value={spec.tracking?.metaPixelId ?? ''}
+          onChange={(v) => set((s) => ({ ...s, tracking: { ...s.tracking, metaPixelId: v || undefined } }))}
+        />
+        <EditField
+          label="GA4 Measurement ID"
+          value={spec.tracking?.ga4Id ?? ''}
+          onChange={(v) => set((s) => ({ ...s, tracking: { ...s.tracking, ga4Id: v || undefined } }))}
+        />
+      </FieldGroup>
+
+      <FieldGroup title={isRTL ? 'صفحة الشكر' : 'Thank-you step'}>
+        <p className="-mt-1 mb-1 text-xs text-muted-fg">
+          {isRTL ? 'تُعرض بدلاً من رسالة "تم الإرسال" الافتراضية بعد إرسال النموذج.' : 'Shown instead of the default "Sent" message after the lead form is submitted.'}
+        </p>
+        <EditField
+          label={isRTL ? 'العنوان' : 'Headline'}
+          value={thankYou?.headline ?? ''}
+          onChange={(v) => set((s) => ({ ...s, page: { ...s.page, thankYou: { ...s.page.thankYou, headline: v, body: s.page.thankYou?.body ?? '' } } }))}
+        />
+        <EditArea
+          label={isRTL ? 'النص' : 'Body'}
+          value={thankYou?.body ?? ''}
+          onChange={(v) => set((s) => ({ ...s, page: { ...s.page, thankYou: { ...s.page.thankYou, headline: s.page.thankYou?.headline ?? '', body: v } } }))}
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <EditField
+            label={isRTL ? 'نص الزر (اختياري)' : 'CTA label (optional)'}
+            value={thankYou?.ctaLabel ?? ''}
+            onChange={(v) => set((s) => ({ ...s, page: { ...s.page, thankYou: { headline: s.page.thankYou?.headline ?? '', body: s.page.thankYou?.body ?? '', ctaLabel: v, ctaHref: s.page.thankYou?.ctaHref } } }))}
+          />
+          <EditField
+            label={isRTL ? 'رابط الزر (اختياري)' : 'CTA link (optional)'}
+            value={thankYou?.ctaHref ?? ''}
+            onChange={(v) => set((s) => ({ ...s, page: { ...s.page, thankYou: { headline: s.page.thankYou?.headline ?? '', body: s.page.thankYou?.body ?? '', ctaLabel: s.page.thankYou?.ctaLabel, ctaHref: v } } }))}
+          />
+        </div>
+      </FieldGroup>
     </div>
   )
 }

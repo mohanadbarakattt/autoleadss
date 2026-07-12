@@ -39,6 +39,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (patch.accent !== undefined) col('accent', patch.accent)
     if (patch.spec !== undefined) col('spec', JSON.stringify(patch.spec))
     if (patch.visits !== undefined) col('visits', patch.visits)
+    if (patch.visitsByDay !== undefined) col('visits_by_day', JSON.stringify(patch.visitsByDay))
     col('updated_at', new Date().toISOString())
 
     if (!fields.length) return sendJson(res, 400, { error: 'No updatable fields in body.' })

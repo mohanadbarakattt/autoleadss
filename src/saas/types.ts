@@ -24,7 +24,12 @@ export interface FunnelSpec {
     faq: { q: string; a: string }[]
     finalCta: { headline: string; sub: string; cta: string }
     leadForm: { title: string; fields: string[]; button: string }
+    /** Shown instead of the default inline "Sent ✅" panel after a lead submits, when set. */
+    thankYou?: { headline: string; body: string; ctaLabel?: string; ctaHref?: string }
   }
+  /** Per-funnel conversion tracking — injected into the published page's <head> (see
+   * Published.tsx). Both optional and independent of each other. */
+  tracking?: { metaPixelId?: string; ga4Id?: string }
   ads: { platform: string; headline: string; description: string; cta: string }[]
   chatbot: {
     greeting: string
@@ -68,6 +73,10 @@ export interface Funnel {
   updatedAt: number
   visits: number
   leads: Lead[]
+  /** Daily visit rollup, keyed by UTC 'YYYY-MM-DD', for the visits trend chart in
+   * FunnelAnalytics — `visits` alone is just a running total with no timeline.
+   * Optional so older stored funnels (from before this field existed) still load. */
+  visitsByDay?: Record<string, number>
   /** The fake visit count `seedDemoLeads` added at creation time (so "clear sample
    * data" can subtract exactly that many and leave any real, later visits intact). */
   seedVisits?: number

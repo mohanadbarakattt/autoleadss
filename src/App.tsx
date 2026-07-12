@@ -7,9 +7,10 @@ import Process from './components/sections/Process'
 import Work from './components/sections/Work'
 import Results from './components/sections/Results'
 import WhyUs from './components/sections/WhyUs'
+import PricingTeaser from './components/sections/PricingTeaser'
 import FAQ from './components/sections/FAQ'
 import CTABanner from './components/sections/CTABanner'
-import Contact from './components/sections/Contact'
+import WhatsAppMarketplace from './components/sections/WhatsAppMarketplace'
 import Footer from './components/Footer'
 import ChatWidget from './components/ChatWidget'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -77,9 +78,10 @@ export default function App() {
         <Results />
         <Process />
         <WhyUs />
+        <PricingTeaser />
         <FAQ />
         <CTABanner />
-        <Contact />
+        <WhatsAppMarketplace />
       </main>
       <Footer />
       <ChatWidget />

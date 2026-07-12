@@ -335,7 +335,14 @@ export function publishFunnel(id: string) {
 
 export function recordVisit(slug: string) {
   ensureHydrated()
-  set({ funnels: state.funnels.map((f) => (f.slug === slug ? { ...f, visits: f.visits + 1 } : f)) })
+  const day = new Date().toISOString().slice(0, 10) // UTC 'YYYY-MM-DD'
+  set({
+    funnels: state.funnels.map((f) =>
+      f.slug === slug
+        ? { ...f, visits: f.visits + 1, visitsByDay: { ...f.visitsByDay, [day]: (f.visitsByDay?.[day] ?? 0) + 1 } }
+        : f,
+    ),
+  })
 }
 
 export function addLead(slug: string, lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {

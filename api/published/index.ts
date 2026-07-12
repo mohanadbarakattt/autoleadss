@@ -21,7 +21,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   if (!slug) return sendJson(res, 400, { error: 'slug is required.' })
 
   const rows = (await sql`
-    select id, name, slug, industry, language, status, accent, spec, visits, created_at, updated_at
+    select id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, created_at, updated_at
     from autoleadss.funnels
     where slug = ${slug} and status = 'published'
     limit 1

@@ -21,6 +21,21 @@ function lastNDays(leads: Lead[], n: number): { label: string; day: number; coun
   return buckets
 }
 
+/** Same last-N-days bucketing as `lastNDays`, but reading straight from the
+ * `visitsByDay` rollup (keyed by UTC 'YYYY-MM-DD') instead of a Lead[] array —
+ * there's no per-visit event to bucket, just a per-day count. */
+function lastNDaysFromRollup(visitsByDay: Record<string, number> | undefined, n: number): { label: string; count: number }[] {
+  const today = new Date()
+  today.setUTCHours(0, 0, 0, 0)
+  const buckets: { label: string; count: number }[] = []
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * DAY)
+    const key = d.toISOString().slice(0, 10)
+    buckets.push({ label: `${d.getUTCMonth() + 1}/${d.getUTCDate()}`, count: visitsByDay?.[key] ?? 0 })
+  }
+  return buckets
+}
+
 export default function FunnelAnalytics({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
   const leads = funnel.leads
   const conv = funnel.visits ? Math.round((leads.length / funnel.visits) * 100) : 0
@@ -38,6 +53,9 @@ export default function FunnelAnalytics({ funnel, isRTL }: { funnel: Funnel; isR
   const days = lastNDays(leads, 14)
   const max = Math.max(1, ...days.map((d) => d.count))
 
+  const visitDays = lastNDaysFromRollup(funnel.visitsByDay, 14)
+  const visitMax = Math.max(1, ...visitDays.map((d) => d.count))
+
   const sources: { key: Lead['source']; label: string; count: number }[] = [
     { key: 'whatsapp', label: '🟢 WhatsApp', count: wa },
     { key: 'page', label: '🌐 Page', count: leads.length - wa },
@@ -54,6 +72,25 @@ export default function FunnelAnalytics({ funnel, isRTL }: { funnel: Funnel; isR
             <p className="mt-0.5 text-xs text-muted-fg">{k.l}</p>
           </div>
         ))}
+      </div>
+
+      {/* Visits · last 14 days */}
+      <div className="mt-4 rounded-2xl border border-border bg-card p-6">
+        <p className="mb-5 font-display font-semibold">{isRTL ? 'الزيارات · آخر 14 يوماً' : 'Visits · last 14 days'}</p>
+        <div className="flex h-40 items-end gap-1.5" role="img" aria-label="Visits per day, last 14 days">
+          {visitDays.map((d, i) => (
+            <div key={i} className="group relative flex flex-1 flex-col items-center justify-end" title={`${d.label}: ${d.count}`}>
+              <div
+                className="w-full rounded-t bg-foreground/40 transition-all"
+                style={{ height: d.count ? `${(d.count / visitMax) * 100}%` : '2px', opacity: d.count ? 1 : 0.18, minHeight: 2 }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-2 flex justify-between text-[10px] text-muted-fg">
+          <span>{visitDays[0].label}</span>
+          <span>{visitDays[visitDays.length - 1].label}</span>
+        </div>
       </div>
 
       {/* Leads · last 14 days — single-series bars, brand accent */}

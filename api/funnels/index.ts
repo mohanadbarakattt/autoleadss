@@ -15,7 +15,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (req.method === 'GET') {
     const funnelRows = (await sql`
-      select id, name, slug, industry, language, status, accent, spec, visits, created_at, updated_at
+      select id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, created_at, updated_at
       from autoleadss.funnels
       where clerk_user_id = ${userId}
       order by created_at desc
@@ -44,10 +44,11 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
       return sendJson(res, 400, { error: 'id, name, slug, industry, language are required.' })
     }
     await sql`
-      insert into autoleadss.funnels (id, clerk_user_id, name, slug, industry, language, status, accent, spec, visits)
+      insert into autoleadss.funnels (id, clerk_user_id, name, slug, industry, language, status, accent, spec, visits, visits_by_day)
       values (
         ${body.id}, ${userId}, ${body.name}, ${body.slug}, ${body.industry}, ${body.language},
-        ${body.status ?? 'draft'}, ${body.accent ?? null}, ${JSON.stringify(body.spec ?? {})}, ${body.visits ?? 0}
+        ${body.status ?? 'draft'}, ${body.accent ?? null}, ${JSON.stringify(body.spec ?? {})}, ${body.visits ?? 0},
+        ${JSON.stringify(body.visitsByDay ?? {})}
       )
     `
     if (body.leads?.length) {

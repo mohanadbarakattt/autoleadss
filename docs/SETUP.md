@@ -87,7 +87,6 @@ Each of these has a short doc comment in its source file pointing back here.
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk auth (`/login`, `/signup`, `/app`) | ⛔ add to go live |
 | `CLERK_SECRET_KEY` | `api/*` — verifies Clerk session tokens server-side | ⛔ add to go live |
 | `DATABASE_URL` / `DIRECT_URL` | `api/*` — shared Neon Postgres (`autoleadss` schema) | ⛔ add to go live |
-| `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | Marketing-site contact form only (`send-contact-email`) — unrelated to the SaaS above | ✅ set (own small Supabase project) |
 
 _Historical note: Phases "2"–"8" below describe the old Supabase-backed
 implementation, kept for context on what shipped and when. The persistence layer

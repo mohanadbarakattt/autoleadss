@@ -148,8 +148,23 @@ export default function FunnelRenderer({
                 <span className="flex h-12 w-12 items-center justify-center rounded-full" style={{ background: `${accent}22` }}>
                   <Check size={24} style={{ color: accent }} />
                 </span>
-                <p className="font-display text-lg font-semibold text-white">{rtl ? 'تم الإرسال ✅' : 'Sent ✅'}</p>
-                <p className="text-sm text-white/60">{rtl ? 'سنتواصل معك قريباً.' : 'We’ll reach out shortly.'}</p>
+                <p className="font-display text-lg font-semibold text-white">
+                  {p.thankYou?.headline || (rtl ? 'تم الإرسال ✅' : 'Sent ✅')}
+                </p>
+                <p className="text-sm text-white/60">
+                  {p.thankYou?.body || (rtl ? 'سنتواصل معك قريباً.' : 'We’ll reach out shortly.')}
+                </p>
+                {p.thankYou?.ctaHref && (
+                  <a
+                    href={p.thankYou.ctaHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
+                    style={{ background: accent }}
+                  >
+                    {p.thankYou.ctaLabel || (rtl ? 'التالي' : 'Next step')}
+                  </a>
+                )}
               </div>
             ) : (
               <form onSubmit={submit} className="flex flex-col gap-3">
