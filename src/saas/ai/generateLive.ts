@@ -1,13 +1,6 @@
 import type { FunnelSpec, WizardInput } from '../types'
-import { generateFromTemplate } from './generate'
+import { generateFromTemplate, mergeAiFunnelSpec } from './generate'
 import { getDb } from '../store'
-
-interface AiHeroCopy {
-  eyebrow?: string
-  headline?: string
-  subhead?: string
-  ctaPrimary?: string
-}
 
 interface LiveResult {
   spec: FunnelSpec | null
@@ -24,15 +17,19 @@ interface LiveResult {
 }
 
 /**
- * Optional AI-copy path, proxied through `/api/ai-generate` (which in turn talks to
- * the shared MBAI Model Gateway server-side — the SPA never holds
- * MBAI_GATEWAY_KEY; see ~/projects/mbai-ecosystem/docs/ENV-CONTRACT.md).
+ * The real-AI generation path, proxied through `/api/ai-generate` (which in turn
+ * talks to the shared MBAI Model Gateway server-side — the SPA never holds
+ * MBAI_GATEWAY_KEY; see ~/projects/mbai-ecosystem/docs/ENV-CONTRACT.md). Asks the
+ * gateway for a complete, tailored funnel (page copy, ads, WhatsApp bot script,
+ * social posts), then merges whatever validates onto the template spec via
+ * `mergeAiFunnelSpec` (see generate.ts for the validation rules).
  *
  * Returns a null `spec` — same as always — whenever there's no signed-in remote
- * session, no Clerk token, the gateway isn't configured (503), or anything about
- * the call fails. That keeps the demo-mode / no-key experience byte-for-byte
- * identical to before this was added: `generateFunnel` below falls back to the
- * template generator exactly as it did when this always returned `null`.
+ * session, no Clerk token, the gateway isn't configured (503), the response
+ * doesn't parse, or the AI output doesn't validate. That keeps the demo-mode /
+ * no-key experience byte-for-byte identical to before this was added:
+ * `generateFunnel` below falls back to the template generator exactly as it did
+ * when this always returned `null`.
  */
 export async function generateLive(input: WizardInput, _onStep: (label: string) => void): Promise<LiveResult> {
   const remote = getDb()
@@ -50,8 +47,10 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
         businessName: input.businessName,
         industry: input.industry,
         language: input.language,
+        region: input.region,
         goal: input.goal,
         tone: input.tone,
+        audience: input.audience,
         plan: input.plan,
       }),
     })
@@ -61,26 +60,18 @@ export async function generateLive(input: WizardInput, _onStep: (label: string) 
   if (res.status === 429) return { spec: null, capExceeded: true }
   if (!res.ok) return { spec: null }
 
-  let copy: AiHeroCopy | null = null
+  let ai: unknown
   let usageRecorded = false
   try {
     const data = (await res.json()) as { text?: string; usageRecorded?: boolean }
-    if (data.text) copy = JSON.parse(data.text) as AiHeroCopy
+    if (data.text) ai = JSON.parse(data.text)
     usageRecorded = data.usageRecorded === true
   } catch {
     return { spec: null }
   }
-  if (!copy || !copy.headline) return { spec: null }
 
-  const spec = generateFromTemplate(input)
-  spec.page.hero = {
-    ...spec.page.hero,
-    eyebrow: copy.eyebrow || spec.page.hero.eyebrow,
-    headline: copy.headline,
-    subhead: copy.subhead || spec.page.hero.subhead,
-    ctaPrimary: copy.ctaPrimary || spec.page.hero.ctaPrimary,
-  }
-  spec.page.finalCta = { ...spec.page.finalCta, cta: spec.page.hero.ctaPrimary }
+  const spec = mergeAiFunnelSpec(input, ai)
+  if (!spec) return { spec: null }
   return { spec, usageRecorded }
 }
 

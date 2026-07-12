@@ -3,7 +3,8 @@ import { getSql } from './_lib/db'
 import { incrementUsageCounter } from './_lib/usage'
 import { methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from './_lib/http'
 import { entitlementFor } from '../src/saas/entitlements'
-import type { PlanId } from '../src/saas/types'
+import { buildGenerationPrompt } from '../src/saas/ai/generate'
+import type { Industry, PlanId, Tone, WizardInput } from '../src/saas/types'
 
 const KNOWN_PLANS: readonly PlanId[] = ['starter', 'growth', 'pro', 'dwy', 'whitelabel']
 
@@ -11,8 +12,10 @@ interface AiGenerateBody {
   businessName?: string
   industry?: string
   language?: string
+  region?: string
   goal?: string
   tone?: string
+  audience?: string
   plan?: string
 }
 
@@ -55,6 +58,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const language = body.language === 'ar' ? 'ar' : 'en'
   const goal = typeof body.goal === 'string' ? body.goal.slice(0, 100) : ''
   const tone = typeof body.tone === 'string' ? body.tone.slice(0, 100) : ''
+  const audience = typeof body.audience === 'string' ? body.audience.slice(0, 200) : undefined
 
   if (!businessName || !industry) {
     return sendJson(res, 400, { error: 'businessName and industry are required.' })
@@ -95,9 +99,19 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     }
   }
 
-  const system =
-    'You are AutoLeadss\'s funnel copywriter. Write high-converting, natural, market-appropriate landing-page hero copy for businesses in Egypt and the Gulf. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market. Respond with ONLY a JSON object of the exact shape {"eyebrow": string, "headline": string, "subhead": string, "ctaPrimary": string} — no prose, no markdown fences.'
-  const user = `Business: ${businessName}\nIndustry: ${industry}\nLanguage: ${language}\nPrimary goal: ${goal || 'leads'}\nTone: ${tone || 'bold'}`
+  // input.accent is unused by buildGenerationPrompt (it only drives the prompt
+  // text below, never the visual accent color) — a placeholder is fine here.
+  const wizardInput: WizardInput = {
+    industry: industry as Industry,
+    businessName,
+    language,
+    region: body.region === 'gulf' ? 'gulf' : 'egypt',
+    goal: goal || 'leads',
+    tone: (tone || 'bold') as Tone,
+    accent: '#000000',
+    audience,
+  }
+  const { system, user } = buildGenerationPrompt(wizardInput)
 
   let upstream: Response
   try {
@@ -115,7 +129,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
           { role: 'user', content: user },
         ],
         temperature: 0.7,
-        max_tokens: 400,
+        max_tokens: 3000,
       }),
     })
   } catch (e) {
@@ -136,5 +150,9 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (!text) return sendJson(res, 502, { error: 'Gateway returned no content.' })
 
-  return sendJson(res, 200, { text, usageRecorded })
+  // The model is instructed to return raw JSON, but strip an accidental
+  // ```json fence defensively before handing it to the client's JSON.parse.
+  const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')
+
+  return sendJson(res, 200, { text: cleaned, usageRecorded })
 }

@@ -180,11 +180,14 @@ export function generateFromTemplate(input: WizardInput): FunnelSpec {
   return spec
 }
 
-/** System + user prompt for the real-AI path (used when ANTHROPIC_API_KEY is set). */
+/** System + user prompt for the real-AI path, sent to the MBAI Model Gateway
+ * by api/ai-generate.ts. Asks for a complete funnel — page copy, ads, the
+ * WhatsApp bot script, and social posts — tailored to the business, not a
+ * template with names swapped in. */
 export function buildGenerationPrompt(input: WizardInput): { system: string; user: string } {
   const example = pickTemplate(input.industry, input.language)
-  const system = `You are AutoLeadss's funnel generator. You write high-converting, natural, market-appropriate sales-funnel copy for businesses in Egypt and the Gulf. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market. Output ONLY a JSON object exactly matching the provided schema — no prose, no markdown fences.`
-  const user = `Generate a complete funnel spec.
+  const system = `You are AutoLeadss's funnel generator. You write high-converting, natural, market-appropriate sales-funnel copy for businesses in Egypt and the Gulf: landing-page copy, ad copy, a WhatsApp bot script, and social posts. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market. Never invent specific customer names, numbers, or stories for "testimonials" — leave that array generic or empty; the platform replaces it with verified generic phrasing. Output ONLY a JSON object exactly matching the provided schema — no prose, no markdown fences.`
+  const user = `Generate a complete funnel spec, tailored specifically to this business (not generic boilerplate).
 Business: ${input.businessName}
 Industry: ${input.industry}
 Language: ${input.language}
@@ -196,4 +199,88 @@ ${input.audience ? `Audience: ${input.audience}` : ''}
 Match this JSON shape exactly (same keys, same nesting), but with fresh, tailored content:
 ${JSON.stringify(example)}`
   return { system, user }
+}
+
+// ---------------------------------------------------------------------------
+// Validation + merge for the gateway's JSON response. The model can drop or
+// mangle a section; each section is only accepted if it structurally matches
+// FunnelSpec, otherwise the template's version of that section is kept — so a
+// partially-broken response still produces a fully-valid, mostly-AI funnel
+// instead of discarding the whole thing.
+// ---------------------------------------------------------------------------
+
+function isStr(v: unknown): v is string {
+  return typeof v === 'string' && v.trim().length > 0
+}
+function isStrArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.length > 0 && v.every(isStr)
+}
+
+type Rec = Record<string, unknown>
+const isRec = (v: unknown): v is Rec => !!v && typeof v === 'object'
+
+function validHero(v: unknown): v is FunnelSpec['page']['hero'] {
+  const h = v as Rec
+  return isRec(h) && isStr(h.eyebrow) && isStr(h.headline) && isStr(h.subhead) && isStr(h.ctaPrimary) && isStr(h.ctaSecondary) && isStrArray(h.badges)
+}
+function validStats(v: unknown): v is FunnelSpec['page']['stats'] {
+  return Array.isArray(v) && v.length > 0 && v.every((s) => isRec(s) && isStr(s.value) && isStr(s.label))
+}
+function validFeatures(v: unknown): v is FunnelSpec['page']['features'] {
+  return Array.isArray(v) && v.length > 0 && v.every((f) => isRec(f) && isStr(f.title) && isStr(f.body) && isStr(f.icon))
+}
+function validFaq(v: unknown): v is FunnelSpec['page']['faq'] {
+  return Array.isArray(v) && v.length > 0 && v.every((f) => isRec(f) && isStr(f.q) && isStr(f.a))
+}
+function validFinalCta(v: unknown): v is FunnelSpec['page']['finalCta'] {
+  const c = v as Rec
+  return isRec(c) && isStr(c.headline) && isStr(c.sub) && isStr(c.cta)
+}
+function validLeadForm(v: unknown): v is FunnelSpec['page']['leadForm'] {
+  const l = v as Rec
+  return isRec(l) && isStr(l.title) && isStrArray(l.fields) && isStr(l.button)
+}
+function validAds(v: unknown): v is FunnelSpec['ads'] {
+  return Array.isArray(v) && v.length > 0 && v.every((a) => isRec(a) && isStr(a.platform) && isStr(a.headline) && isStr(a.description) && isStr(a.cta))
+}
+function validChatbot(v: unknown): v is FunnelSpec['chatbot'] {
+  const c = v as Rec
+  return (
+    isRec(c) &&
+    isStr(c.greeting) &&
+    isStrArray(c.qualifyingQuestions) &&
+    Array.isArray(c.flow) &&
+    c.flow.length > 0 &&
+    c.flow.every((f) => isRec(f) && isStr(f.trigger) && isStr(f.response)) &&
+    isStr(c.bookingMessage)
+  )
+}
+function validSocial(v: unknown): v is FunnelSpec['social'] {
+  return Array.isArray(v) && v.length > 0 && v.every((s) => isRec(s) && isStr(s.platform) && isStr(s.caption) && isStrArray(s.hashtags))
+}
+
+/**
+ * Merges a gateway JSON response onto the template-generated spec, section by
+ * section, keeping only sections that structurally validate. Returns null
+ * when the hero itself doesn't validate — that's the bar for "the AI actually
+ * produced usable output"; callers fall back to the pure template in that case.
+ * Testimonials are always the template's generic ones (see
+ * `genericTestimonials`) regardless of what the model returned — this app
+ * never puts fabricated customer identities on a funnel.
+ */
+export function mergeAiFunnelSpec(input: WizardInput, ai: unknown): FunnelSpec | null {
+  if (!isRec(ai) || !isRec(ai.page) || !validHero(ai.page.hero)) return null
+
+  const spec = generateFromTemplate(input)
+  spec.page.hero = ai.page.hero
+  if (validStats(ai.page.stats)) spec.page.stats = ai.page.stats
+  if (validFeatures(ai.page.features)) spec.page.features = ai.page.features
+  if (validFaq(ai.page.faq)) spec.page.faq = ai.page.faq
+  if (validFinalCta(ai.page.finalCta)) spec.page.finalCta = ai.page.finalCta
+  if (validLeadForm(ai.page.leadForm)) spec.page.leadForm = ai.page.leadForm
+  if (validAds(ai.ads)) spec.ads = ai.ads
+  if (validChatbot(ai.chatbot)) spec.chatbot = ai.chatbot
+  if (validSocial(ai.social)) spec.social = ai.social
+  spec.isDemoContent = false
+  return spec
 }
