@@ -15,6 +15,7 @@ import Footer from './components/Footer'
 import ChatWidget from './components/ChatWidget'
 import WhatsAppButton from './components/WhatsAppButton'
 import ScrollProgress from './components/ScrollProgress'
+import CookieConsent from './components/CookieConsent'
 import { useLocale, useT } from './i18n/LocaleProvider'
 
 /** BCP-47 lang per locale — Franco is Egyptian Arabic in Latin script, so "ar-Latn" (not "fr-eg", which reads as French). */
@@ -86,6 +87,7 @@ export default function App() {
       <Footer />
       <ChatWidget />
       <WhatsAppButton />
+      <CookieConsent />
     </div>
   )
 }

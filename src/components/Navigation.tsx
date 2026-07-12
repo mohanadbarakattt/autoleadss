@@ -76,7 +76,7 @@ export default function Navigation() {
             <Logo variant="dark" size={34} />
           </a>
 
-          <nav className="hidden md:flex items-center gap-7">
+          <nav className="hidden lg:flex items-center gap-7">
             {navLinks.map(link => (
               <a
                 key={link.href}
@@ -96,7 +96,7 @@ export default function Navigation() {
             </a>
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <LocaleSwitcher locale={locale} switchLocale={switchLocale} />
             <a
               href="/login"
@@ -112,7 +112,7 @@ export default function Navigation() {
             </a>
           </div>
 
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-2">
             <LocaleSwitcher locale={locale} switchLocale={switchLocale} size="sm" />
             <button className="p-2 text-white" onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu">
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -128,7 +128,7 @@ export default function Navigation() {
             animate={{ x: 0 }}
             exit={{ x: isRTL ? '-100%' : '100%' }}
             transition={{ type: 'tween', duration: 0.28 }}
-            className={`fixed inset-y-0 z-50 flex w-72 flex-col gap-6 p-8 md:hidden ${
+            className={`fixed inset-y-0 z-50 flex w-72 flex-col gap-6 p-8 lg:hidden ${
               isRTL ? 'left-0 border-r' : 'right-0 border-l'
             }`}
             style={{ background: '#0A0A0B', borderColor: 'rgba(255,255,255,0.1)' }}
@@ -184,7 +184,7 @@ export default function Navigation() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
             onClick={() => setMenuOpen(false)}
           />
         )}

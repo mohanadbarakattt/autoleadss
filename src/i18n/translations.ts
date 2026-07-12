@@ -254,6 +254,14 @@ const en = {
     sendLabel: 'Send',
   },
   langSwitch: { en: 'EN', ar: 'AR' },
+  cookieConsent: {
+    body: 'We use essential cookies to run this site, and optional cookies for analytics. You can accept or reject anytime.',
+    analyticsLabel: 'Analytics (optional) — helps us understand site usage',
+    acceptAll: 'Accept all',
+    rejectAll: 'Reject non-essential',
+    manage: 'Manage',
+    saveChoices: 'Save choices',
+  },
 }
 
 export type Dict = typeof en
@@ -511,6 +519,14 @@ const ar: Dict = {
     sendLabel: 'إرسال',
   },
   langSwitch: { en: 'EN', ar: 'AR' },
+  cookieConsent: {
+    body: 'بنستخدم كوكيز أساسية عشان الموقع يشتغل، وكوكيز تانية اختيارية للتحليلات. تقدر توافق أو ترفض في أي وقت.',
+    analyticsLabel: 'تحليلات (اختياري) — تساعدنا نفهم استخدام الموقع',
+    acceptAll: 'موافقة على الكل',
+    rejectAll: 'رفض غير الأساسي',
+    manage: 'إدارة',
+    saveChoices: 'حفظ الاختيار',
+  },
 }
 
 /**
@@ -773,6 +789,14 @@ const francoEg: Dict = {
     sendLabel: 'Eb3at',
   },
   langSwitch: { en: 'EN', ar: 'AR' },
+  cookieConsent: {
+    body: 'Benesta5dem cookies asasya 3ashan el site ye4-8al, w cookies tanya ekhtiarya lel tahlilat. Te2dar tewafe2 aw terfod aw wa2t.',
+    analyticsLabel: 'Tahlilat (ekhtiary) — tesa3edna nefham este5dam el site',
+    acceptAll: 'Mwafa2a 3ala el kol',
+    rejectAll: 'Rafd 8eir el asasy',
+    manage: 'Edara',
+    saveChoices: 'Hefz el ekhtiar',
+  },
 }
 
 export const translations: Record<Locale, Dict> = { en, ar, 'fr-eg': francoEg }
