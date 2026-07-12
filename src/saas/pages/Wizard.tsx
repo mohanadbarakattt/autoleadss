@@ -22,6 +22,20 @@ const GEN_STEPS = {
   ar: ['نحلّل نشاطك…', 'نكتب صفحة الهبوط…', 'ننشئ نصوص الإعلانات…', 'نبني بوت واتساب…', 'نولّد منشورات السوشيال…', 'اللمسات الأخيرة…'],
 }
 
+/** Persists in-progress wizard answers across a back-button tap / accidental close —
+ * sessionStorage (not localStorage) so it clears itself once the tab/session ends. */
+const DRAFT_KEY = 'autoleadss:wizard:draft:v1'
+
+interface WizardDraft {
+  step: number
+  industry: Industry | null
+  businessName: string
+  language: 'en' | 'ar'
+  goal: string
+  tone: Tone
+  accent: string
+}
+
 export default function Wizard() {
   const { t, locale, isRTL } = useI18n()
   const session = useSession()
@@ -47,6 +61,59 @@ export default function Wizard() {
   const [goal, setGoal] = useState<string>('leads')
   const [tone, setTone] = useState<Tone>('bold')
   const [accent, setAccent] = useState(ACCENTS[0])
+  const [draftHydrated, setDraftHydrated] = useState(false)
+
+  // Restore any in-progress answers left by a previous visit (e.g. the user hit
+  // the browser back button mid-wizard) — runs once, before the persist effect below.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY)
+      if (raw) {
+        const d = JSON.parse(raw) as Partial<WizardDraft>
+        if (d.industry) setIndustry(d.industry)
+        if (typeof d.businessName === 'string') setBusinessName(d.businessName)
+        if (d.language === 'en' || d.language === 'ar') setLanguage(d.language)
+        if (typeof d.goal === 'string') setGoal(d.goal)
+        if (d.tone) setTone(d.tone)
+        if (typeof d.accent === 'string') setAccent(d.accent)
+        if (typeof d.step === 'number') setStep(d.step)
+      }
+    } catch {
+      /* ignore malformed/unavailable sessionStorage */
+    }
+    setDraftHydrated(true)
+  }, [])
+
+  // Persist on every change, once hydration above has had its chance to run first
+  // (otherwise this would fire with the blank initial state and clobber the draft).
+  useEffect(() => {
+    if (!draftHydrated || phase !== 'form') return
+    try {
+      const draft: WizardDraft = { step, industry, businessName, language, goal, tone, accent }
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+    } catch {
+      /* ignore quota/storage errors */
+    }
+  }, [draftHydrated, phase, step, industry, businessName, language, goal, tone, accent])
+
+  const hasProgress = phase === 'form' && (step > 0 || businessName.trim().length > 0)
+
+  // Native "leave site?" prompt on tab close/refresh while there's unsaved-feeling progress.
+  useEffect(() => {
+    if (!hasProgress) return
+    function handler(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [hasProgress])
+
+  function confirmLeave(e: React.MouseEvent) {
+    if (hasProgress && !window.confirm(isRTL ? 'تريد الخروج من المعالج؟ إجاباتك محفوظة وستجدها عند العودة.' : 'Leave the wizard? Your answers are saved and will be here when you come back.')) {
+      e.preventDefault()
+    }
+  }
 
   const Arrow = isRTL ? ArrowLeft : ArrowRight
   const goals = [
@@ -125,6 +192,7 @@ export default function Wizard() {
     seedDemoLeads(id, language === 'ar'
       ? [['أحمد المنصوري', '+971 50 123 4567'], ['سارة عبدالله', '+20 100 234 5678'], ['محمد خالد', '+971 55 987 6543']]
       : [['Ahmed Al Mansoori', '+971 50 123 4567'], ['Sara Abdullah', '+20 100 234 5678'], ['Mohamed Khaled', '+971 55 987 6543']])
+    try { sessionStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
     setSpec(resultSpec)
     setCreatedId(id)
     setPhase('ready')
@@ -144,7 +212,7 @@ export default function Wizard() {
 
       <div className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
         <Logo size={28} />
-        <Link to="/app" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
+        <Link to="/app" onClick={confirmLeave} className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
           <X size={18} />
         </Link>
       </div>

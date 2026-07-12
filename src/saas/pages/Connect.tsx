@@ -59,7 +59,7 @@ function ConnectInner() {
           <Lock size={24} className="text-accent" />
         </div>
         <h1 className="mt-5 font-display text-2xl font-bold">{isRTL ? 'بوت واتساب من مزايا Growth' : 'WhatsApp bot is a Growth feature'}</h1>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-fg">{isRTL ? 'رقِّ لربط رقم واتساب الخاص بك وتشغيل البوت مباشرة على العملاء.' : 'Upgrade to connect your own WhatsApp number and run the bot live on real customers.'}</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-fg">{isRTL ? 'رقِّ لتجهيز بوت الذكاء الاصطناعي الخاص بقمعك. ربط رقم واتساب حقيقي وتشغيله مباشرة على العملاء قريباً.' : 'Upgrade to set up your funnel’s AI bot script. Connecting a real WhatsApp number and running it live on customers is coming soon.'}</p>
         <button onClick={() => openUpgrade('whatsappBot')} className="mt-6 rounded-full bg-accent px-7 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5">
           {isRTL ? 'رقِّ الآن' : 'Upgrade'}
         </button>

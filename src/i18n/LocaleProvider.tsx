@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { translations, type Locale, type Dict } from './translations'
+import { LOCALE_KEY } from '../saas/i18n'
 
 type Ctx = {
   locale: Locale
@@ -19,7 +20,15 @@ const LocaleContext = createContext<Ctx | null>(null)
 const HTML_LANG: Record<Locale, string> = { en: 'en', ar: 'ar', 'fr-eg': 'ar-Latn' }
 const LOCALE_ROUTE_RE = /^\/(en|ar|fr-eg)/
 
-export function LocaleProvider({ locale, children }: { locale: Locale; children: ReactNode }) {
+/**
+ * `persist` bridges this choice into the SaaS app (`src/saas/i18n.tsx` reads the
+ * same `LOCALE_KEY`), so a language picked on the marketing site carries into
+ * /signup and /app instead of silently resetting to English. Defaults to true for
+ * the explicit `/en`, `/ar`, `/fr-eg` routes and `switchLocale`; the bare `/`
+ * fallback route passes `persist={false}` so it never clobbers an already-stored
+ * preference with its hardcoded "en" default.
+ */
+export function LocaleProvider({ locale, persist = true, children }: { locale: Locale; persist?: boolean; children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
   const dir = locale === 'ar' ? 'rtl' : 'ltr'
@@ -31,12 +40,26 @@ export function LocaleProvider({ locale, children }: { locale: Locale; children:
     html.setAttribute('dir', dir)
   }, [locale, dir])
 
+  useEffect(() => {
+    if (!persist) return
+    try {
+      window.localStorage.setItem(LOCALE_KEY, locale)
+    } catch {
+      /* ignore quota/storage errors */
+    }
+  }, [locale, persist])
+
   const value = useMemo<Ctx>(() => ({
     locale,
     dir,
     isRTL,
     t: translations[locale],
     switchLocale: (next) => {
+      try {
+        window.localStorage.setItem(LOCALE_KEY, next)
+      } catch {
+        /* ignore quota/storage errors */
+      }
       const rest = location.pathname.replace(LOCALE_ROUTE_RE, '') || ''
       navigate(`/${next}${rest}${location.hash}`, { replace: true })
     },

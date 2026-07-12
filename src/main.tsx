@@ -44,8 +44,10 @@ createRoot(document.getElementById('root')!).render(
           </Routes>
         ) : (
         <Routes>
-          {/* Marketing site (agency / done-with-you) */}
-          <Route path="/" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
+          {/* Marketing site (agency / done-with-you). The bare "/" fallback passes
+              persist={false} so its hardcoded "en" default never overwrites a
+              language the user already chose (see LocaleProvider's `persist` doc). */}
+          <Route path="/" element={<LocaleProvider locale="en" persist={false}><App /></LocaleProvider>} />
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
           <Route path="/fr-eg/*" element={<LocaleProvider locale="fr-eg"><App /></LocaleProvider>} />

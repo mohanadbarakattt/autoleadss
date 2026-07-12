@@ -355,7 +355,9 @@ export function setLeadStatus(funnelId: string, leadId: string, status: Lead['st
   syncRemote((auth) => rSetLeadStatus(auth, leadId, status))
 }
 
-/** Seed demo leads so the CRM/analytics never look empty. Demo mode only. */
+/** Seed demo leads so the CRM/analytics never look empty. Demo mode only. Each lead
+ * (and the visit bump) is flagged so the UI can badge it as sample data and offer a
+ * one-click clear — see `clearSampleData` below. */
 export function seedDemoLeads(funnelId: string, names: [string, string][]) {
   if (remote) return
   ensureHydrated()
@@ -368,6 +370,24 @@ export function seedDemoLeads(funnelId: string, names: [string, string][]) {
     source: i % 2 === 0 ? 'whatsapp' : 'page',
     status: (['new', 'qualified', 'won'] as const)[i % 3],
     createdAt: Date.now() - (i + 1) * 3600_000,
+    sample: true,
   }))
-  updateFunnel(funnelId, { leads: demo, visits: f.visits + 40 + names.length * 7 })
+  const seedVisits = 40 + names.length * 7
+  updateFunnel(funnelId, { leads: demo, visits: f.visits + seedVisits, seedVisits })
+}
+
+/** True when a funnel still carries any of the fictitious data `seedDemoLeads` injected. */
+export function hasSampleData(f: Pick<Funnel, 'leads' | 'seedVisits'>): boolean {
+  return !!f.seedVisits || f.leads.some((l) => l.sample)
+}
+
+/** "ابدأ من صفر" — removes every sample lead and the fake visit count `seedDemoLeads`
+ * added, leaving any real leads/visits captured since untouched. */
+export function clearSampleData(funnelId: string) {
+  ensureHydrated()
+  const f = state.funnels.find((x) => x.id === funnelId)
+  if (!f) return
+  const leads = f.leads.filter((l) => !l.sample)
+  const visits = Math.max(0, f.visits - (f.seedVisits ?? 0))
+  updateFunnel(funnelId, { leads, visits, seedVisits: 0 })
 }

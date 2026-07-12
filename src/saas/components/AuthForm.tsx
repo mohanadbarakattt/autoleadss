@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { ArrowRight, Info } from 'lucide-react'
+import { ArrowRight, Info, AlertCircle } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
 import { signUp } from '../store'
 import type { Region } from '../types'
 import LocaleSwitcher from './LocaleSwitcher'
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   const { t, isRTL, locale, setLocale } = useI18n()
@@ -15,11 +17,22 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [region, setRegion] = useState<Region>('gulf')
+  const [errors, setErrors] = useState<{ name?: string; email?: string }>({})
   const isSignup = mode === 'signup'
+
+  function validate(): boolean {
+    const next: { name?: string; email?: string } = {}
+    if (isSignup && !name.trim()) next.name = t.auth.nameRequired
+    if (!email.trim()) next.email = t.auth.emailRequired
+    else if (!EMAIL_RE.test(email.trim())) next.email = t.auth.emailInvalid
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
-    signUp(name || email.split('@')[0] || 'Founder', email || 'demo@autoleadss.com', region)
+    if (!validate()) return
+    signUp(name.trim(), email.trim(), region)
     navigate(isSignup ? '/app/new' : '/app')
   }
 
@@ -73,14 +86,28 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
             <p>{t.auth.demoNote}</p>
           </div>
 
-          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+          <form onSubmit={submit} noValidate className="mt-6 flex flex-col gap-4">
             {isSignup && (
-              <Field label={t.auth.name}>
-                <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder={isRTL ? 'اسمك' : 'Your name'} />
+              <Field label={t.auth.name} error={errors.name}>
+                <input
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); if (errors.name) setErrors((er) => ({ ...er, name: undefined })) }}
+                  className={`${inputClass} ${errors.name ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20' : ''}`}
+                  placeholder={isRTL ? 'اسمك' : 'Your name'}
+                  aria-invalid={!!errors.name}
+                />
               </Field>
             )}
-            <Field label={t.auth.email}>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="you@company.com" dir="ltr" />
+            <Field label={t.auth.email} error={errors.email}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors((er) => ({ ...er, email: undefined })) }}
+                className={`${inputClass} ${errors.email ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20' : ''}`}
+                placeholder="you@company.com"
+                dir="ltr"
+                aria-invalid={!!errors.email}
+              />
             </Field>
             {isSignup && (
               <Field label={t.auth.region}>
@@ -117,11 +144,16 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
 const inputClass =
   'w-full rounded-lg border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-fg/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all'
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-fg">{label}</span>
       {children}
+      {error && (
+        <span className="flex items-center gap-1.5 text-xs font-medium text-red-500">
+          <AlertCircle size={12} /> {error}
+        </span>
+      )}
     </label>
   )
 }

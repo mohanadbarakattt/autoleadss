@@ -62,6 +62,9 @@ const STRINGS = {
       haveAccount: 'Already have an account?',
       noAccount: "Don't have an account?",
       demoNote: 'Runs in demo mode — your data stays in this browser.',
+      nameRequired: 'Please enter your name.',
+      emailRequired: 'Please enter your email.',
+      emailInvalid: 'Please enter a valid email address.',
     },
     wizard: {
       title: 'Let’s build your funnel',
@@ -161,6 +164,9 @@ const STRINGS = {
       haveAccount: 'لديك حساب بالفعل؟',
       noAccount: 'ليس لديك حساب؟',
       demoNote: 'يعمل في وضع العرض — بياناتك تبقى في هذا المتصفّح.',
+      nameRequired: 'من فضلك أدخل اسمك.',
+      emailRequired: 'من فضلك أدخل بريدك الإلكتروني.',
+      emailInvalid: 'من فضلك أدخل بريداً إلكترونياً صحيحاً.',
     },
     wizard: {
       title: 'لنبنِ قمعك',
@@ -260,6 +266,9 @@ const STRINGS = {
       haveAccount: '3andak account already?',
       noAccount: 'Mesh 3andak account?',
       demoNote: 'Shaghal fi demo mode — el data beta3ak fi el browser da bas.',
+      nameRequired: 'Ektib esmak min fadlak.',
+      emailRequired: 'Ektib el email beta3ak min fadlak.',
+      emailInvalid: 'Ektib email sa7i7 min fadlak.',
     },
     wizard: {
       title: 'Yalla nebni el funnel beta3ak',
@@ -326,7 +335,11 @@ export type Dict = (typeof STRINGS)['en']
 
 const Ctx = createContext<{ locale: UILocale; t: Dict; setLocale: (l: UILocale) => void; isRTL: boolean } | null>(null)
 
-const LOCALE_KEY = 'autoleadss:locale'
+/** Shared across the marketing site's LocaleProvider (src/i18n/LocaleProvider.tsx)
+ * too, so a language chosen while browsing the marketing pages carries into
+ * /signup and the app instead of silently resetting to English — see that file's
+ * `persist` handling for the other half of this bridge. */
+export const LOCALE_KEY = 'autoleadss:locale'
 /** Pre-rebrand key (this SaaS was ported from the "Virlo" project name). Read-only —
  * we migrate it into LOCALE_KEY on first load so returning users keep their choice. */
 const LEGACY_LOCALE_KEY = 'virlo:locale'

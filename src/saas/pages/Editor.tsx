@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2, FlaskConical, Info } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
 import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
-import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
+import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb, hasSampleData, clearSampleData } from '../store'
 import { generateFromTemplate } from '../ai/generate'
 import { useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
@@ -132,6 +132,12 @@ function EditorInner() {
       </div>
 
       <div className="mt-8">
+        {spec.isDemoContent && (
+          <div className="mb-6 flex items-start gap-2.5 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            <Info size={15} className="mt-0.5 shrink-0" />
+            <p>{isRTL ? 'نموذج تجريبي — عدّله من المحرر قبل النشر ليعكس نشاطك بدقة.' : 'Demo template — edit it in the editor below before publishing so it accurately reflects your business.'}</p>
+          </div>
+        )}
         {tab === 'page' && (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,360px)_1fr]">
             <div className="flex flex-col gap-5">
@@ -228,12 +234,42 @@ function EditorInner() {
           </div>
         )}
 
-        {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />}
+        {tab === 'leads' && (
+          <>
+            {hasSampleData(funnel) && <SampleDataBanner funnelId={id} isRTL={isRTL} />}
+            <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />
+          </>
+        )}
 
-        {tab === 'insights' && <FunnelAnalytics funnel={funnel} isRTL={isRTL} />}
+        {tab === 'insights' && (
+          <>
+            {hasSampleData(funnel) && <SampleDataBanner funnelId={id} isRTL={isRTL} />}
+            <FunnelAnalytics funnel={funnel} isRTL={isRTL} />
+          </>
+        )}
 
         {tab === 'domain' && <DomainPanel funnel={funnel} isRTL={isRTL} />}
       </div>
+    </div>
+  )
+}
+
+function SampleDataBanner({ funnelId, isRTL }: { funnelId: string; isRTL: boolean }) {
+  return (
+    <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+      <span className="flex items-center gap-2 font-medium">
+        <FlaskConical size={14} /> {isRTL ? 'يتضمن هذا بيانات تجريبية (عملاء وزيارات وهمية) لتوضيح الشكل النهائي.' : 'This includes sample data (fake leads/visits) to show what a live funnel looks like.'}
+      </span>
+      <button
+        onClick={() => {
+          if (window.confirm(isRTL ? 'مسح كل العملاء والزيارات التجريبية وابدأ من صفر؟' : 'Clear all sample leads/visits and start from scratch?')) {
+            clearSampleData(funnelId)
+          }
+        }}
+        className="shrink-0 font-semibold underline decoration-dotted hover:text-amber-950"
+      >
+        {isRTL ? 'ابدأ من صفر' : 'Start from scratch'}
+      </button>
     </div>
   )
 }
@@ -261,7 +297,14 @@ function LeadsTable({ funnelId, leads, locale, isRTL }: { funnelId: string; lead
         <tbody>
           {leads.map((l) => (
             <tr key={l.id} className="border-b border-border/60 last:border-0">
-              <td className="px-5 py-3 font-medium">{l.name}</td>
+              <td className="px-5 py-3 font-medium">
+                {l.name}
+                {l.sample && (
+                  <span className="ms-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                    {isRTL ? 'تجريبي' : 'Sample'}
+                  </span>
+                )}
+              </td>
               <td className="px-5 py-3 text-muted-fg" dir="ltr">{l.phone}</td>
               <td className="px-5 py-3">
                 <span className="inline-flex items-center gap-1.5 text-xs text-muted-fg">

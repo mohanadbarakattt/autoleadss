@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp } from 'lucide-react'
+import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp, FlaskConical } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { useI18n, toContentLocale } from '../i18n'
-import { useFunnels, useAgency } from '../store'
+import { useFunnels, useAgency, hasSampleData, clearSampleData } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
@@ -144,6 +144,23 @@ function DashboardInner() {
                     <Metric value={f.leads.length} label={t.common.leads} />
                     <Metric value={`${conv}%`} label={t.common.convRate} />
                   </div>
+                  {hasSampleData(f) && (
+                    <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-amber-300/50 bg-amber-50 px-3 py-2 text-amber-800">
+                      <span className="flex items-center gap-1.5 text-[11px] font-medium">
+                        <FlaskConical size={12} /> {isRTL ? 'بيانات تجريبية' : 'Sample data'}
+                      </span>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(isRTL ? 'مسح كل العملاء والزيارات التجريبية وابدأ من صفر؟' : 'Clear all sample leads/visits and start from scratch?')) {
+                            clearSampleData(f.id)
+                          }
+                        }}
+                        className="text-[11px] font-semibold underline decoration-dotted hover:text-amber-950"
+                      >
+                        {isRTL ? 'ابدأ من صفر' : 'Start from scratch'}
+                      </button>
+                    </div>
+                  )}
                   <div className="mt-4 flex gap-2">
                     <Link to={`/app/funnel/${f.id}`} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-foreground py-2.5 text-xs font-medium text-background transition-opacity hover:opacity-90">
                       <Pencil size={13} /> {t.common.edit}

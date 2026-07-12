@@ -33,6 +33,12 @@ export interface FunnelSpec {
     bookingMessage: string
   }
   social: { platform: string; caption: string; hashtags: string[] }[]
+  /** True when this spec's body copy (features/testimonials/FAQ/chatbot/ads/social)
+   * is still template-derived rather than freshly written by a live AI model — the
+   * demo-mode generator personalizes the template (business name, goal, tone,
+   * location) but doesn't rewrite it from scratch. Drives the "edit it in the
+   * editor" disclosure shown to the funnel owner (never on the public page). */
+  isDemoContent?: boolean
 }
 
 export interface Lead {
@@ -44,6 +50,9 @@ export interface Lead {
   source: 'page' | 'whatsapp'
   status: 'new' | 'qualified' | 'won' | 'lost'
   createdAt: number
+  /** True for the fictitious leads `seedDemoLeads` injects on a new funnel so the
+   * CRM never looks empty — lets the UI badge them and offer a one-click clear. */
+  sample?: boolean
 }
 
 export interface Funnel {
@@ -59,6 +68,9 @@ export interface Funnel {
   updatedAt: number
   visits: number
   leads: Lead[]
+  /** The fake visit count `seedDemoLeads` added at creation time (so "clear sample
+   * data" can subtract exactly that many and leave any real, later visits intact). */
+  seedVisits?: number
   subAccountId?: string
   /** Owner's white-label branding, attached on public published fetches. */
   brand?: { brandName?: string; hideBadge: boolean }

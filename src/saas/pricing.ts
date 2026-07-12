@@ -39,7 +39,7 @@ export const TIERS: Tier[] = [
     tagline: { en: 'Scale what works.', ar: 'وسّع ما ينجح.' },
     features: [
       { en: '5 funnels', ar: '5 أقماع' },
-      { en: 'WhatsApp AI bot', ar: 'بوت واتساب ذكي' },
+      { en: 'WhatsApp AI bot (connecting a live number: coming soon)', ar: 'بوت واتساب ذكي (ربط رقم حقيقي: قريباً)' },
       { en: 'Ad + social generation', ar: 'توليد إعلانات وسوشيال' },
       { en: 'Remove badge · CRM · A/B test', ar: 'إزالة الشارة · CRM · اختبار A/B' },
     ],
@@ -52,7 +52,7 @@ export const TIERS: Tier[] = [
     tagline: { en: 'Maximum output.', ar: 'أقصى إنتاجية.' },
     features: [
       { en: 'Unlimited funnels', ar: 'أقماع غير محدودة' },
-      { en: 'Team seats', ar: 'مقاعد للفريق' },
+      { en: 'Team seats (coming soon)', ar: 'مقاعد للفريق (قريباً)' },
       { en: 'Priority AI + analytics', ar: 'ذكاء اصطناعي أولوية + تحليلات' },
       { en: 'Integrations', ar: 'تكاملات' },
     ],
