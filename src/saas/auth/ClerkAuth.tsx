@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { SignIn, SignUp } from '@clerk/clerk-react'
 import Logo from '../../components/Logo'
 import { useI18n } from '../i18n'
@@ -10,9 +11,17 @@ import { useI18n } from '../i18n'
 export default function ClerkAuth({ mode }: { mode: 'signin' | 'signup' }) {
   const { isRTL } = useI18n()
   const isSignup = mode === 'signup'
+  const title = isSignup
+    ? (isRTL ? 'إنشاء حساب — AutoLeadss' : 'Sign up — AutoLeadss')
+    : (isRTL ? 'تسجيل الدخول — AutoLeadss' : 'Log in — AutoLeadss')
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="grid min-h-screen lg:grid-cols-2">
+      <Helmet defer={false}>
+        <html lang={isRTL ? 'ar' : 'en'} dir={isRTL ? 'rtl' : 'ltr'} />
+        <title>{title}</title>
+        <link rel="canonical" href={`https://autoleadss.com/${isSignup ? 'signup' : 'login'}`} />
+      </Helmet>
       <div className="relative hidden overflow-hidden lg:flex" style={{ background: '#0A0A0B' }}>
         <div aria-hidden className="absolute inset-0 grid-bg-dark" style={{ maskImage: 'radial-gradient(ellipse at 40% 40%, black, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at 40% 40%, black, transparent 75%)' }} />
         <div aria-hidden className="absolute -top-20 opacity-50 blur-3xl" style={{ insetInlineStart: '-10%', width: '60%', height: '60%', background: 'radial-gradient(circle, rgba(255,92,42,0.35), transparent 65%)' }} />

@@ -37,13 +37,26 @@ const AR_KEYWORDS: typeof EN_KEYWORDS = {
   contact: ['تواصل', 'كلم', 'مكالمة', 'اتصل'],
 }
 
+/** Franco (Latin-script Egyptian Arabic) keywords — same intents, casual spelling. */
+const FRANCO_KEYWORDS: typeof EN_KEYWORDS = {
+  services: ['betqademo eh', 'khadamat', 'services'],
+  pricing: ['be kam', 'kam', 'sa3r', 'price', 'pricing'],
+  start: ['ezay abda2', 'abda2', 'start', 'sign up'],
+  landing: ['landing page', 'landing'],
+  chatbot: ['chatbot', 'shat bot', 'whatsapp', 'bot'],
+  ads: ['ads', 'e3lanat', 'meta', 'google', 'facebook'],
+  social: ['social', 'soshal', 'instagram', 'tiktok'],
+  egypt: ['masr', 'el 2ahera', '2ahera', 'eskendareya'],
+  contact: ['kallemna', 'kallem', 'mokalma', 'contact'],
+}
+
 export default function ChatWidget() {
   const t = useT()
   const { isRTL, locale } = useLocale()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
 
-  const keywords = locale === 'ar' ? AR_KEYWORDS : EN_KEYWORDS
+  const keywords = locale === 'ar' ? AR_KEYWORDS : locale === 'fr-eg' ? FRANCO_KEYWORDS : EN_KEYWORDS
   const resp = t.chat.responses
 
   function getResponse(input: string): { text: string; link?: { label: string; href: string } } {

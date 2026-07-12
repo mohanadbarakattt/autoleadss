@@ -5,7 +5,20 @@ import type { FunnelSpec } from '../types'
 
 interface Msg { role: 'bot' | 'user'; text: string }
 
-export default function ChatSimulator({ spec, accent = '#FF5C2A' }: { spec: FunnelSpec; accent?: string }) {
+interface ChatSimulatorProps {
+  spec: FunnelSpec
+  accent?: string
+  /** True once this workspace has hit its WhatsApp-AI conversation cap (hard cap
+   * only) — disables the input so no further conversations start. */
+  locked?: boolean
+  lockedMessage?: string
+  /** Fired once, on the first user message of a session — the moment a real
+   * WhatsApp conversation window would open. Return value is ignored; use
+   * `locked` to actually block further conversations once the cap gate says so. */
+  onConversationStart?: () => void
+}
+
+export default function ChatSimulator({ spec, accent = '#FF5C2A', locked, lockedMessage, onConversationStart }: ChatSimulatorProps) {
   const rtl = spec.language === 'ar'
   const bot = spec.chatbot
   const [msgs, setMsgs] = useState<Msg[]>([{ role: 'bot', text: bot.greeting }])
@@ -32,8 +45,10 @@ export default function ChatSimulator({ spec, accent = '#FF5C2A' }: { spec: Funn
   }
 
   function send(text: string) {
+    if (locked) return
     const trimmed = text.trim()
     if (!trimmed) return
+    if (turn === 0) onConversationStart?.()
     setMsgs((m) => [...m, { role: 'user', text: trimmed }])
     setInput('')
     setTimeout(() => {
@@ -63,19 +78,27 @@ export default function ChatSimulator({ spec, accent = '#FF5C2A' }: { spec: Funn
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap gap-1.5 border-t border-black/5 bg-white px-3 py-2">
-          {chips.map((c, i) => (
-            <button key={i} onClick={() => send(c)} className="rounded-full border border-black/10 px-2.5 py-1 text-[10px] text-black/60 transition-colors hover:border-black/30">
-              {c}
-            </button>
-          ))}
-        </div>
-        <form onSubmit={(e) => { e.preventDefault(); send(input) }} className="flex items-center gap-2 border-t border-black/5 bg-white px-3 py-2.5">
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={rtl ? 'اكتب رسالة…' : 'Type a message…'} className="flex-1 bg-transparent text-[12px] text-black outline-none placeholder:text-black/40" />
-          <button type="submit" className="flex h-8 w-8 items-center justify-center rounded-full text-white" style={{ background: accent }}>
-            <Send size={14} className={rtl ? 'rotate-180' : ''} />
-          </button>
-        </form>
+        {locked ? (
+          <div className="border-t border-black/5 bg-white px-3 py-2.5 text-center text-[11px] font-medium text-black/50">
+            {lockedMessage ?? (rtl ? 'وصلت لحد المحادثات لهذا الشهر.' : 'This month’s conversation limit has been reached.')}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-1.5 border-t border-black/5 bg-white px-3 py-2">
+              {chips.map((c, i) => (
+                <button key={i} onClick={() => send(c)} className="rounded-full border border-black/10 px-2.5 py-1 text-[10px] text-black/60 transition-colors hover:border-black/30">
+                  {c}
+                </button>
+              ))}
+            </div>
+            <form onSubmit={(e) => { e.preventDefault(); send(input) }} className="flex items-center gap-2 border-t border-black/5 bg-white px-3 py-2.5">
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={rtl ? 'اكتب رسالة…' : 'Type a message…'} className="flex-1 bg-transparent text-[12px] text-black outline-none placeholder:text-black/40" />
+              <button type="submit" className="flex h-8 w-8 items-center justify-center rounded-full text-white" style={{ background: accent }}>
+                <Send size={14} className={rtl ? 'rotate-180' : ''} />
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   )

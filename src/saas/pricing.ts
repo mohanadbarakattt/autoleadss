@@ -32,13 +32,13 @@ export const TIERS: Tier[] = [
   },
   {
     id: 'growth',
-    name: { en: 'Growth', ar: 'جروث' },
+    name: { en: 'Growth', ar: 'Growth' },
     priceEgypt: '3,000 EGP',
     priceGulf: '$149',
     popular: true,
     tagline: { en: 'Scale what works.', ar: 'وسّع ما ينجح.' },
     features: [
-      { en: '5 funnels', ar: '5 قمم' },
+      { en: '5 funnels', ar: '5 أقماع' },
       { en: 'WhatsApp AI bot', ar: 'بوت واتساب ذكي' },
       { en: 'Ad + social generation', ar: 'توليد إعلانات وسوشيال' },
       { en: 'Remove badge · CRM · A/B test', ar: 'إزالة الشارة · CRM · اختبار A/B' },
@@ -51,7 +51,7 @@ export const TIERS: Tier[] = [
     priceGulf: '$349',
     tagline: { en: 'Maximum output.', ar: 'أقصى إنتاجية.' },
     features: [
-      { en: 'Unlimited funnels', ar: 'قمم غير محدودة' },
+      { en: 'Unlimited funnels', ar: 'أقماع غير محدودة' },
       { en: 'Team seats', ar: 'مقاعد للفريق' },
       { en: 'Priority AI + analytics', ar: 'ذكاء اصطناعي أولوية + تحليلات' },
       { en: 'Integrations', ar: 'تكاملات' },
@@ -93,3 +93,33 @@ export function planName(id: PlanId, locale: Locale): string {
   const t = TIERS.find((x) => x.id === id)
   return t ? t.name[locale] : id
 }
+
+export interface TopupPack {
+  id: 'small' | 'medium' | 'large'
+  priceEgypt: string
+  priceGulf: string
+  /** Extra WhatsApp-AI conversations granted for `expiryDays` from purchase. */
+  whatsapp: number
+  /** Extra ad/social/page-copy AI generations granted for `expiryDays` from purchase. */
+  aiAction: number
+  expiryDays: number
+  name: { en: string; ar: string }
+}
+
+/**
+ * Top-up packs for Growth/Pro workspaces that hit their monthly WhatsApp-AI or
+ * AI-action cap before the month resets (see entitlements.ts). Price and expiry
+ * mirror IBNI's repriced top-up packs (PRICING-SPEC-DRAFT.md §3.4, decision 4) —
+ * AutoLeadss has no top-up section of its own in that spec, so this reuses IBNI's
+ * binding price/expiry numbers rather than inventing new ones.
+ *
+ * The whatsapp/aiAction credit split is newly derived here (same status as IBNI's
+ * own credit counts in §3.4: "owner should confirm the derived credit counts") to
+ * land at ~76-79% worst-case margin at 2.50 EGP-equivalent-per-conversation pricing
+ * — see scripts/margin-guard.ts for the check.
+ */
+export const TOPUP_PACKS: TopupPack[] = [
+  { id: 'small', priceEgypt: '300 EGP', priceGulf: '$12', whatsapp: 40, aiAction: 1_000, expiryDays: 90, name: { en: 'Small', ar: 'صغيرة' } },
+  { id: 'medium', priceEgypt: '700 EGP', priceGulf: '$28', whatsapp: 100, aiAction: 2_500, expiryDays: 90, name: { en: 'Medium', ar: 'متوسطة' } },
+  { id: 'large', priceEgypt: '1,300 EGP', priceGulf: '$52', whatsapp: 200, aiAction: 5_000, expiryDays: 90, name: { en: 'Large', ar: 'كبيرة' } },
+]

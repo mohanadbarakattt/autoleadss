@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Copy, Check, Lock, MessageCircle } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import { useI18n } from '../i18n'
 import { useFunnels, uid, getDb } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
-import { SUPABASE_URL, remoteEnabled } from '../config'
+import { remoteEnabled } from '../config'
 import { getConnectionForFunnel, saveConnection, listConversations, type WhatsAppConnection, type Conversation } from '../db/whatsapp'
 
 export default function Connect() {
   return (
     <AppShell>
+      <Helmet defer={false}>
+        <title>Connect WhatsApp — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <ConnectInner />
     </AppShell>
   )
@@ -28,11 +33,16 @@ function ConnectInner() {
   const [saved, setSaved] = useState(false)
   const [busy, setBusy] = useState(false)
 
-  const webhookUrl = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/whatsapp-webhook` : 'https://<project>.supabase.co/functions/v1/whatsapp-webhook'
+  // Placeholder — the WhatsApp webhook isn't wired to a live backend yet (not
+  // migrated to the Neon/api/ stack in Phase 2; see src/saas/db/whatsapp.ts).
+  const webhookUrl = 'https://<your-deployment>.vercel.app/api/whatsapp-webhook'
 
   useEffect(() => {
     const sb = getDb()
-    if (!sb || !funnelId) return
+    // WhatsApp remote persistence isn't migrated to the Neon backend yet
+    // (remoteEnabled is hardcoded false — see src/saas/config.ts); skip the call
+    // entirely rather than hitting a stub that always returns empty/throws.
+    if (!sb || !remoteEnabled || !funnelId) return
     getConnectionForFunnel(sb, funnelId)
       .then((c) => {
         setExisting(c)
@@ -59,7 +69,7 @@ function ConnectInner() {
 
   async function save() {
     const sb = getDb()
-    if (!sb) {
+    if (!sb || !remoteEnabled) {
       setSaved(true)
       setTimeout(() => setSaved(false), 2200)
       return
@@ -95,7 +105,7 @@ function ConnectInner() {
 
       {!remoteEnabled && (
         <p className="mt-6 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-700">
-          {isRTL ? 'وضع العرض: احفظ الإعدادات ستفعّل بعد تشغيل قاعدة البيانات (Phase 3). راجع docs/SETUP.md.' : 'Demo mode: saving activates once the database is configured (Phase 3). See docs/SETUP.md.'}
+          {isRTL ? 'وضع العرض: حفظ إعدادات واتساب غير متاح بعد — قريباً.' : 'Demo mode: saving a WhatsApp connection isn’t available yet — coming soon.'}
         </p>
       )}
 

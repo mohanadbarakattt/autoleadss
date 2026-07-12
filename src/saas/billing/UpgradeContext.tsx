@@ -2,20 +2,42 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, Check } from 'lucide-react'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale, type UILocale } from '../i18n'
 import { useSession } from '../store'
-import { entitlementFor, nextPlanFor, type Feature } from '../entitlements'
+import { entitlementFor, nextPlanFor, type Feature, type CapFeature } from '../entitlements'
 import { planName, TIERS, priceFor } from '../pricing'
 
-type Reason = Feature | 'maxFunnels'
+type Reason = Feature | 'maxFunnels' | CapFeature
 
-const COPY: Record<Reason, { en: [string, string]; ar: [string, string] }> = {
-  maxFunnels: { en: ['You’ve hit your funnel limit', 'Upgrade to build more funnels and scale your pipeline.'], ar: ['وصلت إلى حدّ القمم', 'رقِّ باقتك لبناء المزيد من القمم وتوسيع مبيعاتك.'] },
+const COPY: Record<Feature | 'maxFunnels', { en: [string, string]; ar: [string, string] }> = {
+  maxFunnels: { en: ['You’ve hit your funnel limit', 'Upgrade to build more funnels and scale your pipeline.'], ar: ['وصلت إلى حدّ الأقماع', 'رقِّ باقتك لبناء المزيد من الأقماع وتوسيع مبيعاتك.'] },
   whatsappBot: { en: ['WhatsApp AI bot is a Growth feature', 'Answer every lead in seconds, 24/7 — upgrade to switch it on.'], ar: ['بوت واتساب من مزايا Growth', 'ردّ على كل عميل خلال ثوانٍ، 24/7 — رقِّ لتفعيله.'] },
-  removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل قممك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
+  removeBadge: { en: ['Remove the AutoLeadss badge', 'Make published funnels fully yours — available on Growth and up.'], ar: ['أزل شارة AutoLeadss', 'اجعل أقماعك المنشورة لك بالكامل — متاح من Growth فأعلى.'] },
   adSocialGen: { en: ['Ad & social generation is a Growth feature', 'Generate ready-to-run ads and social posts — upgrade to unlock.'], ar: ['توليد الإعلانات والسوشيال من Growth', 'ولّد إعلانات ومنشورات جاهزة — رقِّ لفتحها.'] },
   priorityAI: { en: ['Priority AI is a Pro feature', 'Faster generations and advanced analytics — upgrade to Pro.'], ar: ['الذكاء الاصطناعي بأولوية من Pro', 'توليد أسرع وتحليلات متقدّمة — رقِّ إلى Pro.'] },
   whiteLabel: { en: ['White-label is an Agency plan', 'Resell AutoLeadss as your own with sub-accounts and your branding.'], ar: ['وايت ليبل من باقة الوكالات', 'أعد بيع AutoLeadss باسمك مع حسابات فرعية وهويتك.'] },
+}
+
+/** Cap-hit copy gets genuine text in all three UI locales (unlike `COPY` above,
+ * which falls back Franco→English via `toContentLocale` like the rest of this
+ * file's "formal Record<Locale,...>" lookups) — these are the two newest,
+ * highest-traffic upsell prompts (PRICING-SPEC-DRAFT.md §2.2's hard caps), so they
+ * warrant the same full-Franco treatment as `i18n.tsx`'s STRINGS dict. */
+const CAP_COPY: Record<CapFeature, Record<UILocale, [string, string]>> = {
+  whatsappCap: {
+    en: ['You’ve hit your WhatsApp-AI limit', 'Growth includes 300 AI-answered conversations a month — upgrade to Pro for 800, or buy a top-up pack below.'],
+    ar: ['وصلت إلى حدّ محادثات واتساب الذكي', 'باقة Growth تشمل 300 محادثة يردّ عليها الذكاء الاصطناعي شهرياً — رقِّ إلى Pro لتصل إلى 800، أو اشترِ باقة إضافية.'],
+    'fr-eg': ['Wasalt le limit bta3et WhatsApp AI', 'Plan Growth beyeddeek 300 mokalma be AI kol shahr — ra22i le Pro 3ashan tewsal le 800, aw eshtery top-up pack.'],
+  },
+  aiActionCap: {
+    en: ['You’ve hit your AI-generation limit', 'Growth includes 2,000 ad/social/page-copy generations a month — upgrade to Pro for 10,000, or buy a top-up pack below.'],
+    ar: ['وصلت إلى حدّ توليد الذكاء الاصطناعي', 'باقة Growth تشمل 2,000 توليد إعلانات وسوشيال وصفحات شهرياً — رقِّ إلى Pro لتصل إلى 10,000، أو اشترِ باقة إضافية.'],
+    'fr-eg': ['Wasalt le limit bta3et AI generation', 'Plan Growth beyeddeek 2,000 generation (ads/social/page copy) kol shahr — ra22i le Pro 3ashan tewsal le 10,000, aw eshtery top-up pack.'],
+  },
+}
+
+function isCapReason(r: Reason): r is CapFeature {
+  return r === 'whatsappCap' || r === 'aiActionCap'
 }
 
 const Ctx = createContext<{ openUpgrade: (r: Reason) => void } | null>(null)
@@ -26,11 +48,12 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [reason, setReason] = useState<Reason | null>(null)
 
+  const contentLocale = toContentLocale(locale)
   const plan = session?.workspace.plan ?? 'starter'
   const region = session?.workspace.region ?? 'gulf'
   const target = reason ? nextPlanFor(reason, plan) : 'growth'
   const tier = TIERS.find((x) => x.id === target)
-  const copy = reason ? COPY[reason][locale] : ['', '']
+  const copy = reason ? (isCapReason(reason) ? CAP_COPY[reason][locale] : COPY[reason][contentLocale]) : ['', '']
 
   return (
     <Ctx.Provider value={{ openUpgrade: setReason }}>
@@ -64,19 +87,19 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
               {tier && (
                 <div className="px-8 py-6">
                   <div className="flex items-baseline justify-between">
-                    <p className="font-display text-lg font-bold">{planName(target, locale)}</p>
+                    <p className="font-display text-lg font-bold">{planName(target, contentLocale)}</p>
                     <p className="font-display text-2xl font-bold">{priceFor(tier, region)}<span className="text-sm font-normal text-muted-fg">{t.pricing.mo}</span></p>
                   </div>
                   <ul className="mt-4 flex flex-col gap-2">
                     {tier.features.slice(0, 4).map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-foreground"><Check size={15} className="text-accent" /> {f[locale]}</li>
+                      <li key={i} className="flex items-center gap-2 text-sm text-foreground"><Check size={15} className="text-accent" /> {f[contentLocale]}</li>
                     ))}
                   </ul>
                   <button
                     onClick={() => { setReason(null); navigate('/pricing') }}
                     className="mt-6 w-full rounded-full bg-accent py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
                   >
-                    {isRTL ? `الترقية إلى ${planName(target, locale)}` : `Upgrade to ${planName(target, locale)}`}
+                    {isRTL ? `الترقية إلى ${planName(target, contentLocale)}` : `Upgrade to ${planName(target, contentLocale)}`}
                   </button>
                   <button onClick={() => setReason(null)} className="mt-2 w-full text-center text-xs text-muted-fg hover:text-foreground">
                     {isRTL ? 'ليس الآن' : 'Maybe later'}

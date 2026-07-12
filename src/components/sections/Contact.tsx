@@ -2,9 +2,30 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Phone, Mail, Check, Clock } from 'lucide-react'
 import { z } from 'zod'
-import { supabase } from '../../integrations/supabase/client'
 import { useT } from '../../i18n/LocaleProvider'
 import SectionHeading from '../SectionHeading'
+
+/**
+ * The marketing site's contact form predates the SaaS product (see the original
+ * "Complete rebuild" commit) and is unrelated to the SaaS funnel/lead persistence
+ * migrated to the shared Neon backend in Phase 2 (see docs/SETUP.md) — it's kept on
+ * its own small Supabase project (just this one edge function, `send-contact-email`,
+ * for outbound email) rather than the `@supabase/supabase-js` SDK, which was removed
+ * as part of that migration. A plain `fetch` is all `functions.invoke` ever was.
+ */
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
+
+async function sendContactEmail(body: unknown): Promise<void> {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('Contact form isn’t configured (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY unset).')
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/send-contact-email`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${SUPABASE_ANON_KEY}`, apikey: SUPABASE_ANON_KEY },
+    body: JSON.stringify(body),
+  })
+  const result = await res.json().catch(() => null)
+  if (!res.ok || result?.error) throw new Error(typeof result?.error === 'string' ? result.error : 'Send failed')
+}
 
 type FormData = {
   name: string
@@ -63,9 +84,7 @@ export default function Contact() {
     }
     setLoading(true)
     try {
-      const { data: result, error: fnError } = await supabase.functions.invoke('send-contact-email', { body: parsed.data })
-      if (fnError) throw fnError
-      if (result?.error) throw new Error(typeof result.error === 'string' ? result.error : 'Send failed')
+      await sendContactEmail(parsed.data)
       setSubmitted(true)
     } catch (err) {
       console.error(err)
@@ -88,7 +107,7 @@ export default function Contact() {
   return (
     <section id="contact" className="section-padding bg-background">
       <div className="content-width">
-        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[42%_58%] md:gap-14">
+        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[42fr_58fr] md:gap-14">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}

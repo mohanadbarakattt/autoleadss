@@ -3,6 +3,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/((?!assets/|favicon|robots.txt|sitemap.xml|llms.txt).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|favicon|robots.txt|sitemap.xml|llms.txt).*)", "destination": "/index.html" }
   ]
 }

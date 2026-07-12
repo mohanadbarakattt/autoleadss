@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, Camera, Music2, MessageCircle } from 'lucide-react'
-import { useT } from '../i18n/LocaleProvider'
+import { useLocale, useT } from '../i18n/LocaleProvider'
 import Logo from './Logo'
+import MbaiBadge from './MbaiBadge'
 
 const socials = [
   { icon: Camera, href: 'https://instagram.com/autoleadss', label: 'Instagram' },
@@ -9,8 +10,15 @@ const socials = [
   { icon: MessageCircle, href: 'https://wa.me/201100054278', label: 'WhatsApp' },
 ]
 
+const LEGAL_LABEL = {
+  en: { privacy: 'Privacy Policy', terms: 'Terms of Service' },
+  ar: { privacy: 'سياسة الخصوصية', terms: 'شروط الخدمة' },
+  'fr-eg': { privacy: 'Privacy Policy', terms: 'Terms of Service' },
+} as const
+
 export default function Footer() {
   const t = useT()
+  const { locale, localePath } = useLocale()
   const columns: ('Services' | 'Company')[] = ['Services', 'Company']
   return (
     <footer style={{ background: '#0A0A0B' }} className="relative overflow-hidden text-white">
@@ -68,11 +76,21 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
-          <p className="text-xs text-[#8A857D]">{t.footer.copyright}</p>
-          <p className="flex items-center gap-1.5 text-xs text-[#8A857D]">
-            <span className="h-1 w-1 rounded-full bg-accent" />
-            {t.footer.cities}
-          </p>
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
+            <p className="text-xs text-[#8A857D]">{t.footer.copyright}</p>
+            <span className="hidden h-3 w-px bg-white/10 sm:block" />
+            <div className="flex items-center gap-4">
+              <a href={localePath('/privacy')} className="text-xs text-[#8A857D] transition-colors hover:text-white">{LEGAL_LABEL[locale].privacy}</a>
+              <a href={localePath('/terms')} className="text-xs text-[#8A857D] transition-colors hover:text-white">{LEGAL_LABEL[locale].terms}</a>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+            <p className="flex items-center gap-1.5 text-xs text-[#8A857D]">
+              <span className="h-1 w-1 rounded-full bg-accent" />
+              {t.footer.cities}
+            </p>
+            <MbaiBadge variant="dark" />
+          </div>
         </div>
       </div>
     </footer>

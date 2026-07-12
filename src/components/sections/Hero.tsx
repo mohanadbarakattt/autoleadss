@@ -36,9 +36,10 @@ export default function Hero() {
     my.set((e.clientY - r.top) / r.height)
   }
 
-  const titleLines = isAr
-    ? [{ t: 'توقّف عن مطاردة العملاء.', c: 'white' }, { t: 'ابدأ في استقبالهم.', c: 'accent' }]
-    : [{ t: 'Stop chasing customers.', c: 'white' }, { t: 'Start receiving them.', c: 'accent' }]
+  const titleLines = [
+    { t: t.hero.titleA, c: 'white' as const },
+    { t: t.hero.titleB, c: 'accent' as const },
+  ]
 
   const marqueeItems = [...t.hero.marquee, ...t.hero.marquee]
 
@@ -76,10 +77,11 @@ export default function Hero() {
         />
       </div>
 
-      <div className="content-width relative z-10 min-h-screen flex flex-col justify-center pt-32 pb-10 md:pt-36">
-        <div className="grid grid-cols-1 lg:grid-cols-[54%_46%] gap-14 lg:gap-8 items-center flex-1">
+      {/* tighter top offset + gap on mobile so the "serving" caption clears the fixed WhatsApp/chat buttons on short viewports */}
+      <div className="content-width relative z-10 min-h-screen flex flex-col justify-center pt-24 pb-24 md:pb-10 md:pt-36">
+        <div className="grid grid-cols-1 lg:grid-cols-[54fr_46fr] gap-14 lg:gap-8 items-center flex-1">
           {/* ── Copy ── */}
-          <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-5 sm:gap-7">
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show"
               className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5">
               <span className="relative flex h-1.5 w-1.5">
@@ -223,7 +225,7 @@ export default function Hero() {
                     </span>
                     <div>
                       <p className="text-white text-xs font-medium">WhatsApp</p>
-                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : 'Auto-reply · 12s'}</p>
+                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : locale === 'fr-eg' ? 'Radd otomatiky · 12s' : 'Auto-reply · 12s'}</p>
                     </div>
                   </div>
                 </div>

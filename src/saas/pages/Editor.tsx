@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2 } from 'lucide-react'
 import AppShell from '../components/AppShell'
@@ -7,9 +8,11 @@ import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
 import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
+import { useUpgrade } from '../billing/UpgradeContext'
+import { useCapGate, isCapHit } from '../billing/usage'
 import { remoteEnabled } from '../config'
 import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
@@ -32,10 +35,16 @@ function EditorInner() {
   const [tab, setTab] = useState<Tab>('page')
   const [copied, setCopied] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
+  const openUpgrade = useUpgrade()
+  const whatsappGate = useCapGate('whatsapp')
 
   if (!funnel) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+        <Helmet defer={false}>
+          <title>{isRTL ? 'القمع غير موجود' : 'Funnel not found'} — AutoLeadss</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
         <p className="text-muted-fg">{isRTL ? 'القمع غير موجود.' : 'Funnel not found.'}</p>
         <Link to="/app" className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white">{t.nav.dashboard}</Link>
       </div>
@@ -78,6 +87,10 @@ function EditorInner() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 md:px-10">
+      <Helmet defer={false}>
+        <title>{funnel.name} — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link to="/app" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
@@ -173,7 +186,16 @@ function EditorInner() {
           <div className="grid items-start gap-8 lg:grid-cols-[380px_1fr]">
             <div>
               <p className="mb-3 text-xs font-medium text-muted-fg">{t.editor.simulator}</p>
-              <ChatSimulator spec={spec} accent={accent} />
+              <ChatSimulator
+                spec={spec}
+                accent={accent}
+                locked={isCapHit(whatsappGate.status)}
+                lockedMessage={isRTL ? 'وصلت لحد محادثات واتساب الذكي لهذا الشهر — رقِّ باقتك لمزيد من المحادثات.' : 'This month’s WhatsApp-AI conversation limit has been reached — upgrade for more.'}
+                onConversationStart={() => {
+                  const ok = whatsappGate.record()
+                  if (!ok) openUpgrade('whatsappCap')
+                }}
+              />
             </div>
             <div className="flex flex-col gap-4">
               <FieldGroup title={isRTL ? 'رسالة الترحيب' : 'Greeting'}>
@@ -206,7 +228,7 @@ function EditorInner() {
           </div>
         )}
 
-        {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={locale} isRTL={isRTL} />}
+        {tab === 'leads' && <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />}
 
         {tab === 'insights' && <FunnelAnalytics funnel={funnel} isRTL={isRTL} />}
 
@@ -267,13 +289,16 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
 
   useEffect(() => {
     const sb = getDb()
-    if (!sb) return
+    // Custom domains aren't migrated to the Neon backend yet (remoteEnabled is
+    // hardcoded false — see src/saas/config.ts); skip the call entirely rather than
+    // hitting a stub that always throws/returns empty.
+    if (!sb || !remoteEnabled) return
     listDomains(sb, funnel.id).then(setDomains).catch(() => {})
   }, [funnel.id])
 
   async function add() {
     const sb = getDb()
-    if (!sb || !host.trim()) return
+    if (!sb || !remoteEnabled || !host.trim()) return
     setBusy(true)
     try {
       await addDomain(sb, funnel.id, host)
@@ -286,7 +311,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
   }
   async function remove(domId: string) {
     const sb = getDb()
-    if (!sb) return
+    if (!sb || !remoteEnabled) return
     await deleteDomain(sb, domId)
     setDomains(await listDomains(sb, funnel.id))
   }
@@ -295,7 +320,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
     <div className="mx-auto max-w-2xl">
       <div className="rounded-2xl border border-border bg-card p-6">
         <p className="font-display font-semibold">{isRTL ? 'النطاق الفرعي المجاني' : 'Free subdomain'}</p>
-        <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'قممك المنشورة متاحة هنا فوراً.' : 'Your published funnel goes live here.'}</p>
+        <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أقماعك المنشورة متاحة هنا فوراً.' : 'Your published funnel goes live here.'}</p>
         <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
           <Globe size={14} className="text-accent" />
           <code className="flex-1 text-sm" dir="ltr">{subdomain}</code>
@@ -310,7 +335,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
       <div className="mt-4 rounded-2xl border border-border bg-card p-6">
         <p className="font-display font-semibold">{isRTL ? 'نطاق مخصّص' : 'Custom domain'}</p>
         {!remoteEnabled ? (
-          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة تُفعّل بعد ربط قاعدة البيانات (Phase 3). راجع docs/SETUP.md.' : 'Custom domains activate once the database is connected (Phase 3). See docs/SETUP.md.'}</p>
+          <p className="mt-2 text-sm text-muted-fg">{isRTL ? 'النطاقات المخصّصة غير متاحة بعد — قريباً.' : 'Custom domains aren’t available yet in this version — coming soon.'}</p>
         ) : (
           <>
             <p className="mt-1 text-sm text-muted-fg">{isRTL ? 'أضف نطاقك ثم وجّه سجل CNAME إلى cname.vercel-dns.com' : 'Add your domain, then point a CNAME record to cname.vercel-dns.com'}</p>
@@ -328,7 +353,7 @@ function DomainPanel({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-xs text-muted-fg">{isRTL ? 'أضف النطاق أيضاً في مشروع Vercel ليصدر شهادة SSL.' : 'Also add the domain in your Vercel project so it issues an SSL cert (see docs/SETUP.md).'}</p>
+            <p className="mt-3 text-xs text-muted-fg">{isRTL ? 'أضف النطاق أيضاً في مشروع الاستضافة ليصدر شهادة SSL.' : 'Also add the domain in your hosting project so it issues an SSL cert.'}</p>
           </>
         )}
       </div>

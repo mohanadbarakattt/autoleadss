@@ -1,4 +1,14 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+/**
+ * Custom domains were Supabase-backed (`domains` table + RLS) before the Phase 2
+ * migration to the shared Neon backend. They were NOT carried over — Phase 2's
+ * scope is funnels/leads/publish only (see docs/SETUP.md and
+ * ~/projects/mbai-ecosystem/docs/SHARED-DB-DESIGN.md) — so this module is a stub
+ * kept only so Editor.tsx's DomainPanel still compiles against the same shape.
+ * `remoteEnabled` (src/saas/config.ts) is hardcoded `false` for this feature, so
+ * these functions are never actually called; if that ever changes, implement them
+ * against a new `autoleadss.domains` table + `api/domains/*` functions first.
+ */
+import type { RemoteAuth } from './api'
 
 export interface Domain {
   id: string
@@ -7,23 +17,18 @@ export interface Domain {
   verified: boolean
 }
 
-function fromRow(r: any): Domain {
-  return { id: r.id, funnelId: r.funnel_id, hostname: r.hostname, verified: r.verified }
+function notMigrated(): never {
+  throw new Error('Custom domains are not available yet (not migrated to the Neon backend in Phase 2).')
 }
 
-export async function listDomains(sb: SupabaseClient, funnelId: string): Promise<Domain[]> {
-  const { data, error } = await sb.from('domains').select('*').eq('funnel_id', funnelId).order('created_at', { ascending: true })
-  if (error) throw new Error(error.message)
-  return (data ?? []).map(fromRow)
+export async function listDomains(_auth: RemoteAuth, _funnelId: string): Promise<Domain[]> {
+  return []
 }
 
-export async function addDomain(sb: SupabaseClient, funnelId: string, hostname: string): Promise<void> {
-  const clean = hostname.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')
-  const { error } = await sb.from('domains').insert({ funnel_id: funnelId, hostname: clean })
-  if (error) throw new Error(error.message)
+export async function addDomain(_auth: RemoteAuth, _funnelId: string, _hostname: string): Promise<void> {
+  notMigrated()
 }
 
-export async function deleteDomain(sb: SupabaseClient, id: string): Promise<void> {
-  const { error } = await sb.from('domains').delete().eq('id', id)
-  if (error) throw new Error(error.message)
+export async function deleteDomain(_auth: RemoteAuth, _id: string): Promise<void> {
+  notMigrated()
 }

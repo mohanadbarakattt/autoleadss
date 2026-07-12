@@ -108,4 +108,9 @@ export interface WizardInput {
   tone: Tone
   accent: string
   audience?: string
+  /** Reported to `/api/ai-generate` so its server-side AI-action cap backstop
+   * (api/ai-generate.ts) can look up the right cap for this caller. Only the
+   * wizard's live-AI path (generateLive.ts) needs this — template-only callers
+   * (e.g. Editor.tsx's regenerate, which never hits `/api/ai-generate`) can omit it. */
+  plan?: PlanId
 }

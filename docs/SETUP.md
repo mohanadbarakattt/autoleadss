@@ -4,174 +4,138 @@ The app ships in **demo mode** (works with zero config). Each phase below is rea
 production-grade code that stays dormant until you add its keys — then it activates
 automatically. Nothing here changes the design.
 
----
-
-## Phase 2 — Real AI generation (streaming)  ✅ code shipped
-
-The funnel wizard streams from a Supabase Edge Function (`generate-funnel`). Until the
-key is set, the wizard falls back to the on-device template generator.
-
-**Go live:**
-1. Get an Anthropic API key → https://console.anthropic.com
-2. Set it as a Supabase secret and deploy the function (Supabase CLI, logged into project `ultznwftohbbgceiwkuh`):
-   ```bash
-   supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxx
-   supabase functions deploy generate-funnel
-   ```
-3. (Optional) override models — defaults match `lib/ai/model-router.json`:
-   ```bash
-   supabase secrets set ANTHROPIC_MODEL_FUNNEL=claude-fable-5
-   ```
-That's it — the wizard now shows real backend milestones and real AI output, bilingual.
-Routing: landing copy → Sonnet/Fable, ads+social → Sonnet, WhatsApp bot → Haiku.
+> **Phase 2 update (this doc's most recent revision):** the SaaS's remote
+> persistence moved off Supabase onto the shared MBAI Neon Postgres project. The
+> Supabase project, schema, and edge functions that used to back Phases 2–8 below
+> are gone; see "Phase 2 — Shared Neon backend" for what replaced them and what's
+> temporarily out of scope.
 
 ---
 
-## Phase 3 — Database & Clerk auth  ✅ code shipped
+## Phase 2 — Shared Neon backend (funnels, leads, published pages)  ✅ code shipped
 
-Funnels/leads persist to Supabase (RLS-scoped by Clerk user id), with optimistic UI and a
-localStorage fallback. Auth is Clerk. All gated: set the three env vars and it activates;
-without them the app stays in demo mode.
+Funnels and their leads persist to the shared MBAI Neon Postgres project (schema
+`autoleadss`, owned solely by this app — see
+`~/projects/mbai-ecosystem/docs/SHARED-DB-DESIGN.md`), via this repo's own Vercel
+serverless functions under `api/`. No ORM, no persistent pool: plain parameterized
+SQL over `@neondatabase/serverless`'s HTTP driver, every statement schema-qualified
+against `autoleadss.*`.
 
-**Go live:**
-1. **Clerk** → create an app at https://clerk.com, copy the **Publishable key**.
-2. **Supabase → Authentication → Sign In / Providers → Third-Party Auth → Add Clerk**, paste your
-   Clerk **issuer/Frontend API domain**. (In Clerk: Configure → Supabase integration → Connect.)
-3. Apply the schema (from repo root, logged into project `ultznwftohbbgceiwkuh`):
-   ```bash
-   supabase db push          # runs supabase/migrations/0001_saas.sql
-   ```
-4. Add env vars to **Vercel** (and `.env` locally), then redeploy:
-   ```
-   VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxxx
-   VITE_SUPABASE_URL=...            # already set
-   VITE_SUPABASE_PUBLISHABLE_KEY=... # already set
-   ```
-Now `/login` /`/signup` use Clerk, funnels persist per-user in Postgres (RLS enforced), and the
-public `/p/:slug` page reads + captures leads via SECURITY DEFINER RPCs (no broad table access).
+Auth for the API is Clerk, verified **server-side**: `api/_lib/auth.ts` checks the
+`Authorization: Bearer <token>` header against `CLERK_SECRET_KEY` using
+`@clerk/backend`'s `verifyToken`. No token (or no `CLERK_SECRET_KEY`) → the function
+refuses (401/501); the client then stays in localStorage mode. There's no
+client-visible signal for "is Neon configured" (both secrets are server-only), so the
+frontend just probes `GET /api/funnels` once per sign-in
+(`src/saas/store.ts` → `bridgeClerkSession`) and falls back to the existing
+per-user-namespaced localStorage behavior (with the same one-time
+anonymous→first-signed-in-user migration as before) on any failure — network error,
+501 not configured, or the function not deployed yet.
 
-_Note: workspace plan/region sync to the DB lands with Phase 4 (billing)._
-
-## Phase 4 — Billing (Stripe + Paymob)  ✅ code shipped
-
-Plan entitlements, usage meters, and contextual upgrade gates work today (client-side).
-Real checkout is dual-region and env-gated: Gulf → Stripe, Egypt → Paymob.
-
-**Entitlements** (`src/saas/entitlements.ts`): Starter = 1 funnel; Growth = 5 + WhatsApp bot +
-ad/social gen + remove badge; Pro = unlimited + priority AI. Hitting a cap/feature opens a
-branded upgrade modal (`UpgradeContext`).
-
-**Go live (checkout):**
-1. Deploy the function: `supabase functions deploy create-checkout`
-2. Set secrets:
-   ```bash
-   # Gulf / USD
-   supabase secrets set STRIPE_SECRET_KEY=sk_live_xxx
-   supabase secrets set STRIPE_PRICE_GROWTH_GULF=price_xxx STRIPE_PRICE_PRO_GULF=price_xxx
-   # Egypt / EGP (amounts in piastres: 3,000 EGP = 300000)
-   supabase secrets set PAYMOB_SECRET_KEY=xxx PAYMOB_PUBLIC_KEY=xxx
-   supabase secrets set PAYMOB_PRICE_GROWTH_EGYPT=300000 PAYMOB_PRICE_PRO_EGYPT=750000
-   ```
-3. Add `VITE_STRIPE_PUBLISHABLE_KEY=pk_live_xxx` to Vercel (flips `billingEnabled` on the client).
-4. **Webhook (to flip the plan after payment):** add a `stripe-webhook` / `paymob-webhook`
-   edge function that, on a successful subscription event, updates `workspaces.plan` for the
-   `client_reference_id` (Clerk user id). Until then, checkout redirects work but the plan
-   won't auto-upgrade. _(Stub to add next; low-risk once you have live keys to test against.)_
-
-Without these, "Choose plan" sets the plan locally (demo) — the whole flow stays usable.
-
-## Phase 5 — WhatsApp Cloud API (BYO WABA)  ✅ code shipped
-
-Each funnel connects the customer's **own** WhatsApp number (pass-through — protects margin).
-The webhook runs the funnel's generated bot flow live, auto-replies, captures leads (source
-`whatsapp`), and logs the conversation. Managed from **/app/connect** (Growth+ only).
+The public `/p/:slug` page (`src/saas/pages/Published.tsx`) works the same way: it
+always tries `GET /api/published?slug=...` first and only falls back to localStorage
+if that call fails. When the backend is reachable, this fixes publishing being
+limited to the browser that created the funnel.
 
 **Go live:**
-1. `supabase db push` (adds `whatsapp_connections` + `whatsapp_messages`, from `0002_whatsapp.sql`).
-2. Deploy the **public** webhook (Meta sends no apikey):
+1. Make sure `~/projects/mbai-ecosystem`'s gateway bootstrap has already run against
+   the Neon project (creates `public.users`, the `autoleadss` schema, the
+   `autoleadss_app` role + grants — see `SHARED-DB-DESIGN.md` §7). This app's
+   migration assumes that's already done.
+2. Apply this app's table migration (idempotent, safe to re-run):
    ```bash
-   supabase functions deploy whatsapp-webhook --no-verify-jwt
-   supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<service-role-key>   # SUPABASE_URL is auto-set
+   psql "$DIRECT_URL" -f api/db/migrations/0001_autoleadss_schema.sql
    ```
-3. In the app → **WhatsApp** tab: pick a funnel, copy the **Webhook URL + Verify token** into your
-   Meta app's WhatsApp → Configuration → Webhook, subscribe to the **messages** field, then paste your
-   **phone number ID** and a **permanent access token** and Save.
-4. Message the number — the bot replies from your funnel's flow and a lead appears in the CRM.
+   (`DIRECT_URL` — the non-pooled connection — per the shared-DB design's migration
+   guidance; see `api/db/migrations/README.md`.)
+3. Add env vars to **Vercel** (and `.env.local` locally), then redeploy:
+   ```
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxxx
+   CLERK_SECRET_KEY=sk_live_xxxx        # server-only — never in client code
+   DATABASE_URL=postgres://autoleadss_app:...@.../mbai?sslmode=require   # pooled
+   DIRECT_URL=postgres://autoleadss_app:...@.../mbai?sslmode=require     # direct
+   ```
+   See `~/projects/mbai-ecosystem/docs/ENV-CONTRACT.md` for the canonical variable
+   names — never rename them or add `VITE_`/local variants.
 
-_Note: `access_token` is stored in an RLS-protected table; encrypt with Supabase Vault/pgsodium for
-extra hardening. A shared-inbox UI over `whatsapp_messages` is a nice Phase-8 add._
+**Out of scope for this phase** (existed as Supabase-backed features in the old
+Phases 3–8 below; not carried over — the app degrades gracefully rather than
+breaking):
+- **Custom domains / host-based publishing** (`src/saas/db/domains.ts`) — the editor's
+  Domain tab always shows "not available yet"; no `autoleadss.domains` table exists.
+- **WhatsApp remote persistence / shared inbox** (`src/saas/db/whatsapp.ts`) — the
+  Connect page always shows demo-mode copy; no `autoleadss.whatsapp_*` tables exist.
+- **Agency / white-label settings, sub-accounts, workspace plan & region** — these
+  still work, but only ever persist to the per-Clerk-user-namespaced localStorage
+  blob (same mechanism as full demo mode), never to Neon.
+- **Real (non-template) AI generation** (`src/saas/ai/generateLive.ts`) — always
+  falls back to the on-device template generator now; it used to call a Supabase
+  Edge Function. Wiring it to the shared MBAI Model Gateway (`MBAI_GATEWAY_URL` /
+  `MBAI_GATEWAY_KEY`) is a reasonable follow-up.
+- **Billing checkout** (`src/saas/billing/checkout.ts`) — `billingEnabled` is
+  hardcoded `false`; "Choose plan" sets the plan locally (demo) as it always did when
+  billing wasn't configured. It used to call a Supabase Edge Function
+  (`create-checkout`).
 
-## Phase 5.5 — Gemma-powered WhatsApp bot  ✅ code shipped
-
-The webhook now generates **dynamic** replies with Gemma 4 (grounded in the funnel's chatbot
-spec + recent conversation history), falling back to the deterministic flow if unconfigured.
-Gemma is ~10× cheaper than Claude Haiku on this highest-volume path — protecting margin as
-WhatsApp usage scales.
-
-**Go live** (any OpenAI-compatible Gemma host — DeepInfra / Together / Groq, or self-hosted vLLM/Ollama):
-```bash
-supabase secrets set GEMMA_API_KEY=<key>
-supabase secrets set GEMMA_BASE_URL=https://api.deepinfra.com/v1/openai   # or your endpoint
-supabase secrets set GEMMA_MODEL=google/gemma-4-26b-a4b-it               # adjust to the host's id
-```
-Without these, the bot uses the rule-based flow (still works). **Before flipping it on, run the
-eval harness on Gulf + Egyptian Arabic** (see `docs/AI_MODEL_EVAL.md`).
-
-## Phase 6 — Custom domains / real publishing  ✅ code shipped
-
-Once Phase 3 is live, published funnels already work cross-device via `/p/:slug`. Phase 6 adds
-host-based rendering (subdomains + custom domains) and SEO/OG meta on published pages.
-
-- **Free subdomains** `{slug}.autoleadss.site`: register `autoleadss.site`, add it (and a wildcard
-  `*.autoleadss.site`) to the Vercel project, and point DNS at Vercel. Any such host renders that
-  funnel at `/`. Override the root via `VITE_FUNNEL_DOMAIN` if you use a different domain.
-- **Custom domains**: in the editor → **Domain** tab, add the customer's hostname (writes to the
-  `domains` table); they point a **CNAME → cname.vercel-dns.com**; add the domain in the Vercel
-  project so it issues SSL. The public page resolves host → funnel via `get_published_funnel_by_host`.
-- **SEO/OG**: published pages emit `<title>/description/OG/lang/dir/theme-color` from the funnel spec.
-- Apply the migration: `supabase db push` (adds `0003_domains.sql`).
-
-_SSR is not enabled (SPA) — helmet meta covers OG/unfurls and basic SEO; add prerender/SSR in Phase 8 if organic SEO becomes a priority._
-
-## Phase 7 — White-label / agency mode  ✅ code shipped
-
-Agencies on the **white-label** plan get client **sub-accounts** + their own **branding**.
-Managed at **/app/agency** (gated to the whitelabel plan). New funnels attach to the active
-sub-account; the dashboard filters by it; the published-page badge respects the agency's
-branding (hide, or "Made with {brand}").
-
-- Apply the migration: `supabase db push` (adds `0004_agency.sql` — `agency_settings`,
-  `sub_accounts`, `funnels.sub_account_id`, RLS).
-- Set a workspace to the whitelabel plan (via billing / admin) to unlock the Agency tab.
-
-_Follow-ups (Phase 8): propagate agency branding to remote public pages (embed brand in the
-published payload), per-sub-account seats/roles, and reseller billing rails._
-
-## Phase 8 — Analytics, inbox, billing webhook & hardening  ✅ code shipped
-
-- **Per-funnel analytics**: editor → **Insights** tab — visits / leads / conversion / won KPIs, a
-  14-day leads bar chart, and a lead-source breakdown (works in demo from lead data).
-- **WhatsApp lite inbox**: recent conversations per contact on the WhatsApp tab (reads
-  `whatsapp_messages`; remote only).
-- **Billing webhook** (closes Phase 4): `stripe-webhook` flips `workspaces.plan` after payment.
-  The workspace plan now loads from and persists to Postgres, so upgrades stick across devices.
-  ```bash
-  supabase functions deploy stripe-webhook --no-verify-jwt
-  supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx STRIPE_SECRET_KEY=sk_live_xxx
-  # point a Stripe webhook at .../functions/v1/stripe-webhook for checkout.session.completed + customer.subscription.deleted
-  ```
-- **Hardening**: agency white-label branding now propagates to **remote public pages**
-  (`0005_public_branding.sql` extends the published RPCs), so the badge is hidden/rebranded for
-  real visitors, not just in demo. Apply with `supabase db push`.
-
-_Remaining hardening ideas: encrypt the WhatsApp `access_token` with Supabase Vault/pgsodium;
-a full cross-tenant admin console (service-role dashboards); SSR/prerender for organic SEO._
+Each of these has a short doc comment in its source file pointing back here.
 
 ---
 
-### Env reference (`.env` / Vercel)
+### Env reference (`.env.local` / Vercel)
 | Var | Used by | Status |
 |---|---|---|
-| `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | client + edge calls | ✅ set |
-| `ANTHROPIC_API_KEY` (Supabase secret) | `generate-funnel` | ⛔ add to go live |
-| `ANTHROPIC_MODEL_*` (Supabase secret) | model routing | optional |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk auth (`/login`, `/signup`, `/app`) | ⛔ add to go live |
+| `CLERK_SECRET_KEY` | `api/*` — verifies Clerk session tokens server-side | ⛔ add to go live |
+| `DATABASE_URL` / `DIRECT_URL` | `api/*` — shared Neon Postgres (`autoleadss` schema) | ⛔ add to go live |
+| `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | Marketing-site contact form only (`send-contact-email`) — unrelated to the SaaS above | ✅ set (own small Supabase project) |
+
+_Historical note: Phases "2"–"8" below describe the old Supabase-backed
+implementation, kept for context on what shipped and when. The persistence layer
+they describe (Supabase tables + edge functions `generate-funnel`,
+`create-checkout`, `whatsapp-webhook`, `stripe-webhook`) was removed in the Neon
+migration above; the phase numbering wasn't renumbered to avoid rewriting history
+that other docs may reference._
+
+## Phase 2 (historical) — Real AI generation (streaming)
+
+The funnel wizard used to stream from a Supabase Edge Function (`generate-funnel`).
+Removed — see "Out of scope" above. The wizard always uses the on-device template
+generator for now.
+
+## Phase 3 (historical) — Database & Clerk auth via Supabase
+
+Funnels/leads used to persist to Supabase (RLS-scoped by Clerk user id). Superseded
+by "Phase 2 — Shared Neon backend" above.
+
+## Phase 4 (historical) — Billing (Stripe + Paymob)
+
+Plan entitlements, usage meters, and contextual upgrade gates still work today
+(client-side, local). Real checkout (`create-checkout` Supabase Edge Function) was
+removed — see "Out of scope" above.
+
+## Phase 5 (historical) — WhatsApp Cloud API (BYO WABA)
+
+Each funnel used to connect the customer's own WhatsApp number via a Supabase
+webhook. Removed — see "Out of scope" above; `src/saas/db/whatsapp.ts` is a stub.
+
+## Phase 5.5 (historical) — Gemma-powered WhatsApp bot
+
+Depended on Phase 5's webhook (removed).
+
+## Phase 6 (historical) — Custom domains / real publishing
+
+`/p/:slug` cross-device publishing is now covered by "Phase 2 — Shared Neon backend"
+above. Host-based rendering (subdomains + custom domains) was Supabase-backed and
+was not carried over — see "Out of scope" above.
+
+## Phase 7 (historical) — White-label / agency mode
+
+Agencies' sub-accounts + branding still work today, but local-only (see
+"Out of scope" above) — no longer synced to a remote database.
+
+## Phase 8 (historical) — Analytics, inbox, billing webhook & hardening
+
+- **Per-funnel analytics** (editor → Insights tab) still works — it's computed from
+  local lead data, no backend dependency.
+- **WhatsApp lite inbox** and **billing webhook** were Supabase-backed — removed,
+  see "Out of scope" above.

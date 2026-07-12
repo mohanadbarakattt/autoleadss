@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useT } from '../../i18n/LocaleProvider'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
 
 /** City pins positioned on an abstract dotted map of the UAE + Egypt corridor. */
 const CITIES = [
@@ -21,14 +21,15 @@ for (let r = 0; r < 14; r++) {
 
 export default function Regions() {
   const t = useT()
-  const isAr = t.regions.title === 'حيث نعمل'
+  const { locale } = useLocale()
+  const isAr = locale === 'ar'
 
   return (
     <section className="relative overflow-hidden py-24" style={{ background: '#0A0A0B' }}>
       {/* ambient glow */}
       <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: 'radial-gradient(ellipse 60% 50% at 70% 45%, rgba(255,92,42,0.18) 0%, transparent 70%)' }} />
       <div className="content-width relative z-10">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[38%_62%]">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[38fr_62fr]">
           {/* copy */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

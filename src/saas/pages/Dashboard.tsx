@@ -1,15 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Plus, ExternalLink, Pencil, Users, Eye, TrendingUp } from 'lucide-react'
 import AppShell from '../components/AppShell'
-import { useI18n } from '../i18n'
+import { useI18n, toContentLocale } from '../i18n'
 import { useFunnels, useAgency } from '../store'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
+import { useCapGate, isCapHit } from '../billing/usage'
+import type { CapGate } from '../billing/usage'
 
 export default function Dashboard() {
   return (
     <AppShell>
+      <Helmet defer={false}>
+        <title>Dashboard — AutoLeadss</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <DashboardInner />
     </AppShell>
   )
@@ -23,6 +30,8 @@ function DashboardInner() {
   const navigate = useNavigate()
   const ent = useEntitlements()
   const openUpgrade = useUpgrade()
+  const whatsappGate = useCapGate('whatsapp')
+  const aiActionGate = useCapGate('aiAction')
 
   const atCap = allFunnels.length >= ent.maxFunnels
   function handleNew() {
@@ -65,7 +74,7 @@ function DashboardInner() {
       {ent.maxFunnels !== Infinity && (
         <div className="mt-4 rounded-2xl border border-border bg-card p-5">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium">{isRTL ? 'استهلاك القمم' : 'Funnel usage'}</span>
+            <span className="font-medium">{isRTL ? 'استهلاك الأقماع' : 'Funnel usage'}</span>
             <span className="text-muted-fg">{allFunnels.length} / {ent.maxFunnels}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -73,10 +82,27 @@ function DashboardInner() {
           </div>
           {atCap && (
             <button onClick={() => openUpgrade('maxFunnels')} className="mt-3 text-xs font-medium text-accent hover:underline">
-              {isRTL ? 'رقِّ لمزيد من القمم ←' : 'Upgrade for more funnels →'}
+              {isRTL ? 'رقِّ لمزيد من الأقماع ←' : 'Upgrade for more funnels →'}
             </button>
           )}
         </div>
+      )}
+
+      {whatsappGate.status && (
+        <CapUsageBar
+          label={isRTL ? 'محادثات واتساب الذكي' : 'WhatsApp-AI conversations'}
+          gate={whatsappGate}
+          isRTL={isRTL}
+          onUpgrade={() => openUpgrade('whatsappCap')}
+        />
+      )}
+      {aiActionGate.status && (
+        <CapUsageBar
+          label={isRTL ? 'توليد الذكاء الاصطناعي' : 'AI generations'}
+          gate={aiActionGate}
+          isRTL={isRTL}
+          onUpgrade={() => openUpgrade('aiActionCap')}
+        />
       )}
 
       {funnels.length === 0 ? (
@@ -103,7 +129,7 @@ function DashboardInner() {
                   <div aria-hidden className="absolute inset-0 opacity-50" style={{ background: `radial-gradient(ellipse at 80% 20%, ${f.accent}55, transparent 60%)` }} />
                   <div className="relative flex items-center justify-between">
                     <span className="flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-0.5 text-[10px] text-white/70">
-                      <span>{ind?.emoji}</span> {industryLabel(f.industry, locale)}
+                      <span>{ind?.emoji}</span> {industryLabel(f.industry, toContentLocale(locale))}
                     </span>
                     <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${f.status === 'published' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
                       {f.status === 'published' ? t.common.published : t.common.draft}
@@ -141,6 +167,39 @@ function Metric({ value, label }: { value: string | number; label: string }) {
     <div className="rounded-lg bg-muted/50 py-2">
       <p className="font-display text-lg font-bold">{value}</p>
       <p className="text-[10px] text-muted-fg">{label}</p>
+    </div>
+  )
+}
+
+/**
+ * Friendly usage bar for a WhatsApp-AI/AI-action cap. Hard caps (Growth) get an
+ * "upgrade for more" CTA once hit, matching the funnel-usage bar above. Soft caps
+ * (Pro) never block — past 100% they just switch to an advisory note, per
+ * PRICING-SPEC-DRAFT.md §2.2 ("don't throttle the power users").
+ */
+function CapUsageBar({ label, gate, isRTL, onUpgrade }: { label: string; gate: CapGate; isRTL: boolean; onUpgrade: () => void }) {
+  const status = gate.status
+  if (!status) return null
+  const pct = Math.min(100, (status.used / status.limit) * 100)
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-card p-5">
+      <div className="mb-2 flex items-center justify-between text-sm">
+        <span className="font-medium">{label}</span>
+        <span className="text-muted-fg">{status.used} / {status.limit}</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
+        <div className={`h-full rounded-full transition-all ${isCapHit(status) ? 'bg-red-500' : 'bg-accent'}`} style={{ width: `${pct}%` }} />
+      </div>
+      {isCapHit(status) && (
+        <button onClick={onUpgrade} className="mt-3 text-xs font-medium text-accent hover:underline">
+          {isRTL ? 'رقِّ لمزيد ←' : 'Upgrade for more →'}
+        </button>
+      )}
+      {status.hit && status.type === 'soft' && (
+        <p className="mt-3 text-xs text-muted-fg">
+          {isRTL ? 'أنت من المستخدمين الأقوياء — لا تقييد على باقة Pro.' : 'You’re a power user — no throttling on Pro.'}
+        </p>
+      )}
     </div>
   )
 }

@@ -1,54 +1,70 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import FunnelRenderer from '../components/FunnelRenderer'
 import { LogoMark } from '../../components/Logo'
 import { getFunnelBySlug, recordVisit, addLead, useAgency } from '../store'
-import { remoteEnabled } from '../config'
-import { getAnonSupabase } from '../db/client'
-import { getPublishedFunnel, getPublishedFunnelByHost, recordVisitRemote, captureLeadRemote } from '../db/remote'
-import { subdomainSlug, isFunnelHost, currentHost } from '../publish/host'
+import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/api'
+import { subdomainSlug, isFunnelHost } from '../publish/host'
 import type { Funnel } from '../types'
 
 export default function Published() {
   const { slug: routeSlug } = useParams()
   const [funnel, setFunnel] = useState<Funnel | null | undefined>(undefined)
+  const [backendReachable, setBackendReachable] = useState(false)
   const { settings: brand } = useAgency()
-  const sb = useMemo(() => (remoteEnabled ? getAnonSupabase() : null), [])
+  /** Which store the currently-shown funnel came from — decides where a captured
+   * lead goes. Set once per load so a read/write split-brain can't happen. */
+  const source = useRef<'remote' | 'local'>('local')
 
   // Slug source: /p/:slug param, or a {slug}.autoleadss.site subdomain.
   const subSlug = subdomainSlug()
   const slug = routeSlug ?? subSlug ?? ''
-  // On a custom-domain host with no slug, resolve the host itself.
+  // On a custom-domain host with no slug, resolve the host itself. Host-based lookup
+  // has no Neon-backed equivalent yet (custom domains weren't migrated in Phase 2 —
+  // see src/saas/db/domains.ts) so this path always falls through to local lookup.
   const byHost = !slug && isFunnelHost()
 
   useEffect(() => {
     let cancelled = false
     async function load() {
-      if (sb) {
+      if (!byHost) {
+        // Always try the shared Neon backend first — there's no client-side signal
+        // for whether it's configured (server-only secrets), so we just attempt the
+        // call. If it responds at all (found or not), trust it and stop — only an
+        // actual failure (network error, 501 not configured, ...) falls through to
+        // localStorage below. This fixes same-browser-only publishing whenever the
+        // backend *is* reachable.
         try {
-          const f = byHost ? await getPublishedFunnelByHost(sb, currentHost()) : await getPublishedFunnel(sb, slug)
-          if (!cancelled) setFunnel(f ?? null)
-          if (f) recordVisitRemote(sb, f.slug).catch(() => {})
+          const f = await getPublishedFunnel(slug)
+          if (!cancelled) {
+            setBackendReachable(true)
+            source.current = 'remote'
+            setFunnel(f ?? null)
+          }
+          if (f) recordVisitRemote(f.slug).catch(() => {})
+          return
         } catch {
-          if (!cancelled) setFunnel(null)
+          /* backend unreachable/unconfigured — fall back to localStorage below */
         }
-      } else {
-        const f = getFunnelBySlug(slug)
-        setFunnel(f ?? null)
-        if (f) recordVisit(slug)
       }
+      const f = getFunnelBySlug(slug)
+      if (!cancelled) {
+        source.current = 'local'
+        setFunnel(f ?? null)
+      }
+      if (f) recordVisit(slug)
     }
     load()
     return () => {
       cancelled = true
     }
-  }, [slug, byHost, sb])
+  }, [slug, byHost])
 
   function handleLead(d: { name: string; phone: string; extra?: string }) {
     const targetSlug = funnel?.slug ?? slug
-    if (sb) {
-      captureLeadRemote(sb, targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' }).catch(() => {})
+    if (source.current === 'remote') {
+      captureLeadRemote(targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' }).catch(() => {})
     } else {
       addLead(targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' })
     }
@@ -64,7 +80,7 @@ export default function Published() {
         <LogoMark size={44} />
         <h1 className="font-display text-2xl font-bold">This funnel isn’t published here yet</h1>
         <p className="max-w-md text-sm text-white/60">
-          {remoteEnabled
+          {backendReachable
             ? 'This link has no published funnel. Publish one from your dashboard to see it live.'
             : 'Published funnels are stored in the browser that created them (demo mode). Generate one and publish it to see it live.'}
         </p>
@@ -76,13 +92,15 @@ export default function Published() {
   const hero = funnel.spec.page.hero
   return (
     <div className="relative">
-      <Helmet>
+      <Helmet defer={false}>
         <html lang={funnel.language} dir={funnel.language === 'ar' ? 'rtl' : 'ltr'} />
         <title>{funnel.name} — {hero.eyebrow}</title>
         <meta name="description" content={hero.subhead} />
         <meta property="og:title" content={`${funnel.name} — ${hero.headline}`} />
         <meta property="og:description" content={hero.subhead} />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://autoleadss.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content={funnel.accent} />
       </Helmet>
       <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
