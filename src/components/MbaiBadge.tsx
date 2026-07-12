@@ -49,6 +49,8 @@ export const MbaiBadge: React.FC<MbaiBadgeProps> = ({ variant = 'light', classNa
         <text
           x="30"
           y="17"
+          direction="ltr"
+          textAnchor="start"
           fontFamily="Helvetica, Arial, sans-serif"
           fontWeight="600"
           fontSize="9.5"
