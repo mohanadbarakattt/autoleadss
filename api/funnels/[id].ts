@@ -1,7 +1,19 @@
 import { getSql } from '../_lib/db'
 import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
+import { isValidGa4, isValidPixel } from '../../src/saas/lib/tracking'
 import type { Funnel } from '../../src/saas/types'
+
+/** Strips any tracking id that fails format validation before it's ever persisted —
+ * the server-side half of the stored-XSS fix (see also Published.tsx's render-time
+ * check and Editor.tsx's inline field validation). */
+function sanitizeTracking(spec: Funnel['spec']): Funnel['spec'] {
+  if (!spec.tracking) return spec
+  const tracking = { ...spec.tracking }
+  if (tracking.ga4Id !== undefined && !isValidGa4(tracking.ga4Id)) delete tracking.ga4Id
+  if (tracking.metaPixelId !== undefined && !isValidPixel(tracking.metaPixelId)) delete tracking.metaPixelId
+  return { ...spec, tracking }
+}
 
 /** PATCH /api/funnels/:id — update. DELETE /api/funnels/:id — delete. Both owner-scoped. */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
@@ -37,7 +49,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (patch.language !== undefined) col('language', patch.language)
     if (patch.status !== undefined) col('status', patch.status)
     if (patch.accent !== undefined) col('accent', patch.accent)
-    if (patch.spec !== undefined) col('spec', JSON.stringify(patch.spec))
+    if (patch.spec !== undefined) col('spec', JSON.stringify(sanitizeTracking(patch.spec)))
     if (patch.visits !== undefined) col('visits', patch.visits)
     if (patch.visitsByDay !== undefined) col('visits_by_day', JSON.stringify(patch.visitsByDay))
     col('updated_at', new Date().toISOString())

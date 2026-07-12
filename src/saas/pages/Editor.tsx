@@ -16,6 +16,7 @@ import { useCapGate, isCapHit } from '../billing/usage'
 import { remoteEnabled } from '../config'
 import { FUNNEL_ROOT } from '../publish/host'
 import { listDomains, addDomain, deleteDomain, type Domain } from '../db/domains'
+import { isValidGa4, isValidPixel } from '../lib/tracking'
 import type { FunnelSpec, Lead, Funnel } from '../types'
 
 type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'insights' | 'settings' | 'domain'
@@ -276,7 +277,8 @@ function downloadLeadsCsv(funnelName: string, leads: Lead[]) {
   const header = ['Name', 'Phone', 'Email', 'Source', 'Status', 'Created At']
   const rows = leads.map((l) => [l.name, l.phone, l.email ?? '', l.source, l.status, new Date(l.createdAt).toISOString()])
   const csv = [header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  // Leading BOM so Excel detects UTF-8 and doesn't mojibake Arabic names.
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -287,6 +289,8 @@ function downloadLeadsCsv(funnelName: string, leads: Lead[]) {
 
 function SettingsPanel({ spec, set, isRTL }: { spec: FunnelSpec; set: (mutate: (s: FunnelSpec) => FunnelSpec) => void; isRTL: boolean }) {
   const thankYou = spec.page.thankYou
+  const metaPixelId = spec.tracking?.metaPixelId ?? ''
+  const ga4Id = spec.tracking?.ga4Id ?? ''
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5">
       <FieldGroup title={isRTL ? 'تتبّع التحويل' : 'Conversion tracking'}>
@@ -295,13 +299,15 @@ function SettingsPanel({ spec, set, isRTL }: { spec: FunnelSpec; set: (mutate: (
         </p>
         <EditField
           label="Meta Pixel ID"
-          value={spec.tracking?.metaPixelId ?? ''}
+          value={metaPixelId}
           onChange={(v) => set((s) => ({ ...s, tracking: { ...s.tracking, metaPixelId: v || undefined } }))}
+          error={metaPixelId && !isValidPixel(metaPixelId) ? (isRTL ? 'صيغة غير صحيحة (أرقام فقط، 6-20 رقم)' : 'Invalid format (digits only, 6-20 chars)') : undefined}
         />
         <EditField
           label="GA4 Measurement ID"
-          value={spec.tracking?.ga4Id ?? ''}
+          value={ga4Id}
           onChange={(v) => set((s) => ({ ...s, tracking: { ...s.tracking, ga4Id: v || undefined } }))}
+          error={ga4Id && !isValidGa4(ga4Id) ? (isRTL ? 'صيغة غير صحيحة (مثال: G-ABC1234)' : 'Invalid format (e.g. G-ABC1234)') : undefined}
         />
       </FieldGroup>
 
@@ -495,11 +501,12 @@ function FieldGroup({ title, children }: { title: string; children: React.ReactN
   )
 }
 
-function EditField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function EditField({ label, value, onChange, error }: { label: string; value: string; onChange: (v: string) => void; error?: string }) {
   return (
     <label className="flex flex-col gap-1">
       {label && <span className="text-[10px] font-medium uppercase text-muted-fg">{label}</span>}
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-accent ${error ? 'border-red-400' : 'border-border'}`} />
+      {error && <span className="text-[10px] text-red-500">{error}</span>}
     </label>
   )
 }

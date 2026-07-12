@@ -6,6 +6,7 @@ import { LogoMark } from '../../components/Logo'
 import { getFunnelBySlug, recordVisit, addLead, useAgency } from '../store'
 import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/api'
 import { subdomainSlug, isFunnelHost } from '../publish/host'
+import { isValidGa4, isValidPixel } from '../lib/tracking'
 import type { Funnel } from '../types'
 
 export default function Published() {
@@ -91,6 +92,10 @@ export default function Published() {
 
   const hero = funnel.spec.page.hero
   const tracking = funnel.spec.tracking
+  // Format-validate before ever splicing these into a <script> body below — an
+  // invalid id (e.g. a stored XSS payload) is simply omitted, never rendered.
+  const ga4Id = tracking?.ga4Id && isValidGa4(tracking.ga4Id) ? tracking.ga4Id : undefined
+  const metaPixelId = tracking?.metaPixelId && isValidPixel(tracking.metaPixelId) ? tracking.metaPixelId : undefined
   return (
     <div className="relative">
       <Helmet defer={false}>
@@ -103,19 +108,19 @@ export default function Published() {
         <meta property="og:image" content="https://autoleadss.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content={funnel.accent} />
-        {tracking?.ga4Id && (
-          <script async src={`https://www.googletagmanager.com/gtag/js?id=${tracking.ga4Id}`} />
+        {ga4Id && (
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
         )}
-        {tracking?.ga4Id && (
-          <script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${tracking.ga4Id}');`}</script>
+        {ga4Id && (
+          <script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${ga4Id}');`}</script>
         )}
-        {tracking?.metaPixelId && (
-          <script>{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${tracking.metaPixelId}');fbq('track','PageView');`}</script>
+        {metaPixelId && (
+          <script>{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`}</script>
         )}
       </Helmet>
-      {tracking?.metaPixelId && (
+      {metaPixelId && (
         <noscript>
-          <img height="1" width="1" style={{ display: 'none' }} alt="" src={`https://www.facebook.com/tr?id=${tracking.metaPixelId}&ev=PageView&noscript=1`} />
+          <img height="1" width="1" style={{ display: 'none' }} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} />
         </noscript>
       )}
       <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />

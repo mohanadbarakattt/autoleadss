@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount } from './types'
 import { clerkEnabled } from './config'
+import { spreadVisitsByDay } from './lib/visits'
 import type { RemoteAuth } from './db/api'
 import {
   listFunnels as rListFunnels,
@@ -380,7 +381,8 @@ export function seedDemoLeads(funnelId: string, names: [string, string][]) {
     sample: true,
   }))
   const seedVisits = 40 + names.length * 7
-  updateFunnel(funnelId, { leads: demo, visits: f.visits + seedVisits, seedVisits })
+  const visitsByDay = { ...f.visitsByDay, ...spreadVisitsByDay(seedVisits) }
+  updateFunnel(funnelId, { leads: demo, visits: f.visits + seedVisits, seedVisits, visitsByDay })
 }
 
 /** True when a funnel still carries any of the fictitious data `seedDemoLeads` injected. */
