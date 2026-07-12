@@ -8,8 +8,8 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
     "businessName": "Marina Heights Realty",
     "page": {
       "hero": {
-        "eyebrow": "RERA-Licensed Property Advisory | Dubai, Abu Dhabi, Cairo & the Northern Coast",
-        "headline": "Own Off-Plan Property in Prime Waterfront Addresses — From 10% Down",
+        "eyebrow": "RERA-Licensed Property Advisory | Serving {{LOCATION}}",
+        "headline": "Own Off-Plan Property in Prime {{LOCATION}} Addresses — From 10% Down",
         "subhead": "Marina Heights Realty gives you direct-from-developer access to hand-picked off-plan and ready homes across the UAE, Gulf and Egypt — with interest-free payment plans, guaranteed rental yields, and a dedicated advisor who handles every step, from reservation to handover.",
         "ctaPrimary": "Book a Free Investment Consultation",
         "ctaSecondary": "Download the 2026 Off-Plan Price List",
@@ -127,7 +127,7 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
     "ads": [
       {
         "platform": "google",
-        "headline": "Off-Plan Dubai Property | From 10% Down",
+        "headline": "Off-Plan Property in {{LOCATION}} | From 10% Down",
         "description": "RERA-licensed brokerage. Direct developer prices, interest-free plans & up to 9% yields. Free consultation — get your shortlist today.",
         "cta": "Get Free Shortlist"
       },
@@ -139,13 +139,13 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
       },
       {
         "platform": "meta",
-        "headline": "Own a Dubai Marina Apartment From Just 10% Down",
+        "headline": "Own an Apartment in {{LOCATION}} From Just 10% Down",
         "description": "Interest-free payment plans, direct-from-developer prices, and rental yields up to 9%. We handle everything — even if you're overseas. Book a free 30-minute strategy call.",
         "cta": "Message Us on WhatsApp"
       },
       {
         "platform": "tiktok",
-        "headline": "This is how expats buy Dubai property with 10% down 👀",
+        "headline": "This is how buyers get property in {{LOCATION}} with 10% down 👀",
         "description": "No hidden fees, interest-free plans, and yields the bank can't match. Watch how our investors did it — then get your free shortlist in minutes.",
         "cta": "Get My Shortlist"
       }
@@ -154,7 +154,7 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
       "greeting": "Hi there 👋 Welcome to Marina Heights Realty! I'm here to help you find the right off-plan or ready property across the UAE, Gulf or Egypt — and get you real prices and payment plans, no pressure. Mind if I ask a couple of quick questions to point you in the right direction?",
       "qualifyingQuestions": [
         "Are you looking to invest for rental income / capital growth, or to live in the home yourself? 🏡",
-        "Which area interests you most — Dubai, Abu Dhabi, elsewhere in the Gulf, or Egypt?",
+        "Which area interests you most — {{LOCATION}}, or somewhere else?",
         "Roughly what budget are you working with (in AED or EGP)? This helps me match the best payment plans for you."
       ],
       "flow": [
@@ -184,11 +184,11 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
     "social": [
       {
         "platform": "Instagram",
-        "caption": "Off-plan in Dubai Marina, from just 10% down. Interest-free payment plans, direct developer prices, and yields up to 9%. Swipe to see this week's launch allocation before it hits the public market 👀 DM us \"MARINA\" for the full price list.",
+        "caption": "Off-plan in {{LOCATION}}, from just 10% down. Interest-free payment plans, direct developer prices, and yields up to 9%. Swipe to see this week's launch allocation before it hits the public market 👀 DM us for the full price list.",
         "hashtags": [
           "#DubaiRealEstate",
           "#OffPlanDubai",
-          "#DubaiMarina",
+          "#OffPlanProperty",
           "#PropertyInvestment",
           "#GoldenVisa"
         ]
@@ -205,7 +205,7 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
       },
       {
         "platform": "TikTok",
-        "caption": "POV: you bought a Dubai apartment with 10% down and it now pays your rent back home 🤝 Here's exactly how our overseas investors do it — no bank interest, no hidden fees. Comment \"SHORTLIST\" and we'll send you the options.",
+        "caption": "POV: you bought a property in {{LOCATION}} with 10% down and it now pays your rent back home 🤝 Here's exactly how our overseas investors do it — no bank interest, no hidden fees. Comment \"SHORTLIST\" and we'll send you the options.",
         "hashtags": [
           "#DubaiProperty",
           "#RealEstateTok",
@@ -253,9 +253,9 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
     "businessName": "مرتفعات المارينا العقارية",
     "page": {
       "hero": {
-        "eyebrow": "مشاريع سكنية على البحر مباشرة — تسليم مضمون",
-        "headline": "تملّك وحدتك المطلّة على البحر بمقدّم 10% وتقسيط حتى 8 سنوات",
-        "subhead": "شقق وشاليهات وفلل فاخرة في أرقى كمبوندات الساحل والعاصمة الإدارية، بأنظمة سداد مرنة وعقود موثّقة. استثمر اليوم في عقار يرتفع سعره كل عام.",
+        "eyebrow": "مشاريع سكنية في {{LOCATION}} — تسليم مضمون",
+        "headline": "تملّك وحدتك في {{LOCATION}} بمقدّم 10% وتقسيط حتى 8 سنوات",
+        "subhead": "شقق وفلل فاخرة في أرقى كمبوندات {{LOCATION}}، بأنظمة سداد مرنة وعقود موثّقة. استثمر اليوم في عقار يرتفع سعره كل عام.",
         "ctaPrimary": "احجز معاينتك المجانية الآن",
         "ctaSecondary": "حمّل كتيّب الأسعار وخطط السداد",
         "badges": [
@@ -300,7 +300,7 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
         },
         {
           "title": "مواقع استثمارية مميزة",
-          "body": "وحدات في قلب الساحل الشمالي والعاصمة الإدارية الجديدة ومشاريع الخليج، على مقربة من الخدمات والطرق الرئيسية.",
+          "body": "وحدات في قلب {{LOCATION}} وأقرب المناطق الحيوية، على مقربة من الخدمات والطرق الرئيسية.",
           "icon": "Target"
         },
         {
@@ -354,7 +354,7 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
         }
       ],
       "finalCta": {
-        "headline": "منزل أحلامك على البحر ينتظرك — لا تفوّت عرض هذا الموسم",
+        "headline": "منزل أحلامك في {{LOCATION}} ينتظرك — لا تفوّت عرض هذا الموسم",
         "sub": "احجز معاينتك المجانية اليوم واحصل على خطة سداد حصرية وخصم خاص للحاجزين مبكراً. الوحدات المميزة محدودة وتُباع بسرعة.",
         "cta": "تواصل معنا واحجز وحدتك"
       },
@@ -372,34 +372,34 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
     "ads": [
       {
         "platform": "google",
-        "headline": "شقق على البحر بمقدّم 10% | تقسيط 8 سنوات",
-        "description": "تملّك وحدتك في أرقى كمبوندات الساحل والعاصمة الإدارية. عقود موثّقة وتسليم مضمون. احجز معاينتك المجانية الآن.",
+        "headline": "شقق في {{LOCATION}} بمقدّم 10% | تقسيط 8 سنوات",
+        "description": "تملّك وحدتك في أرقى كمبوندات {{LOCATION}}. عقود موثّقة وتسليم مضمون. احجز معاينتك المجانية الآن.",
         "cta": "احجز معاينة"
       },
       {
         "platform": "meta",
         "headline": "استثمر في عقار يرتفع سعره 22% كل عام",
-        "description": "وحدات فاخرة مطلّة على البحر بمقدّم بسيط وتقسيط مريح. أكثر من 3200 عائلة وثقت بنا. اطلب كتيّب الأسعار وخطط السداد.",
+        "description": "وحدات فاخرة في {{LOCATION}} بمقدّم بسيط وتقسيط مريح. أكثر من 3200 عائلة وثقت بنا. اطلب كتيّب الأسعار وخطط السداد.",
         "cta": "اعرف المزيد"
       },
       {
         "platform": "meta",
-        "headline": "منزل أحلامك على البحر أقرب مما تتخيّل",
-        "description": "شاليهات وفلل بإطلالات ساحرة، عقود مسجّلة بالشهر العقاري وتسليم في الموعد. عروض الحجز المبكر محدودة — تواصل معنا اليوم.",
+        "headline": "منزل أحلامك في {{LOCATION}} أقرب مما تتخيّل",
+        "description": "وحدات وفلل بإطلالات ساحرة، عقود مسجّلة بالشهر العقاري وتسليم في الموعد. عروض الحجز المبكر محدودة — تواصل معنا اليوم.",
         "cta": "أرسل رسالة"
       },
       {
         "platform": "tiktok",
-        "headline": "جولة داخل شاليه على البحر بمقدّم 10% بس",
+        "headline": "جولة داخل وحدتك في {{LOCATION}} بمقدّم 10% بس",
         "description": "شوف الوحدات الفاخرة من جوّه، واعرف خطط السداد اللي توصل 8 سنين بدون فوايد. الوحدات المميزة بتخلص بسرعة!",
         "cta": "احجز دلوقتي"
       }
     ],
     "chatbot": {
-      "greeting": "أهلاً وسهلاً بك في مرتفعات المارينا العقارية! 🏖️ أنا مساعدك العقاري، وهنا لأساعدك تلاقي وحدة أحلامك على البحر بأنسب خطة سداد. خلّينا نبدأ ببعض الأسئلة البسيطة؟",
+      "greeting": "أهلاً وسهلاً بك في مرتفعات المارينا العقارية! 🏠 أنا مساعدك العقاري، وهنا لأساعدك تلاقي وحدة أحلامك في {{LOCATION}} بأنسب خطة سداد. خلّينا نبدأ ببعض الأسئلة البسيطة؟",
       "qualifyingQuestions": [
         "هل تبحث عن وحدة للسكن أم للاستثمار؟",
-        "أي منطقة تفضّل — الساحل الشمالي، العاصمة الإدارية، أم مشاريع الخليج؟",
+        "أي منطقة تفضّل — {{LOCATION}}، أم منطقة أخرى؟",
         "ما هي ميزانيتك التقريبية وهل تفضّل الدفع كاش أم بالتقسيط؟"
       ],
       "flow": [
@@ -424,25 +424,24 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
           "response": "ممتاز! 🗓️ المعاينة مجانية وبدون أي التزام، وفريقنا هيرافقك في جولة كاملة. ابعت لي اسمك ورقمك والوقت المناسب لك، وهنأكّد لك الموعد في أسرع وقت."
         }
       ],
-      "bookingMessage": "تمام! ✅ تم تسجيل بياناتك بنجاح. مستشارنا العقاري هيتواصل معك خلال ساعات قليلة على الواتساب لتأكيد موعد معاينتك المجانية وإرسال كتيّب الأسعار وخطط السداد. شكراً لثقتك في مرتفعات المارينا العقارية — منزل أحلامك على البحر بقى أقرب! 🏖️🤝"
+      "bookingMessage": "تمام! ✅ تم تسجيل بياناتك بنجاح. مستشارنا العقاري هيتواصل معك خلال ساعات قليلة على الواتساب لتأكيد موعد معاينتك المجانية وإرسال كتيّب الأسعار وخطط السداد. شكراً لثقتك في مرتفعات المارينا العقارية — منزل أحلامك في {{LOCATION}} بقى أقرب! 🏠🤝"
     },
     "social": [
       {
         "platform": "instagram",
-        "caption": "إطلالة تفتح لك يومك… وبحر يعيد لك هدوءك. 🌊 تملّك وحدتك المطلّة على البحر في مرتفعات المارينا بمقدّم يبدأ من 10% وتقسيط حتى 8 سنوات. منزل أحلامك مش حلم بعيد.",
+        "caption": "سكن يليق بطموحك. 🏠 تملّك وحدتك في {{LOCATION}} بمقدّم يبدأ من 10% وتقسيط حتى 8 سنوات. منزل أحلامك مش حلم بعيد.",
         "hashtags": [
-          "#مرتفعات_المارينا",
+          "{{BRAND_TAG}}",
           "#عقارات_مصر",
-          "#الساحل_الشمالي",
           "#شقق_للبيع",
           "#استثمار_عقاري"
         ]
       },
       {
         "platform": "facebook",
-        "caption": "ليه تدفع إيجار كل شهر وأنت تقدر تمتلك؟ 🏡 وحدات فاخرة في العاصمة الإدارية والساحل الشمالي بأنظمة سداد مريحة وعقود موثّقة بالشهر العقاري. أكثر من 3200 عائلة وثقت بنا — يبقى دورك امتى؟ تواصل معنا واحجز معاينتك المجانية.",
+        "caption": "ليه تدفع إيجار كل شهر وأنت تقدر تمتلك؟ 🏡 وحدات فاخرة في {{LOCATION}} بأنظمة سداد مريحة وعقود موثّقة بالشهر العقاري. أكثر من 3200 عائلة وثقت بنا — يبقى دورك امتى؟ تواصل معنا واحجز معاينتك المجانية.",
         "hashtags": [
-          "#مرتفعات_المارينا",
+          "{{BRAND_TAG}}",
           "#تمليك",
           "#العاصمة_الإدارية",
           "#عقارات",
@@ -455,19 +454,19 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
         "hashtags": [
           "#استثمار_عقاري",
           "#عائد_استثماري",
-          "#مرتفعات_المارينا",
+          "{{BRAND_TAG}}",
           "#عقارات_الخليج",
           "#فرص_استثمارية"
         ]
       },
       {
         "platform": "tiktok",
-        "caption": "جولة سريعة جوّه شاليه على البحر مباشرة 🌅 تشطيب فاخر، إطلالة خيالية، ومقدّم 10% بس! الوحدات المميزة بتخلص بسرعة… احجز معاينتك قبل ما تفوتك.",
+        "caption": "جولة سريعة جوّه وحدتك في {{LOCATION}} 🏠 تشطيب فاخر، إطلالة خيالية، ومقدّم 10% بس! الوحدات المميزة بتخلص بسرعة… احجز معاينتك قبل ما تفوتك.",
         "hashtags": [
           "#عقارات",
-          "#الساحل_الشمالي",
-          "#شاليهات_للبيع",
-          "#مرتفعات_المارينا",
+          "#عقارات_للبيع",
+          "#وحدات_للبيع",
+          "{{BRAND_TAG}}",
           "#عقارات_مصر"
         ]
       },
@@ -477,17 +476,17 @@ export const TEMPLATES: Record<string, FunnelSpec> = {
         "hashtags": [
           "#التطوير_العقاري",
           "#الاستثمار_العقاري",
-          "#مرتفعات_المارينا",
+          "{{BRAND_TAG}}",
           "#العقارات_في_مصر",
           "#فرص_استثمارية"
         ]
       },
       {
         "platform": "facebook",
-        "caption": "عرض هذا الموسم لن يتكرّر! 🎉 خصم خاص للحاجزين مبكراً، وخطط سداد حصرية على وحدات محدودة مطلّة على البحر. راحتك وحقوقك مضمونة بعقود موثّقة وتسليم في الموعد. سجّل بياناتك دلوقتي وفريقنا هيتواصل معك في الحال.",
+        "caption": "عرض هذا الموسم لن يتكرّر! 🎉 خصم خاص للحاجزين مبكراً، وخطط سداد حصرية على وحدات محدودة في {{LOCATION}}. راحتك وحقوقك مضمونة بعقود موثّقة وتسليم في الموعد. سجّل بياناتك دلوقتي وفريقنا هيتواصل معك في الحال.",
         "hashtags": [
           "#عرض_خاص",
-          "#مرتفعات_المارينا",
+          "{{BRAND_TAG}}",
           "#عقارات_للبيع",
           "#حجز_مبكر",
           "#تقسيط"

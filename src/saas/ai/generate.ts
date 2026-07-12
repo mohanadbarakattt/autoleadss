@@ -35,86 +35,65 @@ export function pickTemplate(industry: string, language: string): FunnelSpec {
 // business the user actually typed in (e.g. "شقق للبيع في التجمع الخامس" is
 // inland New Cairo; the base template's copy is written for a North Coast /
 // waterfront listing).
+//
+// The template itself carries `{{LOCATION}}` / `{{BRAND_TAG}}` placeholder
+// tokens (see templates.ts) instead of baked-in prose like "على البحر" or
+// "#مرتفعات_المارينا". `tokenPairs` below is a plain token → value
+// substitution, applied by the same `deepReplace` pass that runs across the
+// whole spec (hero, features, ads, chatbot, social — every channel), so there
+// is no longer a list of exact sentence fragments that has to be kept in sync
+// with the template's prose. If the copy in templates.ts is reworded, the
+// token stays put and the substitution keeps working.
 // ---------------------------------------------------------------------------
 
 interface LocationHint {
   /** Localized display phrase for the area recognized in the user's business
    * name/description, or null if nothing was recognized. */
   phrase: { en: string; ar: string } | null
-  /** True when the recognized area is a genuine beach/waterfront destination —
-   * in which case the template's coastal copy isn't a contradiction and is left as-is. */
-  coastal: boolean
 }
 
-const KNOWN_AREAS: { re: RegExp; en: string; ar: string; coastal: boolean }[] = [
-  { re: /التجمع\s*الخامس|new\s*cairo|fifth\s*settlement|tagamoa/i, en: 'New Cairo', ar: 'التجمع الخامس', coastal: false },
-  { re: /العاصمة\s*الإدارية|new\s*capital/i, en: 'the New Capital', ar: 'العاصمة الإدارية', coastal: false },
-  { re: /الشيخ\s*زايد|sheikh\s*zayed/i, en: 'Sheikh Zayed', ar: 'الشيخ زايد', coastal: false },
-  { re: /مدينتي|madinaty/i, en: 'Madinaty', ar: 'مدينتي', coastal: false },
-  { re: /المعادي|maadi/i, en: 'Maadi', ar: 'المعادي', coastal: false },
-  { re: /6\s*أكتوبر|october\s*city|6th\s*of\s*october/i, en: '6th of October City', ar: 'مدينة 6 أكتوبر', coastal: false },
-  { re: /الساحل\s*الشمالي|north\s*coast/i, en: 'the North Coast', ar: 'الساحل الشمالي', coastal: true },
-  { re: /العين\s*السخنة|ain\s*sokhna|sokhna/i, en: 'Ain Sokhna', ar: 'العين السخنة', coastal: true },
-  { re: /الإسكندرية|alexandria/i, en: 'Alexandria', ar: 'الإسكندرية', coastal: true },
-  { re: /دبي\s*مارينا|dubai\s*marina/i, en: 'Dubai Marina', ar: 'مارينا دبي', coastal: true },
-  { re: /داون\s*تاون\s*دبي|downtown\s*dubai/i, en: 'Downtown Dubai', ar: 'داون تاون دبي', coastal: false },
-  { re: /أبوظبي|abu\s*dhabi/i, en: 'Abu Dhabi', ar: 'أبوظبي', coastal: false },
-  { re: /جدة|jeddah/i, en: 'Jeddah', ar: 'جدة', coastal: true },
-  { re: /الرياض|riyadh/i, en: 'Riyadh', ar: 'الرياض', coastal: false },
-  { re: /دبي|dubai/i, en: 'Dubai', ar: 'دبي', coastal: false },
+const KNOWN_AREAS: { re: RegExp; en: string; ar: string }[] = [
+  { re: /التجمع\s*الخامس|new\s*cairo|fifth\s*settlement|tagamoa/i, en: 'New Cairo', ar: 'التجمع الخامس' },
+  { re: /العاصمة\s*الإدارية|new\s*capital/i, en: 'the New Capital', ar: 'العاصمة الإدارية' },
+  { re: /الشيخ\s*زايد|sheikh\s*zayed/i, en: 'Sheikh Zayed', ar: 'الشيخ زايد' },
+  { re: /مدينتي|madinaty/i, en: 'Madinaty', ar: 'مدينتي' },
+  { re: /المعادي|maadi/i, en: 'Maadi', ar: 'المعادي' },
+  { re: /6\s*أكتوبر|october\s*city|6th\s*of\s*october/i, en: '6th of October City', ar: 'مدينة 6 أكتوبر' },
+  { re: /الساحل\s*الشمالي|north\s*coast/i, en: 'the North Coast', ar: 'الساحل الشمالي' },
+  { re: /العين\s*السخنة|ain\s*sokhna|sokhna/i, en: 'Ain Sokhna', ar: 'العين السخنة' },
+  { re: /الإسكندرية|alexandria/i, en: 'Alexandria', ar: 'الإسكندرية' },
+  { re: /دبي\s*مارينا|dubai\s*marina/i, en: 'Dubai Marina', ar: 'مارينا دبي' },
+  { re: /داون\s*تاون\s*دبي|downtown\s*dubai/i, en: 'Downtown Dubai', ar: 'داون تاون دبي' },
+  { re: /أبوظبي|abu\s*dhabi/i, en: 'Abu Dhabi', ar: 'أبوظبي' },
+  { re: /جدة|jeddah/i, en: 'Jeddah', ar: 'جدة' },
+  { re: /الرياض|riyadh/i, en: 'Riyadh', ar: 'الرياض' },
+  { re: /دبي|dubai/i, en: 'Dubai', ar: 'دبي' },
 ]
 
 function detectLocation(text: string): LocationHint {
   for (const a of KNOWN_AREAS) {
-    if (a.re.test(text)) return { phrase: { en: a.en, ar: a.ar }, coastal: a.coastal }
+    if (a.re.test(text)) return { phrase: { en: a.en, ar: a.ar } }
   }
-  return { phrase: null, coastal: false }
+  return { phrase: null }
 }
 
 /**
- * Exact-fragment replacements that neutralize the real-estate template's baked-in
- * beachfront/North-Coast framing when the business the user described isn't
- * actually on the coast. Deliberately matches whole phrases (not single words like
- * "بحر"/"sea") so the result stays grammatically correct Arabic/English rather than
- * a naive word swap. Runs across hero, features, ads, chatbot and social — every
- * channel the wizard generates — not just the headline.
+ * Token → value substitution pairs, applied uniformly across every generated
+ * channel (page, ads, chatbot, social). `{{LOCATION}}` resolves to the area
+ * recognized in the business name (falling back to a neutral "Egypt & the
+ * Gulf" phrase when none is recognized — including a genuinely coastal area
+ * like the North Coast, so a legit coastal business still reads as coastal).
+ * `{{BRAND_TAG}}` is a hashtag-safe version of the business name, for social
+ * hashtags that can't contain spaces.
  */
-function coastalReplacements(hint: LocationHint): [string, string][] {
+function tokenPairs(input: WizardInput): [string, string][] {
+  const hint = detectLocation(input.businessName)
   const locAr = hint.phrase?.ar ?? 'مصر والخليج'
   const locEn = hint.phrase?.en ?? 'Egypt & the Gulf'
+  const brandTag = (input.businessName || '').trim().replace(/\s+/g, '_')
   return [
-    // Arabic — full phrases first, emoji cleanup last.
-    ['مشاريع سكنية على البحر مباشرة — تسليم مضمون', `مشاريع سكنية في ${locAr} — تسليم مضمون`],
-    ['تملّك وحدتك المطلّة على البحر بمقدّم 10% وتقسيط حتى 8 سنوات', `تملّك وحدتك في ${locAr} بمقدّم 10% وتقسيط حتى 8 سنوات`],
-    ['شقق وشاليهات وفلل فاخرة في أرقى كمبوندات الساحل والعاصمة الإدارية', `شقق وفلل فاخرة في أرقى كمبوندات ${locAr}`],
-    ['منزل أحلامك على البحر ينتظرك', `منزل أحلامك في ${locAr} ينتظرك`],
-    ['وحدات في قلب الساحل الشمالي والعاصمة الإدارية الجديدة ومشاريع الخليج', `وحدات في قلب ${locAr} وأقرب المناطق الحيوية`],
-    ['شقق على البحر بمقدّم 10% | تقسيط 8 سنوات', `شقق في ${locAr} بمقدّم 10% | تقسيط 8 سنوات`],
-    ['منزل أحلامك على البحر أقرب مما تتخيّل', `منزل أحلامك في ${locAr} أقرب مما تتخيّل`],
-    ['جولة داخل شاليه على البحر مباشرة', `جولة داخل وحدتك في ${locAr}`],
-    ['أحلامك على البحر بأنسب خطة سداد', `أحلامك في ${locAr} بأنسب خطة سداد`],
-    ['الساحل الشمالي، العاصمة الإدارية، أم مشاريع الخليج؟', `${locAr}، أم منطقة أخرى؟`],
-    ['أحلامك على البحر بقى أقرب', `أحلامك في ${locAr} بقى أقرب`],
-    [
-      'إطلالة تفتح لك يومك… وبحر يعيد لك هدوءك. 🌊 تملّك وحدتك المطلّة على البحر في مرتفعات المارينا بمقدّم يبدأ من 10% وتقسيط حتى 8 سنوات. منزل أحلامك مش حلم بعيد.',
-      `سكن يليق بطموحك. 🏠 تملّك وحدتك في ${locAr} بمقدّم يبدأ من 10% وتقسيط حتى 8 سنوات. منزل أحلامك مش حلم بعيد.`,
-    ],
-    ['وحدات فاخرة في العاصمة الإدارية والساحل الشمالي', `وحدات فاخرة في ${locAr}`],
-    ['جولة سريعة جوّه شاليه على البحر مباشرة 🌅', `جولة سريعة جوّه وحدتك في ${locAr} 🏠`],
-    ['خطط سداد حصرية على وحدات محدودة مطلّة على البحر', `خطط سداد حصرية على وحدات محدودة في ${locAr}`],
-    ['#الساحل_الشمالي', '#عقارات_مصر'],
-    ['🏖️', '🏠'],
-    ['🌊', ''],
-    ['🌅', '🏠'],
-    // English
-    ['RERA-Licensed Property Advisory | Dubai, Abu Dhabi, Cairo & the Northern Coast', `RERA-Licensed Property Advisory | Serving ${locEn}`],
-    ['Own Off-Plan Property in Prime Waterfront Addresses — From 10% Down', `Own Off-Plan Property in Prime ${locEn} Addresses — From 10% Down`],
-    ['Off-Plan Dubai Property | From 10% Down', `Off-Plan Property in ${locEn} | From 10% Down`],
-    ['Own a Dubai Marina Apartment From Just 10% Down', `Own an Apartment in ${locEn} From Just 10% Down`],
-    ['This is how expats buy Dubai property with 10% down 👀', `This is how buyers get property in ${locEn} with 10% down 👀`],
-    ['Off-plan in Dubai Marina, from just 10% down.', `Off-plan in ${locEn}, from just 10% down.`],
-    ['POV: you bought a Dubai apartment with 10% down', `POV: you bought an apartment in ${locEn} with 10% down`],
-    ['Which area interests you most — Dubai, Abu Dhabi, elsewhere in the Gulf, or Egypt?', `Which area interests you most — ${locEn}, or somewhere else?`],
+    ['{{LOCATION}}', input.language === 'ar' ? locAr : locEn],
+    ['{{BRAND_TAG}}', brandTag ? `#${brandTag}` : '#عقارات'],
   ]
 }
 
@@ -180,13 +159,11 @@ export function generateFromTemplate(input: WizardInput): FunnelSpec {
   // guarantees the returned spec is an independent clone (never aliases `TEMPLATES`).
   let spec = deepReplace(base, [[base.businessName, input.businessName || base.businessName]])
 
-  // Pass 2: real-estate only — kill location-specific canned fragments (beachfront/
-  // North Coast/waterfront) that contradict a non-coastal business the user described,
-  // and reference their actual area instead when we can detect one.
-  const hint = detectLocation(input.businessName)
-  if (input.industry === 'real-estate' && !hint.coastal) {
-    spec = deepReplace(spec, coastalReplacements(hint))
-  }
+  // Pass 2: resolve `{{LOCATION}}` / `{{BRAND_TAG}}` placeholder tokens against the
+  // area detected in the business name. Runs for every industry/channel — it's a
+  // no-op wherever a template doesn't contain the tokens (only the real-estate
+  // templates do today), so there's no per-industry branch to keep in sync.
+  spec = deepReplace(spec, tokenPairs(input))
 
   spec.businessName = input.businessName || base.businessName
   spec.industry = input.industry
