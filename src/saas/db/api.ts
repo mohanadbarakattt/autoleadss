@@ -1,4 +1,5 @@
 import type { Funnel, Lead } from '../types'
+import type { FollowUpInput } from '../ai/followUp'
 
 /**
  * Remote data-access layer backed by the shared Neon Postgres project, via this
@@ -71,6 +72,15 @@ export async function deleteFunnel(auth: RemoteAuth, id: string): Promise<void> 
 
 export async function setLeadStatusRemote(auth: RemoteAuth, leadId: string, status: Lead['status']): Promise<void> {
   await authedRequest(auth, `/api/leads/${encodeURIComponent(leadId)}`, { method: 'PATCH', body: JSON.stringify({ status }) })
+}
+
+/** Gateway-backed instant-reply draft for a lead — see `api/leads/follow-up.ts`.
+ * Throws (like every other function here) on any failure, including "gateway not
+ * configured" (503); `ai/followUp.ts`'s `generateFollowUp` catches that and falls
+ * back to a keyless template. */
+export async function generateFollowUpRemote(auth: RemoteAuth, input: FollowUpInput): Promise<string> {
+  const { text } = await authedRequest<{ text: string }>(auth, '/api/leads/follow-up', { method: 'POST', body: JSON.stringify(input) })
+  return text
 }
 
 // ---------- public (published page) ----------

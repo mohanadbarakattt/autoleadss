@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2, FlaskConical, Info, Download } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Plus, Trash2, FlaskConical, Info, Download, MessageCircle } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
@@ -11,6 +11,7 @@ import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
 import { useFunnel, updateSpec, updateFunnel, publishFunnel, setLeadStatus, getDb, hasSampleData, clearSampleData } from '../store'
 import { generateFromTemplate } from '../ai/generate'
+import { generateFollowUp } from '../ai/followUp'
 import { useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
 import { remoteEnabled } from '../config'
@@ -249,7 +250,7 @@ function EditorInner() {
                 </button>
               </div>
             )}
-            <LeadsTable funnelId={id} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />
+            <LeadsTable funnel={funnel} leads={funnel.leads} locale={toContentLocale(locale)} isRTL={isRTL} />
           </>
         )}
 
@@ -362,7 +363,8 @@ function SampleDataBanner({ funnelId, isRTL }: { funnelId: string; isRTL: boolea
   )
 }
 
-function LeadsTable({ funnelId, leads, locale, isRTL }: { funnelId: string; leads: Lead[]; locale: 'en' | 'ar'; isRTL: boolean }) {
+function LeadsTable({ funnel, leads, locale, isRTL }: { funnel: Funnel; leads: Lead[]; locale: 'en' | 'ar'; isRTL: boolean }) {
+  const funnelId = funnel.id
   const statuses: Lead['status'][] = ['new', 'qualified', 'won', 'lost']
   const labels: Record<Lead['status'], { en: string; ar: string }> = {
     new: { en: 'New', ar: 'جديد' }, qualified: { en: 'Qualified', ar: 'مؤهّل' }, won: { en: 'Won', ar: 'مكسوب' }, lost: { en: 'Lost', ar: 'مفقود' },
@@ -370,6 +372,7 @@ function LeadsTable({ funnelId, leads, locale, isRTL }: { funnelId: string; lead
   const colors: Record<Lead['status'], string> = {
     new: 'bg-blue-500/15 text-blue-600', qualified: 'bg-amber-500/15 text-amber-600', won: 'bg-emerald-500/15 text-emerald-600', lost: 'bg-red-500/15 text-red-600',
   }
+  const [openId, setOpenId] = useState<string | null>(null)
   if (!leads.length) return <p className="py-16 text-center text-sm text-muted-fg">{isRTL ? 'لا يوجد عملاء بعد.' : 'No leads yet.'}</p>
   return (
     <div className="overflow-x-auto rounded-2xl border border-border bg-card">
@@ -380,34 +383,105 @@ function LeadsTable({ funnelId, leads, locale, isRTL }: { funnelId: string; lead
             <th className="px-5 py-3 text-start font-medium">{isRTL ? 'الهاتف' : 'Phone'}</th>
             <th className="px-5 py-3 text-start font-medium">{isRTL ? 'المصدر' : 'Source'}</th>
             <th className="px-5 py-3 text-start font-medium">{isRTL ? 'الحالة' : 'Status'}</th>
+            <th className="px-5 py-3 text-start font-medium">{isRTL ? 'رد فوري' : 'Instant reply'}</th>
           </tr>
         </thead>
         <tbody>
           {leads.map((l) => (
-            <tr key={l.id} className="border-b border-border/60 last:border-0">
-              <td className="px-5 py-3 font-medium">
-                {l.name}
-                {l.sample && (
-                  <span className="ms-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                    {isRTL ? 'تجريبي' : 'Sample'}
+            <Fragment key={l.id}>
+              <tr className="border-b border-border/60 last:border-0">
+                <td className="px-5 py-3 font-medium">
+                  {l.name}
+                  {l.sample && (
+                    <span className="ms-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                      {isRTL ? 'تجريبي' : 'Sample'}
+                    </span>
+                  )}
+                </td>
+                <td className="px-5 py-3 text-muted-fg" dir="ltr">{l.phone}</td>
+                <td className="px-5 py-3">
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-fg">
+                    {l.source === 'whatsapp' ? '🟢 WhatsApp' : '🌐 Page'}
                   </span>
-                )}
-              </td>
-              <td className="px-5 py-3 text-muted-fg" dir="ltr">{l.phone}</td>
-              <td className="px-5 py-3">
-                <span className="inline-flex items-center gap-1.5 text-xs text-muted-fg">
-                  {l.source === 'whatsapp' ? '🟢 WhatsApp' : '🌐 Page'}
-                </span>
-              </td>
-              <td className="px-5 py-3">
-                <select value={l.status} onChange={(e) => setLeadStatus(funnelId, l.id, e.target.value as Lead['status'])} className={`rounded-full px-3 py-1 text-xs font-semibold outline-none ${colors[l.status]}`}>
-                  {statuses.map((s) => <option key={s} value={s}>{labels[s][locale]}</option>)}
-                </select>
-              </td>
-            </tr>
+                </td>
+                <td className="px-5 py-3">
+                  <select value={l.status} onChange={(e) => setLeadStatus(funnelId, l.id, e.target.value as Lead['status'])} className={`rounded-full px-3 py-1 text-xs font-semibold outline-none ${colors[l.status]}`}>
+                    {statuses.map((s) => <option key={s} value={s}>{labels[s][locale]}</option>)}
+                  </select>
+                </td>
+                <td className="px-5 py-3">
+                  <button
+                    onClick={() => setOpenId(openId === l.id ? null : l.id)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground"
+                  >
+                    <MessageCircle size={13} /> {isRTL ? 'رد فوري' : 'Instant reply'}
+                  </button>
+                </td>
+              </tr>
+              {openId === l.id && (
+                <tr className="border-b border-border/60 bg-muted/30 last:border-0">
+                  <td colSpan={5} className="px-5 py-4">
+                    <InstantReplyPanel funnel={funnel} lead={l} isRTL={isRTL} />
+                  </td>
+                </tr>
+              )}
+            </Fragment>
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+function InstantReplyPanel({ funnel, lead, isRTL }: { funnel: Funnel; lead: Lead; isRTL: boolean }) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function regenerate() {
+    setBusy(true)
+    try {
+      setDraft(await generateFollowUp(funnel, lead))
+    } finally {
+      setBusy(false)
+    }
+  }
+  useEffect(() => {
+    regenerate()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lead.id])
+
+  const digits = lead.phone.replace(/[^0-9]/g, '')
+  const waHref = draft ? `https://wa.me/${digits}?text=${encodeURIComponent(draft)}` : undefined
+
+  return (
+    <div className="flex flex-col gap-3">
+      <textarea
+        dir={funnel.language === 'ar' ? 'rtl' : 'ltr'}
+        value={busy ? (isRTL ? 'جارٍ الكتابة…' : 'Drafting…') : (draft ?? '')}
+        onChange={(e) => setDraft(e.target.value)}
+        readOnly={busy}
+        rows={3}
+        className="w-full resize-none rounded-xl border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <a
+          href={waHref}
+          target="_blank"
+          rel="noreferrer"
+          aria-disabled={!waHref}
+          onClick={(e) => { if (!waHref) e.preventDefault() }}
+          className={`inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-opacity ${waHref ? 'hover:opacity-90' : 'pointer-events-none opacity-50'}`}
+        >
+          <MessageCircle size={13} /> {isRTL ? 'إرسال عبر واتساب' : 'Send via WhatsApp'}
+        </a>
+        <button
+          onClick={regenerate}
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium text-muted-fg transition-colors hover:text-foreground disabled:opacity-50"
+        >
+          <RefreshCw size={13} /> {isRTL ? 'إعادة الصياغة' : 'Regenerate'}
+        </button>
+      </div>
     </div>
   )
 }
