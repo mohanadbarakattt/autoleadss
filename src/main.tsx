@@ -1,9 +1,9 @@
-import {ClerkProvider} from "@clerk/clerk-react";
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
+import ErrorBoundary from './components/ErrorBoundary'
 import App from './App'
 import { LocaleProvider } from './i18n/LocaleProvider'
 import { LocaleProvider as SaasLocaleProvider } from './saas/i18n'
@@ -11,7 +11,7 @@ import AuthProvider from './saas/auth/AuthProvider'
 import AuthRoute from './saas/auth/AuthRoute'
 import RemoteBridge from './saas/auth/RemoteBridge'
 import { UpgradeProvider } from './saas/billing/UpgradeContext'
-import { clerkEnabled, CLERK_PUBLISHABLE_KEY } from './saas/config'
+import { clerkEnabled } from './saas/config'
 import { isFunnelHost } from './saas/publish/host'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
@@ -34,27 +34,16 @@ const withSaas = (el: React.ReactNode) => (
   </AuthProvider>
 )
 
-// Clerk requires a publishableKey, so only mount its provider when one is
-// configured — keeps the app working keyless in demo mode.
-const withClerk = (el: React.ReactNode) =>
-  clerkEnabled ? (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY!} afterSignOutUrl="/">
-      {el}
-    </ClerkProvider>
-  ) : (
-    el
-  )
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {withClerk(
-<HelmetProvider>
+    <HelmetProvider>
       <BrowserRouter>
+        <ErrorBoundary>
         {isFunnelHost() ? (
           // On a {slug}.autoleadss.site subdomain or a mapped custom domain, the whole site is the funnel.
-          (<Routes>
+          <Routes>
             <Route path="*" element={withSaas(<Published />)} />
-          </Routes>)
+          </Routes>
         ) : (
         <Routes>
           {/* Marketing site (agency / done-with-you). The bare "/" fallback passes
@@ -89,8 +78,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="*" element={<NotFound />} />
         </Routes>
         )}
+        </ErrorBoundary>
       </BrowserRouter>
     </HelmetProvider>
-    )}
   </StrictMode>,
 )
