@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { LayoutGrid, Plus, CreditCard, MessageCircle, Building2, PanelLeftClose, PanelLeftOpen, Clock, Sparkles, Menu, X } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, MessageCircle, Building2, PanelLeftClose, PanelLeftOpen, Clock, Sparkles, Menu, X, Megaphone } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useAgency, useFunnels } from '../store'
@@ -51,6 +51,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const nav = [
     { label: t.nav.dashboard, href: '/app', icon: LayoutGrid },
     { label: t.common.new, href: '/app/new', icon: Plus },
+    { label: t.adSuite.navLabel, href: '/app/ads', icon: Megaphone },
     { label: 'WhatsApp', href: '/app/connect', icon: MessageCircle },
     ...(isAgency ? [{ label: isRTL ? 'الوكالة' : 'Agency', href: '/app/agency', icon: Building2 }] : []),
     { label: isRTL ? 'الأسعار' : 'Pricing', href: '/pricing', icon: CreditCard },
