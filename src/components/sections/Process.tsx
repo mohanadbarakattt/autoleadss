@@ -19,9 +19,18 @@ export default function Process() {
             placeholder={
               <div
                 aria-hidden
-                className="h-full w-full"
-                style={{ background: 'linear-gradient(120deg, #0A0A0B 0%, #1a1410 45%, #0A0A0B 100%)' }}
-              />
+                className="relative h-full w-full"
+                style={{ background: 'linear-gradient(120deg, #FF5C2A 0%, #ff8a5c 45%, #FF5C2A 100%)' }}
+              >
+                <div className="absolute inset-0 opacity-25" style={{ background: 'radial-gradient(ellipse 60% 80% at 30% 20%, #fff 0%, transparent 60%)' }} />
+                <div className="absolute inset-0 flex items-center justify-center gap-6" dir="ltr">
+                  {['1', '2', '3', '4'].map((n) => (
+                    <span key={n} className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 font-mono text-xl font-bold text-[#FF5C2A] shadow-lg">
+                      {n}
+                    </span>
+                  ))}
+                </div>
+              </div>
             }
           />
         </div>
