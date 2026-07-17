@@ -35,24 +35,48 @@ function clamp(s: string, max: number): string {
 // fallback when the AI's own audience/budget doesn't validate.
 // ---------------------------------------------------------------------------
 
-const INDUSTRY_INTERESTS: Record<Industry, string[]> = {
-  'real-estate': ['Real estate investing', 'Home buying', 'Interior design', 'Property management'],
-  ecommerce: ['Online shopping', 'Deals & coupons', 'Fashion & accessories', 'Home goods'],
-  clinic: ['Health & wellness', 'Personal care', 'Preventive medicine', 'Family health'],
-  restaurant: ['Foodies', 'Dining out', 'Food delivery', 'Local events'],
-  fitness: ['Fitness & gyms', 'Healthy living', 'Weight training', 'Nutrition'],
-  services: ['Small business owners', 'Home improvement', 'Professional services', 'Local services'],
-  other: ['Local shoppers', 'Small business owners', 'Deals & offers', 'Community events'],
+// Keyed by content language so an Arabic campaign never renders English
+// fragments inside an otherwise-Arabic card (verify finding #3).
+const INDUSTRY_INTERESTS: Record<'en' | 'ar', Record<Industry, string[]>> = {
+  en: {
+    'real-estate': ['Real estate investing', 'Home buying', 'Interior design', 'Property management'],
+    ecommerce: ['Online shopping', 'Deals & coupons', 'Fashion & accessories', 'Home goods'],
+    clinic: ['Health & wellness', 'Personal care', 'Preventive medicine', 'Family health'],
+    restaurant: ['Foodies', 'Dining out', 'Food delivery', 'Local events'],
+    fitness: ['Fitness & gyms', 'Healthy living', 'Weight training', 'Nutrition'],
+    services: ['Small business owners', 'Home improvement', 'Professional services', 'Local services'],
+    other: ['Local shoppers', 'Small business owners', 'Deals & offers', 'Community events'],
+  },
+  ar: {
+    'real-estate': ['الاستثمار العقاري', 'شراء المنازل', 'التصميم الداخلي', 'إدارة العقارات'],
+    ecommerce: ['التسوق أونلاين', 'العروض والخصومات', 'الموضة والإكسسوارات', 'مستلزمات المنزل'],
+    clinic: ['الصحة والعافية', 'العناية الشخصية', 'الطب الوقائي', 'صحة العائلة'],
+    restaurant: ['محبو الأكل', 'الخروج للمطاعم', 'توصيل الطعام', 'الفعاليات المحلية'],
+    fitness: ['اللياقة والجيم', 'الحياة الصحية', 'تمارين المقاومة', 'التغذية'],
+    services: ['أصحاب الأعمال الصغيرة', 'تحسين المنزل', 'الخدمات المهنية', 'الخدمات المحلية'],
+    other: ['المتسوقون المحليون', 'أصحاب الأعمال الصغيرة', 'العروض والتخفيضات', 'فعاليات المجتمع'],
+  },
 }
 
-const INDUSTRY_JOB_TITLES: Record<Industry, string[]> = {
-  'real-estate': ['Business Owner', 'General Manager', 'Investor'],
-  ecommerce: ['Founder', 'Marketing Manager', 'E-commerce Manager'],
-  clinic: ['Practice Manager', 'Office Manager', 'HR Manager'],
-  restaurant: ['Owner/Operator', 'General Manager', 'Events Coordinator'],
-  fitness: ['Owner', 'Studio Manager', 'HR Manager'],
-  services: ['Owner', 'Operations Manager', 'Office Manager'],
-  other: ['Owner', 'Manager', 'Decision Maker'],
+const INDUSTRY_JOB_TITLES: Record<'en' | 'ar', Record<Industry, string[]>> = {
+  en: {
+    'real-estate': ['Business Owner', 'General Manager', 'Investor'],
+    ecommerce: ['Founder', 'Marketing Manager', 'E-commerce Manager'],
+    clinic: ['Practice Manager', 'Office Manager', 'HR Manager'],
+    restaurant: ['Owner/Operator', 'General Manager', 'Events Coordinator'],
+    fitness: ['Owner', 'Studio Manager', 'HR Manager'],
+    services: ['Owner', 'Operations Manager', 'Office Manager'],
+    other: ['Owner', 'Manager', 'Decision Maker'],
+  },
+  ar: {
+    'real-estate': ['صاحب عمل', 'مدير عام', 'مستثمر'],
+    ecommerce: ['مؤسس', 'مدير تسويق', 'مدير تجارة إلكترونية'],
+    clinic: ['مدير عيادة', 'مدير مكتب', 'مدير موارد بشرية'],
+    restaurant: ['مالك/مشغّل', 'مدير عام', 'منسق فعاليات'],
+    fitness: ['مالك', 'مدير استوديو', 'مدير موارد بشرية'],
+    services: ['مالك', 'مدير عمليات', 'مدير مكتب'],
+    other: ['مالك', 'مدير', 'صانع قرار'],
+  },
 }
 
 const INDUSTRY_AGE_BANDS: Record<Industry, string[]> = {
@@ -65,23 +89,31 @@ const INDUSTRY_AGE_BANDS: Record<Industry, string[]> = {
   other: ['25-34', '35-49'],
 }
 
-const BUDGET_STRATEGY: Record<AdPlatform, { dailyBudgetEgp: number; strategy: string }> = {
-  google: { dailyBudgetEgp: 150, strategy: 'Maximize conversions' },
-  meta: { dailyBudgetEgp: 150, strategy: 'Lowest cost (highest volume)' },
-  linkedin: { dailyBudgetEgp: 350, strategy: 'Manual CPC — start conservative' },
-  tiktok: { dailyBudgetEgp: 150, strategy: 'Lowest cost (highest volume)' },
+const BUDGET_STRATEGY: Record<'en' | 'ar', Record<AdPlatform, { dailyBudgetEgp: number; strategy: string }>> = {
+  en: {
+    google: { dailyBudgetEgp: 150, strategy: 'Maximize conversions' },
+    meta: { dailyBudgetEgp: 150, strategy: 'Lowest cost (highest volume)' },
+    linkedin: { dailyBudgetEgp: 350, strategy: 'Manual CPC — start conservative' },
+    tiktok: { dailyBudgetEgp: 150, strategy: 'Lowest cost (highest volume)' },
+  },
+  ar: {
+    google: { dailyBudgetEgp: 150, strategy: 'أقصى عدد تحويلات' },
+    meta: { dailyBudgetEgp: 150, strategy: 'أقل تكلفة (أعلى حجم)' },
+    linkedin: { dailyBudgetEgp: 350, strategy: 'تكلفة نقرة يدوية — ابدأ بحذر' },
+    tiktok: { dailyBudgetEgp: 150, strategy: 'أقل تكلفة (أعلى حجم)' },
+  },
 }
 
-function demoAudience(industry: Industry): AudienceSuggestion {
+function demoAudience(industry: Industry, language: 'en' | 'ar'): AudienceSuggestion {
   return {
-    interests: INDUSTRY_INTERESTS[industry] ?? INDUSTRY_INTERESTS.other,
-    jobTitles: INDUSTRY_JOB_TITLES[industry] ?? INDUSTRY_JOB_TITLES.other,
+    interests: INDUSTRY_INTERESTS[language][industry] ?? INDUSTRY_INTERESTS[language].other,
+    jobTitles: INDUSTRY_JOB_TITLES[language][industry] ?? INDUSTRY_JOB_TITLES[language].other,
     ageBands: INDUSTRY_AGE_BANDS[industry] ?? INDUSTRY_AGE_BANDS.other,
   }
 }
 
-function demoBudget(platform: AdPlatform): BudgetPreset {
-  return BUDGET_STRATEGY[platform]
+function demoBudget(platform: AdPlatform, language: 'en' | 'ar'): BudgetPreset {
+  return BUDGET_STRATEGY[language][platform]
 }
 
 // ---------------------------------------------------------------------------
@@ -97,12 +129,23 @@ export function buildDemoAdSet(platform: AdPlatform, input: AdSuiteInput): Platf
 
   let copy: GoogleRsaCopy | SocialVideoCopy | LinkedInCopy
   if (platform === 'google') {
+    // Full 15-headline RSA set (spec + Step-1 chip promise 15; verify finding #1).
     const headlines = [
       ar ? `${biz} — احجز الآن` : `${biz} — Book Today`,
       ar ? `اكتشف ${biz}` : `Discover ${biz}`,
       ar ? `عروض ${biz} الحصرية` : `${biz} Special Offers`,
       ar ? 'عملاء أونلاين خلال دقائق' : 'Get Customers Online Fast',
       ar ? 'ثقة عملائك تبدأ هنا' : 'Trusted by Local Customers',
+      ar ? `جرّب ${biz} اليوم` : `Try ${biz} Today`,
+      ar ? `${biz} قريب منك` : `${biz} Near You`,
+      ar ? 'أسعار واضحة بدون مفاجآت' : 'Clear Pricing, No Surprises',
+      ar ? 'خدمة سريعة تقدر تعتمد عليها' : 'Fast, Reliable Service',
+      ar ? `ليه ${biz}؟ جرب بنفسك` : `Why ${biz}? See Yourself`,
+      ar ? 'ابدأ في دقائق معدودة' : 'Get Started in Minutes',
+      ar ? 'عرض خاص لفترة محدودة' : 'Limited-Time Offer',
+      ar ? `كلمنا — ${biz}` : `Talk to Us — ${biz}`,
+      ar ? 'احجز استشارتك المجانية' : 'Book a Free Consultation',
+      ar ? `${biz}: جودة تستاهل` : `${biz}: Quality That Shows`,
     ].map((h) => clamp(h, GOOGLE_RSA.headlineMax))
     const descriptions = [
       ar ? `${biz} — ${what}. تواصل معنا اليوم.` : `${biz} — ${what}. Reach out today.`,
@@ -135,7 +178,7 @@ export function buildDemoAdSet(platform: AdPlatform, input: AdSuiteInput): Platf
     copy = { variants, videoScript }
   }
 
-  return { platform, copy, audience: demoAudience(input.industry), budget: demoBudget(platform), isDemoContent: true }
+  return { platform, copy, audience: demoAudience(input.industry, input.language), budget: demoBudget(platform, input.language), isDemoContent: true }
 }
 
 // ---------------------------------------------------------------------------
@@ -248,8 +291,32 @@ export function mergeAdResult(platform: AdPlatform, input: AdSuiteInput, ai: unk
     copy = ai.copy
   }
 
-  const audience = validAudience(ai.audience) ? ai.audience : demoAudience(input.industry)
-  const budget = validBudget(ai.budget) ? ai.budget : demoBudget(platform)
+  const audience = validAudience(ai.audience) ? ai.audience : demoAudience(input.industry, input.language)
+  const budget = validBudget(ai.budget) ? ai.budget : demoBudget(platform, input.language)
 
-  return { platform, copy: clampCopy(platform, copy), audience, budget, isDemoContent: false }
+  let clamped = clampCopy(platform, copy)
+  if (platform === 'google') {
+    // Enforce the full RSA counts (verify finding #2): models routinely
+    // under-deliver exact-count lists, so top up from the demo set (deduped)
+    // instead of silently shipping a short campaign.
+    const g = clamped as GoogleRsaCopy
+    if (g.headlines.length < GOOGLE_RSA.headlineCount || g.descriptions.length < GOOGLE_RSA.descriptionCount) {
+      const demo = buildDemoAdSet('google', input).copy as GoogleRsaCopy
+      const topUp = (have: string[], filler: string[], want: number) => {
+        const seen = new Set(have.map((x) => x.trim().toLowerCase()))
+        const out = [...have]
+        for (const f of filler) {
+          if (out.length >= want) break
+          if (!seen.has(f.trim().toLowerCase())) { out.push(f); seen.add(f.trim().toLowerCase()) }
+        }
+        return out
+      }
+      clamped = {
+        headlines: topUp(g.headlines, demo.headlines, GOOGLE_RSA.headlineCount),
+        descriptions: topUp(g.descriptions, demo.descriptions, GOOGLE_RSA.descriptionCount),
+      }
+    }
+  }
+
+  return { platform, copy: clamped, audience, budget, isDemoContent: false }
 }
