@@ -19,11 +19,14 @@ function isStrArray(v: unknown): v is string[] {
 type Rec = Record<string, unknown>
 const isRec = (v: unknown): v is Rec => !!v && typeof v === 'object'
 
-/** Hard-cuts a string to `max` chars — a naive slice, not a word-boundary-aware
- * truncation. ponytail: acceptable for a length safety-net on AI output; upgrade to
- * word-boundary trimming if truncated copy starts reading awkwardly in practice. */
+/** Cuts a string to `max` chars at the last word boundary that still fits, so a
+ * clamped headline reads as "Flex Fitness Studio" rather than "Flex Fitness Stud" —
+ * falls back to a hard slice only when there's no space to break on. */
 function clamp(s: string, max: number): string {
-  return s.length > max ? s.slice(0, max) : s
+  if (s.length <= max) return s
+  const cut = s.slice(0, max)
+  const lastSpace = cut.lastIndexOf(' ')
+  return lastSpace > 0 ? cut.slice(0, lastSpace) : cut
 }
 
 // ---------------------------------------------------------------------------
@@ -120,7 +123,7 @@ export function buildDemoAdSet(platform: AdPlatform, input: AdSuiteInput): Platf
     const max = platform === 'meta' ? META_LIMITS.primaryTextMax : TIKTOK_LIMITS.primaryTextMax
     const variants = [
       { primaryText: clamp(ar ? `${biz} — ${what}. جرّبنا اليوم!` : `${biz} — ${what}. Try us today!`, max), headline: ar ? 'اطلب الآن' : 'Order Now' },
-      { primaryText: clamp(ar ? `عايز ${what}؟ ${biz} هو الحل.` : `Looking for ${what}? ${biz} has you covered.`, max), headline: ar ? 'اعرف أكتر' : 'Learn More' },
+      { primaryText: clamp(ar ? `${biz} عنده بالظبط اللي محتاجه: ${what}` : `${biz} has exactly what you need: ${what}`, max), headline: ar ? 'اعرف أكتر' : 'Learn More' },
       { primaryText: clamp(ar ? `${biz}: جودة تقدر تثق فيها.` : `${biz}: quality you can trust.`, max), headline: ar ? 'احجز الآن' : 'Book Now' },
     ]
     const videoScript = [

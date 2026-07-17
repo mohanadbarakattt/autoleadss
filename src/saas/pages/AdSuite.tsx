@@ -157,7 +157,7 @@ function AdSuiteInner() {
         `- ${t.adSuite.ageBands}: ${r.audience.ageBands.join(', ')}`,
         '',
         `### ${t.adSuite.budgetLabel}`,
-        `- ${r.budget.dailyBudgetEgp} EGP${t.adSuite.perDay.replace('EGP', '').trim()} — ${r.budget.strategy}`,
+        `- ${r.budget.dailyBudgetEgp} ${t.adSuite.perDay} — ${r.budget.strategy}`,
         '',
         `### ${t.adSuite.checklistLabel}`,
         ...PLATFORM_INFO[platform].checklist[contentLocale].map((s, i) => `${i + 1}. ${s}`),
@@ -327,7 +327,7 @@ function AdSuiteInner() {
                   disabled={!detailsValid}
                   className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_36px_-8px_rgba(255,92,42,0.6)] disabled:opacity-40"
                 >
-                  <Sparkles size={16} /> {t.common.generate}
+                  <Sparkles size={16} /> {t.adSuite.generateCta}
                 </button>
               </div>
             </motion.div>
