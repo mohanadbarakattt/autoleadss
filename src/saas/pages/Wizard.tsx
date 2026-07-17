@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { X, ArrowRight, ArrowLeft, Check, Sparkles, Loader2 } from 'lucide-react'
 import Logo from '../../components/Logo'
+import AuthGate from '../auth/authReady'
 import FunnelRenderer from '../components/FunnelRenderer'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
@@ -36,17 +37,13 @@ interface WizardDraft {
   accent: string
 }
 
-export default function Wizard() {
+function WizardInner() {
   const { t, locale, isRTL } = useI18n()
   const session = useSession()
   const funnels = useFunnels()
   const ent = useEntitlements()
   const openUpgrade = useUpgrade()
   const aiActionGate = useCapGate('aiAction')
-  const navigate = useNavigate()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  useEffect(() => { if (mounted && !session) navigate('/login', { replace: true }) }, [mounted, session, navigate])
 
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<'form' | 'generating' | 'ready'>('form')
@@ -196,10 +193,6 @@ export default function Wizard() {
     setSpec(resultSpec)
     setCreatedId(id)
     setPhase('ready')
-  }
-
-  if (!mounted || !session) {
-    return <div className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="animate-spin text-accent" /></div>
   }
 
   return (
@@ -367,5 +360,16 @@ function StepWrap({ title, children }: { title: string; children: React.ReactNod
       <h2 className="mb-6 font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{title}</h2>
       {children}
     </div>
+  )
+}
+
+/** Route entry: the shared Clerk-aware gate (authReady) replaces the old
+ * store-only mounted/session check, which raced Clerk's async init and
+ * bounced fresh sign-ups (fallbackRedirectUrl=/app/new) to /login. */
+export default function Wizard() {
+  return (
+    <AuthGate>
+      <WizardInner />
+    </AuthGate>
   )
 }
