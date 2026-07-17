@@ -26,6 +26,7 @@ export default function WhyUs() {
           <h2 className="font-display font-bold" style={{ fontSize: 'clamp(1.9rem, 3.8vw, 3rem)', letterSpacing: '-0.03em' }}>
             {t.why.title}
           </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-fg">{t.why.sub}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">

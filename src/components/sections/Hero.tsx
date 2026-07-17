@@ -13,9 +13,6 @@ const fadeUp: Variants = {
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 
-/** Sparkline path for the mock dashboard */
-const SPARK = 'M0 36 L14 30 L28 33 L42 24 L56 27 L70 18 L84 21 L98 12 L112 15 L126 6'
-
 export default function Hero() {
   const t = useT()
   const { locale, isRTL } = useLocale()
@@ -128,7 +125,7 @@ export default function Hero() {
             </motion.p>
           </div>
 
-          {/* ── 3D dashboard composition ── */}
+          {/* ── hero video, floating in the 3D parallax scene ── */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -148,53 +145,23 @@ export default function Hero() {
                 style={{ rotateX: reduced ? 0 : rotX, rotateY: reduced ? 0 : rotY, transformStyle: 'preserve-3d' }}
                 className="absolute inset-0 flex items-center justify-center"
               >
-                {/* main dashboard card */}
+                {/* hero video — amber orbs orbiting the AutoLeadss sphere: leads arriving on autopilot */}
                 <div
-                  className="glass-dark relative w-[86%] rounded-3xl p-6 shadow-2xl float-slow"
+                  className="relative w-[86%] aspect-square overflow-hidden rounded-3xl shadow-2xl float-slow"
                   style={{ transform: 'translateZ(40px)', boxShadow: '0 40px 90px -20px rgba(0,0,0,0.7), 0 0 60px rgba(255,92,42,0.12)' }}
-                  dir="ltr"
                 >
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
-                    </div>
-                    <span className="eyebrow text-white/40">autoleadss.com</span>
-                  </div>
-
-                  <p className="text-white/50 text-[11px] uppercase tracking-wider mb-1">{t.hero.thisWeek}</p>
-                  <p className="text-white font-display font-bold text-4xl leading-none mb-4">
-                    +247 <span className="text-accent text-base font-medium">{t.hero.leads}</span>
-                  </p>
-
-                  {/* sparkline */}
-                  <svg viewBox="0 0 126 42" className="w-full h-16 mb-5" fill="none" aria-hidden preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="hero-spark-fill" x1="0" y1="0" x2="0" y2="1">
-                        <stop stopColor="#FF5C2A" stopOpacity="0.35" />
-                        <stop offset="1" stopColor="#FF5C2A" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d={`${SPARK} L126 42 L0 42 Z`} fill="url(#hero-spark-fill)" />
-                    <path d={SPARK} stroke="#FF5C2A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="126" cy="6" r="3.5" fill="#FF5C2A" />
-                  </svg>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl bg-white/[0.06] border border-white/10 p-3.5">
-                      <p className="text-white/50 text-[10px] uppercase tracking-wider">{t.hero.convRate}</p>
-                      <p className="text-white font-display font-bold text-xl mt-1">
-                        4.8% <span className="text-emerald-400 text-xs font-medium">↑ 31%</span>
-                      </p>
-                    </div>
-                    <div className="rounded-2xl bg-white/[0.06] border border-white/10 p-3.5">
-                      <p className="text-white/50 text-[10px] uppercase tracking-wider">{t.hero.liveCampaigns}</p>
-                      <p className="text-white font-display font-bold text-xl mt-1">
-                        12 <span className="text-accent text-xs font-medium">●</span>
-                      </p>
-                    </div>
-                  </div>
+                  <video
+                    className="h-full w-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    poster="/media/hero-poster.jpg"
+                    aria-label={t.hero.eyebrow}
+                  >
+                    <source src="/media/hero.mp4" type="video/mp4" />
+                  </video>
                 </div>
 
                 {/* floating "new lead" chip */}

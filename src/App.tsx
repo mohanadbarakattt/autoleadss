@@ -1,12 +1,15 @@
 import { Helmet } from 'react-helmet-async'
 import Navigation from './components/Navigation'
 import Hero from './components/sections/Hero'
+import Features from './components/sections/Features'
+import Testimonials from './components/sections/Testimonials'
+import WhyUs from './components/sections/WhyUs'
+import Comparison from './components/sections/Comparison'
 import Services from './components/sections/Services'
-import Regions from './components/sections/Regions'
 import Process from './components/sections/Process'
+import Regions from './components/sections/Regions'
 import Work from './components/sections/Work'
 import Results from './components/sections/Results'
-import WhyUs from './components/sections/WhyUs'
 import PricingTeaser from './components/sections/PricingTeaser'
 import FAQ from './components/sections/FAQ'
 import CTABanner from './components/sections/CTABanner'
@@ -73,12 +76,15 @@ export default function App() {
       <Navigation />
       <main>
         <Hero />
+        <Features />
+        <Testimonials />
+        <WhyUs />
+        <Comparison />
         <Services />
+        <Process />
         <Regions />
         <Work />
         <Results />
-        <Process />
-        <WhyUs />
         <PricingTeaser />
         <FAQ />
         <CTABanner />

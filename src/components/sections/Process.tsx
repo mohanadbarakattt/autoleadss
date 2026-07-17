@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useT } from '../../i18n/LocaleProvider'
 import SectionHeading from '../SectionHeading'
+import VideoSlot from '../VideoSlot'
 
 export default function Process() {
   const t = useT()
@@ -9,6 +10,21 @@ export default function Process() {
     <section id="process" className="section-padding bg-background relative overflow-hidden">
       <div className="content-width">
         <SectionHeading eyebrow={t.process.eyebrow} title={t.process.title} />
+
+        <div className="relative mb-10 aspect-[21/9] w-full overflow-hidden rounded-3xl">
+          <VideoSlot
+            src="/media/how-it-works.mp4"
+            ariaLabel={t.process.title}
+            className="h-full w-full object-cover"
+            placeholder={
+              <div
+                aria-hidden
+                className="h-full w-full"
+                style={{ background: 'linear-gradient(120deg, #0A0A0B 0%, #1a1410 45%, #0A0A0B 100%)' }}
+              />
+            }
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {t.process.steps.map((step, i) => (

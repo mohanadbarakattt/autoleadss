@@ -27,6 +27,16 @@ const en = {
     liveCampaigns: 'Live campaigns',
     marquee: ['Sales Funnels', 'Landing Pages', 'Google Ads', 'Social Media', 'AI Chatbots', 'SEO & GEO', 'WhatsApp Business API', 'Meta Ads', 'TikTok Ads'],
   },
+  features: {
+    eyebrow: 'Why it works',
+    titleA: 'One system.',
+    titleB: 'Every result, automated.',
+    items: [
+      { title: 'Never miss a lead', body: 'Every message gets answered in seconds — day or night, on WhatsApp or your site.' },
+      { title: 'Native Arabic, Franco & English', body: 'Every page, ad, and reply is written for your market from the start — not bolted on after.' },
+      { title: 'One dashboard, every channel', body: 'Ads, pages, and WhatsApp all report to the same place, so nothing falls through the cracks.' },
+    ],
+  },
   services: {
     eyebrow: 'See it work',
     titleA: 'Less talk.',
@@ -139,33 +149,35 @@ const en = {
   testimonials: {
     eyebrow: 'What Clients Say',
     title: 'Trusted by owners who measure everything.',
-    items: [
-      {
-        quote: 'Within three weeks the WhatsApp bot was booking viewings while my team slept. I stopped worrying about response time completely — it simply never misses a lead.',
-        name: 'Khaled M.',
-        role: 'Managing Partner, Real Estate Brokerage — Dubai',
-      },
-      {
-        quote: 'They rebuilt our funnel end to end and for the first time I can see exactly which pound produced which sale. The reporting alone is worth it.',
-        name: 'Sara A.',
-        role: 'Founder, E-commerce Brand — Cairo',
-      },
-      {
-        quote: 'We tried two agencies before. The difference here is the system — pages, ads, and the chatbot all talk to each other. Our cost per booking dropped by half.',
-        name: 'Omar T.',
-        role: 'Operations Director, Clinic Group — Cairo',
-      },
-    ],
+    confidentiality: 'Selected engagements. Client names withheld under NDA.',
+    // [NEEDS-OWNER: real testimonials] — intentionally empty; Testimonials.tsx is
+    // feature-flagged off until real client quotes/names are supplied. Do not fill
+    // this with invented names or quotes.
+    items: [] as { quote: string; name: string; role: string }[],
   },
   why: {
     eyebrow: 'Why AutoLeadss',
     title: 'Built different. On purpose.',
+    sub: "We're not a vendor you manage — we're the growth team you never had to hire, obsessed with the one number you actually care about: qualified leads.",
     items: [
       { title: 'We know your market', body: 'Built for the UAE and Egypt — Arabic and English, natively.' },
       { title: 'You own everything', body: 'Your pages, content, ad accounts, and data. Leave any time.' },
       { title: 'We earn when you earn', body: 'Tied to real, tracked results. You win, we win.' },
       { title: 'No surprises', body: 'Clear contracts. No auto-renewals. No hidden fees.' },
     ],
+  },
+  comparison: {
+    eyebrow: 'The Alternative',
+    title: 'Compare your options.',
+    sub: "There's no other system quite like this one — so here's how we stack up against the two ways businesses usually try to grow.",
+    columns: { agency: 'Hiring an Agency', diy: 'Doing It Yourself', us: 'AutoLeadss' },
+    rows: [
+      { dimension: 'Cost per month', agency: 'Often $1,500–5,000+ retainer, plus ad spend', diy: 'Free — just your time and tool subscriptions', us: 'From 1,500 EGP / $59' },
+      { dimension: 'Time to first funnel', agency: 'Typically 4–8 weeks of onboarding and revisions', diy: 'Days to months, if you already have the skills', us: 'Minutes with the AI builder — or under 15 days, fully managed' },
+      { dimension: 'Arabic + Franco + English output', agency: 'Varies — often English-first, Arabic as an add-on', diy: "Only if you're bilingual yourself", us: 'Native in all three, built in' },
+      { dimension: 'WhatsApp follow-up automation', agency: 'Rarely included — usually a separate add-on', diy: 'Manual replies, or none at all', us: 'Built-in AI bot, replying in seconds, 24/7' },
+    ],
+    footnote: 'Agency and DIY figures are general industry ranges, not quotes from any specific company.',
   },
   faq: {
     title: 'Common Questions',
@@ -294,6 +306,16 @@ const ar: Dict = {
     liveCampaigns: 'حملات نشطة',
     marquee: ['قمع المبيعات', 'صفحات الهبوط', 'إعلانات جوجل', 'سوشيال ميديا', 'شات بوت ذكي', 'SEO & GEO', 'واتساب بزنس', 'إعلانات ميتا', 'إعلانات تيك توك'],
   },
+  features: {
+    eyebrow: 'ليه بينجح',
+    titleA: 'نظام واحد.',
+    titleB: 'كل نتيجة، تلقائيّاً.',
+    items: [
+      { title: 'لن تفوّت عميلاً', body: 'كل رسالة تُردّ عليها خلال ثوانٍ — ليلاً ونهاراً، على واتساب أو موقعك.' },
+      { title: 'عربي وفرانكو وإنجليزي أصلاً', body: 'كل صفحة وإعلان وردّ مكتوب لسوقك من البداية — لا يُترجَم لاحقاً.' },
+      { title: 'لوحة واحدة لكل القنوات', body: 'الإعلانات والصفحات وواتساب كلّها تُرفَع لمكان واحد، فلا يضيع شيء.' },
+    ],
+  },
   services: {
     eyebrow: 'شاهده يعمل',
     titleA: 'كلام أقل.',
@@ -406,33 +428,32 @@ const ar: Dict = {
   testimonials: {
     eyebrow: 'ماذا يقول عملاؤنا',
     title: 'ثقة أصحاب الأعمال الذين يقيسون كل شيء.',
-    items: [
-      {
-        quote: 'خلال ثلاثة أسابيع كان بوت الواتساب يحجز المعاينات بينما فريقي نائم. توقّفت عن القلق بشأن وقت الردّ تماماً — لا يفوّت أي عميل أبداً.',
-        name: 'خالد م.',
-        role: 'شريك إداري، وساطة عقاريّة — دبي',
-      },
-      {
-        quote: 'أعادوا بناء القمع بالكامل ولأوّل مرّة أستطيع أن أرى بالضبط أي جنيه أنتج أي عمليّة بيع. التقارير وحدها تستحقّ.',
-        name: 'سارة أ.',
-        role: 'مؤسِّسة، علامة تجارة إلكترونيّة — القاهرة',
-      },
-      {
-        quote: 'جرّبنا وكالتين من قبل. الفرق هنا هو النظام — الصفحات والإعلانات والشات بوت تتحدّث مع بعضها. انخفضت تكلفة الحجز إلى النصف.',
-        name: 'عمر ت.',
-        role: 'مدير عمليّات، مجموعة عيادات — القاهرة',
-      },
-    ],
+    confidentiality: 'مشاريع مختارة. أسماء العملاء محجوبة بموجب اتفاقية سريّة.',
+    items: [],
   },
   why: {
     eyebrow: 'لماذا AutoLeadss',
     title: 'مختلفون. بقصد.',
+    sub: 'لسنا موردًا تديره — نحن فريق النمو الذي لم تضطر لتوظيفه، مهووسون بالرقم الوحيد الذي يهمّك فعلاً: العملاء المؤهّلون.',
     items: [
       { title: 'نعرف سوقك', body: 'مبني للإمارات ومصر — بالعربيّة والإنجليزيّة أصلاً.' },
       { title: 'كل شيء ملكك', body: 'صفحاتك ومحتواك وحسابات إعلاناتك وبياناتك. غادر متى شئت.' },
       { title: 'نكسب عندما تكسب', body: 'مرتبط بنتائج حقيقيّة متتبَّعة. تفوز فنفوز.' },
       { title: 'بلا مفاجآت', body: 'عقود واضحة. لا تجديد تلقائي. لا رسوم خفيّة.' },
     ],
+  },
+  comparison: {
+    eyebrow: 'البديل',
+    title: 'قارن بين خياراتك.',
+    sub: 'لا يوجد نظام آخر مثله تمامًا — إليك كيف نقارَن بالطريقتين المعتادتين اللتين تجرّبهما الشركات للنمو.',
+    columns: { agency: 'توظيف وكالة', diy: 'تنفّذها بنفسك', us: 'AutoLeadss' },
+    rows: [
+      { dimension: 'التكلفة الشهريّة', agency: 'غالباً 1,500–5,000$+ اشتراك شهري، بالإضافة لميزانيّة الإعلانات', diy: 'مجاناً — فقط وقتك واشتراكات الأدوات', us: 'من 1,500 جنيه / 59$' },
+      { dimension: 'الوقت حتى أوّل قمع مبيعات', agency: 'عادةً 4–8 أسابيع من التجهيز والتعديلات', diy: 'من أيام إلى شهور، إن كانت لديك المهارات أصلاً', us: 'دقائق مع منشئ الذكاء الاصطناعي — أو أقل من 15 يوماً بإدارة كاملة' },
+      { dimension: 'مخرجات عربي وفرانكو وإنجليزي', agency: 'تتفاوت — غالباً إنجليزي أولاً والعربي إضافة', diy: 'فقط إن كنت ثنائي اللغة بنفسك', us: 'أصليّة باللغات الثلاث، مدمجة في النظام' },
+      { dimension: 'أتمتة متابعة واتساب', agency: 'نادراً ما تكون مضمّنة — غالباً إضافة منفصلة', diy: 'ردود يدويّة، أو لا شيء إطلاقاً', us: 'بوت ذكاء اصطناعي مدمج، يردّ خلال ثوانٍ، 24/7' },
+    ],
+    footnote: 'أرقام الوكالات والتنفيذ الذاتي تقديرات عامة للصناعة، وليست عروض أسعار من شركة محدّدة.',
   },
   faq: {
     title: 'أسئلة شائعة',
@@ -566,6 +587,16 @@ const francoEg: Dict = {
     liveCampaigns: 'Campaigns shaghala',
     marquee: ['Sales Funnels', 'Landing Pages', 'Google Ads', 'Social Media', 'AI Chatbots', 'SEO & GEO', 'WhatsApp Business', 'Meta Ads', 'TikTok Ads'],
   },
+  features: {
+    eyebrow: 'Leh bynagah',
+    titleA: 'Nizam wahed.',
+    titleB: 'Kol nateega, automatic.',
+    items: [
+      { title: 'Msh hatfawwet wala lead', body: 'Kol resala byetrodd 3aleha fi sawany — leil w nahar, 3ala WhatsApp aw mo23ak.' },
+      { title: '3araby w Franco w Engelizy asalan', body: 'Kol page w ad w radd maktoob le so2ak men el awel — mesh metargem ba3dein.' },
+      { title: 'Dashboard wahed, kol el channels', body: 'El ads w el pages w WhatsApp kolohom byrfa3o le nafs el makan, 3ashan wala 7aga tetdaya3.' },
+    ],
+  },
   services: {
     eyebrow: 'Shoofo Byshtaghal',
     titleA: 'Kalam a2al.',
@@ -678,33 +709,32 @@ const francoEg: Dict = {
   testimonials: {
     eyebrow: 'Elly 3omalaena Byqoloh',
     title: 'Se2a men ashab shoghl bye2eesoo kol 7aga.',
-    items: [
-      {
-        quote: 'Khelal talat asabee3 el WhatsApp bot kan byehgez el ma3ayenat wel team beyenam. Batalt a2la2 khales men waqt el radd — msh betfawwet wala lead.',
-        name: 'Khaled M.',
-        role: 'Managing Partner, Real Estate Brokerage — Dubai',
-      },
-      {
-        quote: 'Benaw el funnel men el awel lel akher w awel marra a2dar ashoof bezabt anhi genih gab anhi order. El reports lewa7daha bteswa kolo.',
-        name: 'Sara A.',
-        role: 'Founder, E-commerce Brand — Cairo',
-      },
-      {
-        quote: 'Garrabna wakalatein 2abl keda. El far2 hena howa el nizam — el pages w el ads w el chatbot bykallemo ba3do. Cost per booking te2elit el nos.',
-        name: 'Omar T.',
-        role: 'Operations Director, Clinic Group — Cairo',
-      },
-    ],
+    confidentiality: 'Shoghl mukhtar. Asma2 el 3omala2 mahgooba be NDA.',
+    items: [],
   },
   why: {
     eyebrow: 'Leh AutoLeadss',
     title: 'Mokhtalfeen. Be2asd.',
+    sub: 'Ehna mesh vendor betdeero — ehna growth team msh me7tag te2iso, mahwaseen bel ra2m el wa7eed elly bey hemmak: el 3omala2 el mo2ahaleen.',
     items: [
       { title: 'Ne3raf souqak', body: 'Mabni lel Emarat w Masr — bel 3araby w el engelizy asalan.' },
       { title: 'Kol 7aga beta3ak', body: 'El pages, el content, ad accounts, w el data beta3tak. Emshi emta ma 3ayez.' },
       { title: 'Benkasab lama tekasab', body: 'Marboot be nata2eg 7a2ee2eya metabba3a. Enta tekasab, e7na nekasab.' },
       { title: 'Mafeesh mfaga2at', body: '3o2ood wade7a. Mafeesh renewal automatic. Mafeesh rosoom makhfeya.' },
     ],
+  },
+  comparison: {
+    eyebrow: 'El Badeel',
+    title: '2aren bein el ekhtyarat beta3tak.',
+    sub: 'Mafeesh nizam tany zay da — dih hya moqarna beina w bein el taree2tein el 3adeyeen elly el shorakat betgarrabhom 3ashan tenmo.',
+    columns: { agency: 'Tewazzef Agency', diy: 'Te3milha Benafsak', us: 'AutoLeadss' },
+    rows: [
+      { dimension: 'El Taklefa el Shahreya', agency: 'Ghaleban $1,500–5,000+ retainer, be2edd el ad spend', diy: 'Majjany — bas wa2tak w eshtrakat el adawat', us: 'Men 1,500 genih / $59' },
+      { dimension: 'El Wa2t le Awel Funnel', agency: 'Ghaleban 4–8 asabee3 tagheez w ta3deelat', diy: 'Men kam youm le shohoor, law 3andak el mahara asalan', us: 'Da2a2e2 ma3 el AI builder — aw a2al men 15 youm, fully managed' },
+      { dimension: 'Makhrogat 3araby w Franco w Engelizy', agency: 'Betfawwet — ghaleban Engelizy awalan wel 3araby ezafa', diy: 'Bas law enta bilingual benafsak', us: 'Asleya bel talat loghat, madmoga fel nizam' },
+      { dimension: 'Automation Metaba3et WhatsApp', agency: 'Naderan matkoon madmoga — ghaleban ezafa mostaqilla', diy: 'Radood yadaweya, aw wala 7aga', us: 'AI bot madmoog, byrodd fi sawany, 24/7' },
+    ],
+    footnote: 'Ar2am el agency w el DIY tazmenat 3amma lel industry, mesh 3aro5 as3ar men sharika mo3ayana.',
   },
   faq: {
     title: 'As2ela Metkarrera',

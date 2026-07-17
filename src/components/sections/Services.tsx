@@ -1,11 +1,15 @@
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { useT } from '../../i18n/LocaleProvider'
+import VideoSlot from '../VideoSlot'
 import WhatsAppChat from '../mockups/WhatsAppChat'
 import LandingPreview from '../mockups/LandingPreview'
 import GoogleAd from '../mockups/GoogleAd'
 import SocialGrid from '../mockups/SocialGrid'
 
+/** Each benefit row's future explainer clip — see public/media/MANIFEST.md. Until
+ * the file exists, VideoSlot falls back to the existing mockup so nothing regresses. */
+const VIDEO_SLUGS = ['benefit-chatbot', 'benefit-pages', 'benefit-ads', 'benefit-social']
 const VISUALS = [<WhatsAppChat />, <LandingPreview />, <GoogleAd />, <SocialGrid />]
 
 export default function Services() {
@@ -61,7 +65,14 @@ export default function Services() {
                 >
                   <div className="relative w-full max-w-[440px]">
                     <div aria-hidden className="absolute -inset-6 rounded-[2rem] opacity-70 blur-2xl" style={{ background: 'radial-gradient(circle at 50% 40%, rgba(255,92,42,0.22), transparent 70%)' }} />
-                    <div className="relative">{VISUALS[i]}</div>
+                    <div className="relative flex justify-center">
+                      <VideoSlot
+                        src={`/media/${VIDEO_SLUGS[i]}.mp4`}
+                        ariaLabel={demo.title}
+                        className="mx-auto aspect-[4/5] w-full max-w-[320px] rounded-[2rem] object-cover shadow-2xl"
+                        placeholder={VISUALS[i]}
+                      />
+                    </div>
                   </div>
                 </motion.div>
 

@@ -158,8 +158,28 @@ html[dir="rtl"] .marquee-track {
 }
 .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
 
+/* Features section — small looping visuals per card */
+@keyframes feature-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.feature-sweep { animation: feature-sweep 2.6s linear infinite; transform-origin: center; }
+
+@keyframes feature-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.feature-orbit { animation: feature-orbit 10s linear infinite; }
+
+@keyframes feature-cycle {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 92, 42, 0); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(255, 92, 42, 0.15); }
+}
+.feature-cycle-item { animation: feature-cycle 3s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track, .float-slow, .float-slower, .spin-slow, .pulse-ring {
+  .marquee-track, .float-slow, .float-slower, .spin-slow, .pulse-ring,
+  .feature-sweep, .feature-orbit, .feature-cycle-item {
     animation: none;
   }
 }
