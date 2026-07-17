@@ -172,8 +172,8 @@ const en = {
     sub: "There's no other system quite like this one — so here's how we stack up against the two ways businesses usually try to grow.",
     columns: { agency: 'Hiring an Agency', diy: 'Doing It Yourself', us: 'AutoLeadss' },
     rows: [
-      { dimension: 'Cost per month', agency: 'Often $1,500–5,000+ retainer, plus ad spend', diy: 'Free — just your time and tool subscriptions', us: 'From 1,500 EGP / $59' },
-      { dimension: 'Time to first funnel', agency: 'Typically 4–8 weeks of onboarding and revisions', diy: 'Days to months, if you already have the skills', us: 'Minutes with the AI builder — or under 15 days, fully managed' },
+      { dimension: 'Cost per month', agency: 'A monthly retainer, plus ad spend', diy: 'Free — just your time and tool subscriptions', us: 'From 1,500 EGP / $59' },
+      { dimension: 'Time to first funnel', agency: 'Weeks of onboarding and revisions', diy: 'Days to months, if you already have the skills', us: 'Minutes with the AI builder — or under 15 days, fully managed' },
       { dimension: 'Arabic + Franco + English output', agency: 'Varies — often English-first, Arabic as an add-on', diy: "Only if you're bilingual yourself", us: 'Native in all three, built in' },
       { dimension: 'WhatsApp follow-up automation', agency: 'Rarely included — usually a separate add-on', diy: 'Manual replies, or none at all', us: 'Built-in AI bot, replying in seconds, 24/7' },
     ],
@@ -448,8 +448,8 @@ const ar: Dict = {
     sub: 'لا يوجد نظام آخر مثله تمامًا — إليك كيف نقارَن بالطريقتين المعتادتين اللتين تجرّبهما الشركات للنمو.',
     columns: { agency: 'توظيف وكالة', diy: 'تنفّذها بنفسك', us: 'AutoLeadss' },
     rows: [
-      { dimension: 'التكلفة الشهريّة', agency: 'غالباً 1,500–5,000$+ اشتراك شهري، بالإضافة لميزانيّة الإعلانات', diy: 'مجاناً — فقط وقتك واشتراكات الأدوات', us: 'من 1,500 جنيه / 59$' },
-      { dimension: 'الوقت حتى أوّل قمع مبيعات', agency: 'عادةً 4–8 أسابيع من التجهيز والتعديلات', diy: 'من أيام إلى شهور، إن كانت لديك المهارات أصلاً', us: 'دقائق مع منشئ الذكاء الاصطناعي — أو أقل من 15 يوماً بإدارة كاملة' },
+      { dimension: 'التكلفة الشهريّة', agency: 'اشتراك شهري، بالإضافة لميزانيّة الإعلانات', diy: 'مجاناً — فقط وقتك واشتراكات الأدوات', us: 'من 1,500 جنيه / 59$' },
+      { dimension: 'الوقت حتى أوّل قمع مبيعات', agency: 'أسابيع من التجهيز والتعديلات', diy: 'من أيام إلى شهور، إن كانت لديك المهارات أصلاً', us: 'دقائق مع منشئ الذكاء الاصطناعي — أو أقل من 15 يوماً بإدارة كاملة' },
       { dimension: 'مخرجات عربي وفرانكو وإنجليزي', agency: 'تتفاوت — غالباً إنجليزي أولاً والعربي إضافة', diy: 'فقط إن كنت ثنائي اللغة بنفسك', us: 'أصليّة باللغات الثلاث، مدمجة في النظام' },
       { dimension: 'أتمتة متابعة واتساب', agency: 'نادراً ما تكون مضمّنة — غالباً إضافة منفصلة', diy: 'ردود يدويّة، أو لا شيء إطلاقاً', us: 'بوت ذكاء اصطناعي مدمج، يردّ خلال ثوانٍ، 24/7' },
     ],
@@ -729,8 +729,8 @@ const francoEg: Dict = {
     sub: 'Mafeesh nizam tany zay da — dih hya moqarna beina w bein el taree2tein el 3adeyeen elly el shorakat betgarrabhom 3ashan tenmo.',
     columns: { agency: 'Tewazzef Agency', diy: 'Te3milha Benafsak', us: 'AutoLeadss' },
     rows: [
-      { dimension: 'El Taklefa el Shahreya', agency: 'Ghaleban $1,500–5,000+ retainer, be2edd el ad spend', diy: 'Majjany — bas wa2tak w eshtrakat el adawat', us: 'Men 1,500 genih / $59' },
-      { dimension: 'El Wa2t le Awel Funnel', agency: 'Ghaleban 4–8 asabee3 tagheez w ta3deelat', diy: 'Men kam youm le shohoor, law 3andak el mahara asalan', us: 'Da2a2e2 ma3 el AI builder — aw a2al men 15 youm, fully managed' },
+      { dimension: 'El Taklefa el Shahreya', agency: 'Retainer shahry, be2edd el ad spend', diy: 'Majjany — bas wa2tak w eshtrakat el adawat', us: 'Men 1,500 genih / $59' },
+      { dimension: 'El Wa2t le Awel Funnel', agency: 'Asabee3 tagheez w ta3deelat', diy: 'Men kam youm le shohoor, law 3andak el mahara asalan', us: 'Da2a2e2 ma3 el AI builder — aw a2al men 15 youm, fully managed' },
       { dimension: 'Makhrogat 3araby w Franco w Engelizy', agency: 'Betfawwet — ghaleban Engelizy awalan wel 3araby ezafa', diy: 'Bas law enta bilingual benafsak', us: 'Asleya bel talat loghat, madmoga fel nizam' },
       { dimension: 'Automation Metaba3et WhatsApp', agency: 'Naderan matkoon madmoga — ghaleban ezafa mostaqilla', diy: 'Radood yadaweya, aw wala 7aga', us: 'AI bot madmoog, byrodd fi sawany, 24/7' },
     ],
