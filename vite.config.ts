@@ -8,4 +8,9 @@ export default defineConfig({
   // vars safe to expose in the browser (e.g. NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY), so both
   // prefixes need to reach import.meta.env.
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+  },
 })
