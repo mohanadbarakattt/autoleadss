@@ -78,8 +78,15 @@ async function hydrateUsageRemote(userId: string | null) {
     usageCache.set(key, remote)
     persistUsageLocal(userId, remote)
     emitUsage()
-  } catch (e) {
-    console.info('[usage] remote fetch unavailable, staying on local counters:', e instanceof Error ? e.message : e)
+  } catch (err) {
+    // A READ, so retrying would be safe — but the caller hydrates once per
+    // session and a stale local cache only under-counts this device's view.
+    // Worth surfacing though: if this keeps failing on a fresh device, the
+    // user appears to have unused quota they've already spent elsewhere.
+    console.error(
+      '[usage][QUOTA-DROP] remote usage hydrate failed — this device may show quota the user has already spent',
+      { err },
+    )
   }
 }
 
@@ -115,8 +122,17 @@ export function recordUsage(userId: string | null | undefined, metric: UsageMetr
 
   const auth = getDb()
   if (auth) {
-    incrementUsage(auth, metric).catch((e) =>
-      console.info('[usage] remote increment failed, local counter still recorded:', e instanceof Error ? e.message : e),
+    // Deliberately NOT retried: the server counter is
+    // `whatsapp_count = whatsapp_count + by` (api/_lib/usage.ts), a real
+    // increment with no idempotency key — a retry after a commit-then-timeout
+    // would double-count usage against the customer's quota, which is worse
+    // than under-counting it. Loud instead, so the split-brain is diagnosable
+    // (defect class C9 — see mbai-ecosystem docs/DEFECT-CLASS-REGISTRY.md).
+    incrementUsage(auth, metric).catch((err) =>
+      console.error(
+        '[usage][QUOTA-DROP] remote increment failed — server under-counts this metric (local counter still moved)',
+        { metric, err },
+      ),
     )
   }
 }

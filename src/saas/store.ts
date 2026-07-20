@@ -132,9 +132,40 @@ function subscribe(cb: () => void) {
   return () => listeners.delete(cb)
 }
 
-function syncRemote(fn: (auth: RemoteAuth) => Promise<void>) {
+/**
+ * Pushes a local mutation to the Neon backend. Stays fail-open: the write
+ * already landed in local state + localStorage, so the user's data is not
+ * lost and blocking the UI on a network blip would be worse.
+ *
+ * What it must NOT do is fail *anonymously* (defect class C9 — see
+ * mbai-ecosystem docs/DEFECT-CLASS-REGISTRY.md). This used to log a bare
+ * '[remote sync]' with no operation name, so a divergence was undiagnosable:
+ * you couldn't tell whether a create, an edit or a DELETE had failed to
+ * reach the server — and a failed delete resurrects the funnel on the next
+ * device that syncs.
+ *
+ * One retry, because every remote op here is safe to repeat: PATCH/DELETE are
+ * idempotent by id, and create is an INSERT with a client-supplied primary
+ * key, so a replay conflicts loudly rather than duplicating the row.
+ */
+function syncRemote(op: string, fn: (auth: RemoteAuth) => Promise<void>) {
   if (!remote) return
-  fn(remote).catch((e) => console.error('[remote sync]', e))
+  const auth = remote
+  void (async () => {
+    try {
+      await fn(auth)
+    } catch {
+      try {
+        await new Promise((r) => setTimeout(r, 250))
+        await fn(auth)
+      } catch (err) {
+        console.error(
+          `[store][REMOTE-SYNC-DROP] "${op}" saved locally but NOT on the server — this device now diverges`,
+          err,
+        )
+      }
+    }
+  })()
 }
 
 // ---------- ids ----------
@@ -299,7 +330,7 @@ export function createFunnel(f: Funnel) {
   while (slugs.has(slug)) slug = `${f.slug}-${i++}`
   const funnel = { ...f, slug, subAccountId: f.subAccountId ?? state.agency.activeSubAccountId ?? undefined }
   set({ funnels: [funnel, ...state.funnels] })
-  syncRemote((auth) => rCreateFunnel(auth, funnel))
+  syncRemote('createFunnel', (auth) => rCreateFunnel(auth, funnel))
 }
 
 export function updateFunnel(id: string, patch: Partial<Funnel>) {
@@ -308,7 +339,7 @@ export function updateFunnel(id: string, patch: Partial<Funnel>) {
   // leads are persisted via their own path; don't push them through the funnel row.
   const rest: Partial<Funnel> = { ...patch }
   delete rest.leads
-  syncRemote((auth) => rUpdateFunnel(auth, id, rest))
+  syncRemote('updateFunnel', (auth) => rUpdateFunnel(auth, id, rest))
 }
 
 export function updateSpec(id: string, mutate: (spec: Funnel['spec']) => Funnel['spec']) {
@@ -321,13 +352,13 @@ export function updateSpec(id: string, mutate: (spec: Funnel['spec']) => Funnel[
       return { ...f, spec: nextSpec, updatedAt: Date.now() }
     }),
   })
-  if (nextSpec) syncRemote((auth) => rUpdateFunnel(auth, id, { spec: nextSpec }))
+  if (nextSpec) syncRemote('updateSpec', (auth) => rUpdateFunnel(auth, id, { spec: nextSpec }))
 }
 
 export function deleteFunnel(id: string) {
   ensureHydrated()
   set({ funnels: state.funnels.filter((f) => f.id !== id) })
-  syncRemote((auth) => rDeleteFunnel(auth, id))
+  syncRemote('deleteFunnel', (auth) => rDeleteFunnel(auth, id))
 }
 
 export function publishFunnel(id: string) {
@@ -360,7 +391,7 @@ export function setLeadStatus(funnelId: string, leadId: string, status: Lead['st
       f.id === funnelId ? { ...f, leads: f.leads.map((l) => (l.id === leadId ? { ...l, status } : l)) } : f,
     ),
   })
-  syncRemote((auth) => rSetLeadStatus(auth, leadId, status))
+  syncRemote('setLeadStatus', (auth) => rSetLeadStatus(auth, leadId, status))
 }
 
 /** Seed demo leads so the CRM/analytics never look empty. Demo mode only. Each lead
