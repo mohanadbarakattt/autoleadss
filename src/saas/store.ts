@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount } from './types'
 import { clerkEnabled } from './config'
+import { reportIncident } from './lib/reportIncident'
 import { spreadVisitsByDay } from './lib/visits'
 import type { RemoteAuth } from './db/api'
 import {
@@ -163,6 +164,10 @@ function syncRemote(op: string, fn: (auth: RemoteAuth) => Promise<void>) {
           `[store][REMOTE-SYNC-DROP] "${op}" saved locally but NOT on the server — this device now diverges`,
           err,
         )
+        reportIncident('REMOTE-SYNC-DROP', `"${op}" saved locally but not on the server`, {
+          op,
+          error: err instanceof Error ? err.message : String(err),
+        })
       }
     }
   })()

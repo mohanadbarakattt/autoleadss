@@ -3,6 +3,7 @@ import { useSession, getDb } from '../store'
 import { fetchUsage, incrementUsage, type UsageMetric, type UsagePeriod } from '../db/usage'
 import { entitlementFor, capStatus, type CapStatus } from '../entitlements'
 import { TOPUP_PACKS, type TopupPack } from '../pricing'
+import { reportIncident } from '../lib/reportIncident'
 
 const USAGE_KEY_PREFIX = 'autoleadss:usage:v1'
 const TOPUP_KEY_PREFIX = 'autoleadss:usage:topups:v1'
@@ -87,6 +88,9 @@ async function hydrateUsageRemote(userId: string | null) {
       '[usage][QUOTA-DROP] remote usage hydrate failed — this device may show quota the user has already spent',
       { err },
     )
+    reportIncident('QUOTA-DROP', 'remote usage hydrate failed — device may show already-spent quota', {
+      error: err instanceof Error ? err.message : String(err),
+    })
   }
 }
 
@@ -128,12 +132,16 @@ export function recordUsage(userId: string | null | undefined, metric: UsageMetr
     // would double-count usage against the customer's quota, which is worse
     // than under-counting it. Loud instead, so the split-brain is diagnosable
     // (defect class C9 — see mbai-ecosystem docs/DEFECT-CLASS-REGISTRY.md).
-    incrementUsage(auth, metric).catch((err) =>
+    incrementUsage(auth, metric).catch((err) => {
       console.error(
         '[usage][QUOTA-DROP] remote increment failed — server under-counts this metric (local counter still moved)',
         { metric, err },
-      ),
-    )
+      )
+      reportIncident('QUOTA-DROP', 'remote usage increment failed — server under-counts this metric', {
+        metric,
+        error: err instanceof Error ? err.message : String(err),
+      })
+    })
   }
 }
 

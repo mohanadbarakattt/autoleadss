@@ -8,6 +8,7 @@ import { getFunnelBySlug, recordVisit, addLead, useAgency } from '../store'
 import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/api'
 import { subdomainSlug, isFunnelHost } from '../publish/host'
 import { isValidGa4, isValidPixel } from '../lib/tracking'
+import { reportIncident } from '../lib/reportIncident'
 import type { Funnel } from '../types'
 
 export default function Published() {
@@ -103,6 +104,10 @@ export default function Published() {
           '[lead-capture][LEAD-DROP] remote capture failed twice — lead NOT saved, visitor asked to retry',
           { slug: targetSlug, err },
         )
+        reportIncident('LEAD-DROP', 'remote lead capture failed twice — lead not saved', {
+          slug: targetSlug,
+          error: err instanceof Error ? err.message : String(err),
+        })
         throw err
       }
     }
