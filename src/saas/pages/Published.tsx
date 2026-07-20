@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import FunnelRenderer from '../components/FunnelRenderer'
+import FunnelCookieConsent, { hasFunnelAnalyticsConsent } from '../components/FunnelCookieConsent'
 import { LogoMark } from '../../components/Logo'
 import { getFunnelBySlug, recordVisit, addLead, useAgency } from '../store'
 import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/api'
@@ -25,6 +26,14 @@ export default function Published() {
   // has no Neon-backed equivalent yet (custom domains weren't migrated in Phase 2 —
   // see src/saas/db/domains.ts) so this path always falls through to local lookup.
   const byHost = !slug && isFunnelHost()
+
+  // GA4/Pixel scripts are the funnel owner's tracking — gate them behind analytics
+  // consent (GDPR/PePP-EU). Seeded from a prior decision so returning opted-in
+  // visitors aren't re-prompted; re-read if the slug changes (SPA nav between funnels).
+  const [analyticsOk, setAnalyticsOk] = useState(() => hasFunnelAnalyticsConsent(slug))
+  useEffect(() => {
+    setAnalyticsOk(hasFunnelAnalyticsConsent(slug))
+  }, [slug])
 
   useEffect(() => {
     let cancelled = false
@@ -62,12 +71,40 @@ export default function Published() {
     }
   }, [slug, byHost])
 
-  function handleLead(d: { name: string; phone: string; extra?: string }) {
+  /**
+   * Captures a lead. MUST NOT swallow — a lead is this product's revenue
+   * event, and this page runs in the VISITOR's browser, so there is no local
+   * fallback that would ever reach the funnel owner (localStorage here
+   * belongs to the visitor). Previously this ended in `.catch(() => {})`, so
+   * a failed capture silently destroyed the lead while the form still showed
+   * a thank-you. Now a failure propagates to FunnelRenderer, which keeps the
+   * form up so the visitor can retry. One transparent retry first, since the
+   * common case is a transient blip. (Defect class C9 — see mbai-ecosystem
+   * docs/DEFECT-CLASS-REGISTRY.md.)
+   */
+  async function handleLead(d: { name: string; phone: string; extra?: string }) {
     const targetSlug = funnel?.slug ?? slug
-    if (source.current === 'remote') {
-      captureLeadRemote(targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' }).catch(() => {})
-    } else {
-      addLead(targetSlug, { name: d.name, phone: d.phone, message: d.extra, source: 'page' })
+    const payload = { name: d.name, phone: d.phone, message: d.extra, source: 'page' as const }
+
+    if (source.current !== 'remote') {
+      // Demo/local mode: the funnel came from this browser's storage, so the
+      // owner IS this browser and a local write is the real capture.
+      addLead(targetSlug, payload)
+      return
+    }
+
+    try {
+      await captureLeadRemote(targetSlug, payload)
+    } catch (first) {
+      try {
+        await captureLeadRemote(targetSlug, payload)
+      } catch (err) {
+        console.error(
+          '[lead-capture][LEAD-DROP] remote capture failed twice — lead NOT saved, visitor asked to retry',
+          { slug: targetSlug, err },
+        )
+        throw err
+      }
     }
   }
 
@@ -108,17 +145,17 @@ export default function Published() {
         <meta property="og:image" content="https://autoleadss.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content={funnel.accent} />
-        {ga4Id && (
+        {analyticsOk && ga4Id && (
           <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
         )}
-        {ga4Id && (
+        {analyticsOk && ga4Id && (
           <script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${ga4Id}');`}</script>
         )}
-        {metaPixelId && (
+        {analyticsOk && metaPixelId && (
           <script>{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`}</script>
         )}
       </Helmet>
-      {metaPixelId && (
+      {analyticsOk && metaPixelId && (
         <noscript>
           <img height="1" width="1" style={{ display: 'none' }} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} />
         </noscript>
@@ -137,6 +174,7 @@ export default function Published() {
           </a>
         ))
       })()}
+      <FunnelCookieConsent slug={slug} accent={funnel.accent} language={funnel.language} onDecision={setAnalyticsOk} />
     </div>
   )
 }

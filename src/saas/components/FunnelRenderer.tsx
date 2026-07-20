@@ -12,20 +12,41 @@ export default function FunnelRenderer({
 }: {
   spec: FunnelSpec
   accent?: string
-  onLead?: (data: { name: string; phone: string; extra?: string }) => void
+  /** May be async — submit awaits it and only shows the thank-you on success.
+   * Throwing here is how the handler says "this lead was NOT captured". */
+  onLead?: (data: { name: string; phone: string; extra?: string }) => void | Promise<void>
   scale?: boolean
 }) {
   const rtl = spec.language === 'ar'
   const [open, setOpen] = useState(0)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [failed, setFailed] = useState(false)
   const [form, setForm] = useState<Record<string, string>>({})
   const p = spec.page
 
-  function submit(e: React.FormEvent) {
+  // The lead IS the revenue event of this product, so the form must never
+  // claim success it doesn't have (defect class C9 — see mbai-ecosystem
+  // docs/DEFECT-CLASS-REGISTRY.md). This used to call onLead() without
+  // awaiting and setSent(true) unconditionally, so a failed capture still
+  // showed the thank-you: the visitor believed they'd been contacted and the
+  // business never learned the lead existed. Now we await, and only a
+  // genuinely captured lead gets the thank-you; a failure keeps the filled-in
+  // form on screen so the visitor can retry.
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
+    if (sending) return
     const vals = Object.values(form)
-    onLead?.({ name: vals[0] || 'Lead', phone: vals[1] || '', extra: vals[2] })
-    setSent(true)
+    setSending(true)
+    setFailed(false)
+    try {
+      await onLead?.({ name: vals[0] || 'Lead', phone: vals[1] || '', extra: vals[2] })
+      setSent(true)
+    } catch {
+      setFailed(true)
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -179,9 +200,21 @@ export default function FunnelRenderer({
                     className="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
                   />
                 ))}
-                <button type="submit" className="mt-1 rounded-full py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5" style={{ background: accent }}>
-                  {p.leadForm.button}
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="mt-1 rounded-full py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{ background: accent }}
+                >
+                  {sending ? (rtl ? 'جاري الإرسال…' : 'Sending…') : p.leadForm.button}
                 </button>
+                {failed && (
+                  <p role="alert" className="text-center text-sm text-red-400">
+                    {rtl
+                      ? 'لم نتمكن من إرسال بياناتك. من فضلك حاول مرة أخرى.'
+                      : "We couldn't send your details. Please try again."}
+                  </p>
+                )}
               </form>
             )}
           </div>
