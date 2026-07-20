@@ -98,7 +98,9 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
         'x-mbai-user': userId,
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        // Semantic alias — the gateway picks the model (see its routing.ts).
+        // Ad copy is the complex-text lane.
+        model: 'mbai-smart',
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user },
