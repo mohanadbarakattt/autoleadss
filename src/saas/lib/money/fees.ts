@@ -95,3 +95,60 @@ export const WHATSAPP_EGYPT_USD = {
 } as const;
 
 export type WhatsAppCategory = keyof typeof WHATSAPP_EGYPT_USD;
+
+/**
+ * BSP (Business Solution Provider) markup on WhatsApp.
+ *
+ * Meta does not sell Business API access directly — a BSP resells it and adds
+ * its own fee on top of Meta's per-conversation rate. Published rates,
+ * 2026-07-21:
+ *   - Twilio:     Meta's fee + ~$0.005 PER MESSAGE, both directions
+ *                 (volume tiers reach ~$0.010).
+ *   - 360dialog:  ~€49/month FLAT, zero per-message markup.
+ *   - Crossover between the two models is ~10,000 messages/month.
+ *
+ * ⚠ THE MODELLING TRAP: Meta bills per CONVERSATION (a 24-hour window), but
+ * Twilio-style BSPs mark up per MESSAGE — and one conversation contains many
+ * messages. Applying $0.005 "per conversation" understates the real cost by
+ * however many messages a conversation actually runs to. That is why
+ * `bspCostPerConversationUsd` takes a message count instead of a flat number.
+ *
+ * [NEEDS-OWNER] Two inputs are still guesses:
+ *   1. WHICH BSP. The two models have opposite economics: per-message punishes
+ *      chatty support threads, flat-monthly punishes low volume.
+ *   2. MESSAGES PER CONVERSATION. Nobody has measured this for AutoLeadss.
+ *      MESSAGES_PER_CONVERSATION below is an assumption, not data, and every
+ *      per-message BSP margin depends on it linearly.
+ */
+export const BSP_PER_MESSAGE_USD = {
+  /** Twilio published rate, entry tier. */
+  twilio: 0.005,
+  /** Twilio at higher volume tiers — the pessimistic end of the published band. */
+  twilioHighTier: 0.010,
+  /** 360dialog marks up nothing per message; it charges a monthly licence. */
+  flatLicence: 0,
+} as const;
+
+/** 360dialog's licence, in USD. EUR/USD moves, so this is approximate. */
+export const BSP_MONTHLY_LICENCE_USD = 53;
+
+/**
+ * Messages per conversation — AN ASSUMPTION, NOT MEASURED DATA.
+ *
+ * A support exchange of 3 customer messages and 3 AI replies is 6. Set
+ * deliberately on the higher side: under-estimating this understates cost,
+ * which is the failure mode this whole package exists to prevent.
+ */
+export const MESSAGES_PER_CONVERSATION = 6;
+
+/**
+ * Total WhatsApp cost of ONE conversation in USD: Meta's per-conversation
+ * rate plus the BSP's per-message markup across the whole exchange.
+ */
+export function whatsAppConversationCostUsd(
+  metaRateUsd: number,
+  bspPerMessageUsd: number,
+  messagesPerConversation: number = MESSAGES_PER_CONVERSATION,
+): number {
+  return metaRateUsd + bspPerMessageUsd * messagesPerConversation;
+}

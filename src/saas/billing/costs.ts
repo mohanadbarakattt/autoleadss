@@ -17,7 +17,11 @@
  *     headline price is remitted and was never ours. This was the single
  *     biggest correction.
  */
+import { whatsAppConversationCostUsd, BSP_PER_MESSAGE_USD } from '../lib/money/index.js'
+
 export {
+  whatsAppConversationCostUsd,
+  BSP_PER_MESSAGE_USD,
   usdToEgpRate,
   DEFAULT_USD_TO_EGP,
   paymobFee,
@@ -47,7 +51,42 @@ export {
  * So: the service-category rate, held as a deliberate over-estimate rather
  * than an optimistic zero.
  */
-export const WHATSAPP_COST_USD = 0.04
+const META_SERVICE_CONVERSATION_USD = 0.04
+
+/**
+ * Which BSP resells us the WhatsApp API. Meta does not sell it directly, and
+ * the two market models have OPPOSITE economics:
+ *
+ *   twilio      Meta's fee + ~$0.005 PER MESSAGE (both directions). Cheaper
+ *               below ~10k messages/month, which is where we are pre-launch —
+ *               so it is the realistic default — but it punishes chatty
+ *               support threads, and a conversation is many messages.
+ *   flatLicence 360dialog-style: ~EUR 49/month, zero per-message markup. Costs
+ *               nothing extra per conversation but is a fixed monthly floor.
+ *
+ * Defaults to `twilio` because it is both the likely choice at our volume AND
+ * the more expensive per conversation — assuming the cheaper model before a
+ * contract exists would overstate margin, which is the exact failure this
+ * cost module keeps being corrected for.
+ *
+ * [NEEDS-OWNER] Pick a BSP. Set MBAI_BSP=flatLicence once 360dialog (or
+ * similar) is signed.
+ */
+const BSP = (process.env.MBAI_BSP as keyof typeof BSP_PER_MESSAGE_USD) ?? 'twilio'
+
+/**
+ * WhatsApp cost per AI-answered CONVERSATION, USD.
+ *
+ * Meta bills per 24-hour conversation, but a per-message BSP marks up every
+ * message inside it — so the BSP share scales with MESSAGES_PER_CONVERSATION,
+ * which is an assumption nobody has measured yet. At the default 6 messages
+ * the Twilio markup ($0.03) is comparable to Meta's own service rate ($0.04):
+ * the BSP is not a rounding error.
+ */
+export const WHATSAPP_COST_USD = whatsAppConversationCostUsd(
+  META_SERVICE_CONVERSATION_USD,
+  BSP_PER_MESSAGE_USD[BSP] ?? BSP_PER_MESSAGE_USD.twilio,
+)
 
 /**
  * Cost per AI action, USD. MEASURED from a production usage_ledger row for
