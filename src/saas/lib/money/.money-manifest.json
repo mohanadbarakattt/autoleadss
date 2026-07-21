@@ -1,0 +1,9 @@
+{
+  "manifest": {
+    "constants.ts": "ce2d422c30671082785de38032dcc3ed49125117741d959e7fe7eafc22525d07",
+    "fees.ts": "38d49dca7b67f3cffb6705a73e06d562d94dfe02b9ba06651a395ed9d8eb027f",
+    "index.ts": "cf964617ff40c30890d3440fe2ff2b52638f31d8761266c6d04a4efcc6349f9f",
+    "margin.ts": "880f2d8d52902385e4e29999cbf7e11c42ea7cf51c4ca4205fa7a7ceb0fa86a4",
+    "money.ts": "59cd8a26b789276fb6f5e1694d2d725497374e014905c10b06d944aeed4e380f"
+  }
+}

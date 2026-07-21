@@ -19,10 +19,13 @@ import { ENTITLEMENTS } from "../src/saas/entitlements";
 import {
   WHATSAPP_COST_USD,
   AI_ACTION_COST_USD,
-  FX_USD_TO_EGP,
-  paymobFeeEgp,
   stripeFeeUsd,
 } from "../src/saas/billing/costs";
+// Money maths comes from the shared @mbai/money package (vendored). It is
+// VAT-aware: prices are VAT-inclusive, so 14% of every headline price is
+// remitted and was never ours — ignoring that overstated every margin here
+// by ~12 percentage points.
+import { computeMargin, egpToPiastres, piastresToEgp, usdToEgpRate } from "../src/saas/lib/money/index.js";
 
 export const HARD_FLOOR = 0.55;
 export const WARN_TARGET = 0.6;
@@ -83,11 +86,14 @@ export function tierMarginRows(): TierMarginRow[] {
     const aiActionCap = ent.aiActionCap?.limit ?? 0;
 
     const egpPrice = parseEgp(tier.priceEgypt);
-    const egpFee = paymobFeeEgp(egpPrice);
-    const egpNet = egpPrice - egpFee;
-    const egpWhatsappCost = whatsappCap * WHATSAPP_COST_USD * FX_USD_TO_EGP;
-    const egpAiCost = aiActionCap * AI_ACTION_COST_USD * FX_USD_TO_EGP;
-    const egpTotalCost = egpWhatsappCost + egpAiCost;
+    const rate = usdToEgpRate();
+    const costUsd = whatsappCap * WHATSAPP_COST_USD + aiActionCap * AI_ACTION_COST_USD;
+    const m = computeMargin({ costUsd, priceP: egpToPiastres(egpPrice), rate });
+    const egpFee = piastresToEgp(m.feeP + m.vatP); // fee + VAT both leave us
+    const egpNet = piastresToEgp(m.netP);
+    const egpWhatsappCost = whatsappCap * WHATSAPP_COST_USD * rate;
+    const egpAiCost = aiActionCap * AI_ACTION_COST_USD * rate;
+    const egpTotalCost = piastresToEgp(m.costP);
     rows.push({
       tier: planId,
       region: "egypt",
@@ -127,10 +133,15 @@ export function topupMarginRows(): TopupMarginRow[] {
   const rows: TopupMarginRow[] = [];
   for (const pack of TOPUP_PACKS) {
     const egpPrice = parseEgp(pack.priceEgypt);
-    const egpFee = paymobFeeEgp(egpPrice);
-    const egpNet = egpPrice - egpFee;
-    const egpCost = pack.whatsapp * WHATSAPP_COST_USD * FX_USD_TO_EGP + pack.aiAction * AI_ACTION_COST_USD * FX_USD_TO_EGP;
-    rows.push({ pack: pack.id, region: "egypt", listPrice: egpPrice, fee: egpFee, netRevenue: egpNet, totalCost: egpCost, marginPct: (egpNet - egpCost) / egpNet });
+    const packCostUsd = pack.whatsapp * WHATSAPP_COST_USD + pack.aiAction * AI_ACTION_COST_USD;
+    const pm = computeMargin({ costUsd: packCostUsd, priceP: egpToPiastres(egpPrice) });
+    rows.push({
+      pack: pack.id, region: "egypt", listPrice: egpPrice,
+      fee: piastresToEgp(pm.feeP + pm.vatP),
+      netRevenue: piastresToEgp(pm.netP),
+      totalCost: piastresToEgp(pm.costP),
+      marginPct: pm.ratio,
+    });
 
     const usdPrice = parseUsd(pack.priceGulf);
     const usdFee = stripeFeeUsd(usdPrice);
@@ -175,7 +186,7 @@ export function runMarginGuard(): GuardResult {
 export function formatReport(r: GuardResult): string {
   const lines: string[] = [];
   lines.push("");
-  lines.push(`  AutoLeadss margin-guard  ·  WhatsApp $${WHATSAPP_COST_USD}/conv  ·  AI-action $${AI_ACTION_COST_USD}/action  ·  FX ${FX_USD_TO_EGP} EGP/$1`);
+  lines.push(`  AutoLeadss margin-guard  ·  WhatsApp $${WHATSAPP_COST_USD}/conv  ·  AI-action $${AI_ACTION_COST_USD}/action  ·  FX ${usdToEgpRate()} EGP/$1  ·  VAT-inclusive`);
   lines.push("  " + "-".repeat(84));
   lines.push("  tier/pack       region   list price   net rev.     total cost   margin");
   for (const t of r.tierRows) {
