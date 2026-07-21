@@ -5,7 +5,7 @@ import AppShell from '../components/AppShell'
 import { useI18n } from '../i18n'
 import { useFunnels, uid, getDb } from '../store'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
-import { remoteEnabled } from '../config'
+import { whatsappEnabled } from '../config'
 import { getConnectionForFunnel, saveConnection, listConversations, type WhatsAppConnection, type Conversation } from '../db/whatsapp'
 
 export default function Connect() {
@@ -33,16 +33,16 @@ function ConnectInner() {
   const [saved, setSaved] = useState(false)
   const [busy, setBusy] = useState(false)
 
-  // Placeholder — the WhatsApp webhook isn't wired to a live backend yet (not
-  // migrated to the Neon/api/ stack in Phase 2; see src/saas/db/whatsapp.ts).
-  const webhookUrl = 'https://<your-deployment>.vercel.app/api/whatsapp-webhook'
+  // Real endpoint. Same-origin so it follows whatever domain this workspace is
+  // served from, rather than a placeholder the owner has to hand-edit.
+  const webhookUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/whatsapp/webhook`
+      : '/api/whatsapp/webhook'
 
   useEffect(() => {
     const sb = getDb()
-    // WhatsApp remote persistence isn't migrated to the Neon backend yet
-    // (remoteEnabled is hardcoded false — see src/saas/config.ts); skip the call
-    // entirely rather than hitting a stub that always returns empty/throws.
-    if (!sb || !remoteEnabled || !funnelId) return
+    if (!sb || !whatsappEnabled || !funnelId) return
     getConnectionForFunnel(sb, funnelId)
       .then((c) => {
         setExisting(c)
@@ -69,7 +69,7 @@ function ConnectInner() {
 
   async function save() {
     const sb = getDb()
-    if (!sb || !remoteEnabled) {
+    if (!sb || !whatsappEnabled) {
       setSaved(true)
       setTimeout(() => setSaved(false), 2200)
       return
@@ -103,7 +103,7 @@ function ConnectInner() {
         {existing && <span className="ms-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-600"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {isRTL ? 'متصل' : 'Connected'}</span>}
       </div>
 
-      {!remoteEnabled && (
+      {!whatsappEnabled && (
         <p className="mt-6 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-700">
           {isRTL ? 'وضع العرض: حفظ إعدادات واتساب غير متاح بعد — قريباً.' : 'Demo mode: saving a WhatsApp connection isn’t available yet — coming soon.'}
         </p>
@@ -150,7 +150,7 @@ function ConnectInner() {
       </div>
 
       {/* lite shared inbox */}
-      {remoteEnabled && (
+      {whatsappEnabled && (
         <div className="mt-6 rounded-2xl border border-border bg-card p-6">
           <p className="mb-4 font-display font-semibold">{isRTL ? 'المحادثات الأخيرة' : 'Recent conversations'}</p>
           {convos.length === 0 ? (

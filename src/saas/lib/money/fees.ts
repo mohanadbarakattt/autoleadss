@@ -3,7 +3,7 @@
 //   node packages/money/sync.mjs <this-dir>
 // A CI drift check (packages/money/check-drift.mjs) fails if this copy is
 // edited locally or falls behind source.
-import type { Piastres } from './money.js';
+import type { Piastres } from './money';
 
 /**
  * Payment-processor and channel fees. Owner-sourced 2026-07-20 with citations

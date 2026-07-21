@@ -3,9 +3,9 @@
 //   node packages/money/sync.mjs <this-dir>
 // A CI drift check (packages/money/check-drift.mjs) fails if this copy is
 // edited locally or falls behind source.
-import { usdToEgpRate, EGYPT_VAT_RATE } from './constants.js';
-import { processorFee, type PayMethod } from './fees.js';
-import { egpToPiastres, type Piastres } from './money.js';
+import { usdToEgpRate, EGYPT_VAT_RATE } from './constants';
+import { processorFee, type PayMethod } from './fees';
+import { egpToPiastres, type Piastres } from './money';
 
 /**
  * FX-aware margin maths.

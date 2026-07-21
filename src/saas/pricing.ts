@@ -39,7 +39,7 @@ export const TIERS: Tier[] = [
     tagline: { en: 'Scale what works.', ar: 'وسّع ما ينجح.' },
     features: [
       { en: '5 funnels', ar: '5 أقماع' },
-      { en: 'WhatsApp AI bot (connecting a live number: coming soon)', ar: 'بوت واتساب ذكي (ربط رقم حقيقي: قريباً)' },
+      { en: 'WhatsApp AI bot — connect your own number', ar: 'بوت واتساب ذكي — اربط رقمك' },
       { en: 'Ad + social generation', ar: 'توليد إعلانات وسوشيال' },
       { en: 'Remove badge · CRM · A/B test', ar: 'إزالة الشارة · CRM · اختبار A/B' },
     ],

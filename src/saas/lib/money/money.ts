@@ -3,7 +3,7 @@
 //   node packages/money/sync.mjs <this-dir>
 // A CI drift check (packages/money/check-drift.mjs) fails if this copy is
 // edited locally or falls behind source.
-import { PIASTRES_PER_EGP, EGYPT_VAT_RATE } from './constants.js';
+import { PIASTRES_PER_EGP, EGYPT_VAT_RATE } from './constants';
 
 /** Money in integer piastres. Never a float — see constants.ts. */
 export type Piastres = number;

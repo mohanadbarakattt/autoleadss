@@ -21,10 +21,23 @@ export const clerkEnabled = !!CLERK_PUBLISHABLE_KEY
  * store probes the backend at runtime on sign-in (see store.ts `bridgeClerkSession`)
  * and falls back to localStorage if it's unreachable or not yet deployed.
  *
- * `remoteEnabled` below is unrelated to that probe — it only gates UI copy for
- * features that were Supabase-backed before Phase 2 and were NOT carried over to
- * Neon (custom domains, the WhatsApp connection/inbox remote store; see
- * src/saas/db/domains.ts, src/saas/db/whatsapp.ts, docs/SETUP.md). It stays `false`
- * until a future phase adds Neon tables + api/ routes for those.
+ * `remoteEnabled` below is unrelated to that probe — it gates features that were
+ * Supabase-backed before Phase 2 and had to be rebuilt on Neon.
+ *
+ * WhatsApp was rebuilt 2026-07-21: `autoleadss.whatsapp_connections` /
+ * `whatsapp_messages` tables plus `api/whatsapp/{webhook,send,connection}`.
+ * Custom domains (src/saas/db/domains.ts) are still NOT migrated — they remain
+ * gated by the same flag, which is the one real cost of sharing it.
  */
 export const remoteEnabled = false
+
+/**
+ * WhatsApp connection + shared inbox, rebuilt on Neon 2026-07-21
+ * (`autoleadss.whatsapp_connections` / `whatsapp_messages` +
+ * `api/whatsapp/{webhook,send,connection}`).
+ *
+ * SPLIT OUT of `remoteEnabled` on purpose: that flag also gates custom domains,
+ * which are still NOT migrated, so flipping the shared flag would have switched
+ * on a half-built feature that calls a stub. One flag per feature.
+ */
+export const whatsappEnabled = true
