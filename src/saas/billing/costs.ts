@@ -64,15 +64,21 @@ const META_SERVICE_CONVERSATION_USD = 0.04
  *   flatLicence 360dialog-style: ~EUR 49/month, zero per-message markup. Costs
  *               nothing extra per conversation but is a fixed monthly floor.
  *
- * Defaults to `twilio` because it is both the likely choice at our volume AND
- * the more expensive per conversation — assuming the cheaper model before a
- * contract exists would overstate margin, which is the exact failure this
- * cost module keeps being corrected for.
+ * OWNER DECISION 2026-07-21: 360dialog — the flat-licence model. It beats
+ * Twilio above ~221 conversations/month and the top-up packs sell 40-200
+ * conversations EACH, so the crossover is reached almost immediately. It also
+ * needs no repricing, whereas Twilio would have required +44% to +65%.
  *
- * [NEEDS-OWNER] Pick a BSP. Set MBAI_BSP=flatLicence once 360dialog (or
- * similar) is signed.
+ * Encoded as the DEFAULT rather than left to MBAI_BSP, because a decision that
+ * lives only in an unset env var silently reverts to the wrong number the
+ * first time someone runs the guard on a fresh machine. The env var remains as
+ * an override for comparing models.
+ *
+ * NOTE the flat licence itself (~$53/month) is a FIXED cost that does not
+ * appear in these per-conversation margins. It is a monthly floor to clear,
+ * not a per-unit cost — track it in overheads, not here.
  */
-const BSP = (process.env.MBAI_BSP as keyof typeof BSP_PER_MESSAGE_USD) ?? 'twilio'
+const BSP = (process.env.MBAI_BSP as keyof typeof BSP_PER_MESSAGE_USD) ?? 'flatLicence'
 
 /**
  * WhatsApp cost per AI-answered CONVERSATION, USD.
