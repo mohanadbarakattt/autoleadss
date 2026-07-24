@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { HubContent } from './Hub'
@@ -24,6 +24,15 @@ beforeEach(() => {
   window.localStorage.clear()
 })
 
+// LocaleProvider sets dir="rtl"/lang="ar" on <html> as a side effect and never
+// unsets them — without this, an AR test leaves the DOM in RTL for every test
+// that runs after it in the same file (or worse, another file, since jsdom's
+// document persists across test files in the same worker).
+afterEach(() => {
+  document.documentElement.removeAttribute('dir')
+  document.documentElement.removeAttribute('lang')
+})
+
 describe('Hub', () => {
   it('renders all 9 tools in EN', () => {
     renderHub()
@@ -32,7 +41,7 @@ describe('Hub', () => {
     }
   })
 
-  it('renders in AR with Arabic strings present', () => {
+  it('renders Arabic strings in AR locale', () => {
     window.localStorage.setItem(LOCALE_KEY, 'ar')
     renderHub()
     expect(screen.getByText('مجموعة نموّك')).toBeInTheDocument()
