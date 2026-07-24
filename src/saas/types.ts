@@ -1,3 +1,6 @@
+import type { BusinessTypeId } from './onboarding'
+import type { ToolKey } from './suite/tools'
+
 export type Locale = 'en' | 'ar'
 export type Region = 'egypt' | 'gulf'
 export type Industry = 'real-estate' | 'ecommerce' | 'clinic' | 'restaurant' | 'fitness' | 'services' | 'other'
@@ -111,6 +114,11 @@ export interface Workspace {
    * drives pricing/money paths and migrates separately in Phase 7. Optional so
    * existing sessions default to 'gulf' without a migration. */
   marketRegion?: 'gulf' | 'global'
+  /** Suite v2 onboarding (/app/start) — the business type + recommended toolkit the
+   * workspace chose. Optional so existing sessions (pre-onboarding) don't need a
+   * migration; the Hub redirects to /app/start until `toolkit` is set. */
+  businessType?: BusinessTypeId
+  toolkit?: ToolKey[]
 }
 
 export interface User {

@@ -1,30 +1,11 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Navigate, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { ShoppingBag, Send, MessageCircle, LayoutTemplate, Users, Image, BarChart3, Star, Calendar, type LucideIcon } from 'lucide-react'
 import SuiteShell from '../suite/SuiteShell'
 import { GoldButton, Tag, ToolCard } from '../suite/ui'
+import { TOOLS, LIVE_TOOL_KEYS } from '../suite/tools'
 import { useI18n } from '../i18n'
-
-type ToolKey = 'storefront' | 'ads' | 'whatsapp' | 'pages' | 'leads' | 'social' | 'insights' | 'reviews' | 'bookings'
-
-/** Honest-status guard (design spec §4): today's truth, not the prototype's
- * everything-is-Live mockup. Hub.test.tsx pins its own hardcoded copy of this set
- * (not imported from here) — later phases update both by hand as tools genuinely
- * go live, never the other way around. */
-const LIVE_TOOL_KEYS: ToolKey[] = ['ads', 'whatsapp', 'pages']
-
-const TOOL_META: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
-  { key: 'storefront', icon: ShoppingBag },
-  { key: 'ads', icon: Send, href: '/app/ads' },
-  { key: 'whatsapp', icon: MessageCircle, href: '/app/connect' },
-  { key: 'pages', icon: LayoutTemplate, href: '/app/pages' },
-  { key: 'leads', icon: Users },
-  { key: 'social', icon: Image },
-  { key: 'insights', icon: BarChart3 },
-  { key: 'reviews', icon: Star },
-  { key: 'bookings', icon: Calendar },
-]
+import { useSession } from '../store'
 
 /** The suite home content — the flagship Storefront card + the tool grid. Exported
  * separately from the routed page so tests can render it without an authenticated
@@ -33,6 +14,7 @@ export function HubContent() {
   const { t } = useI18n()
   const h = t.hub
   const { hash } = useLocation()
+  const toolkit = useSession()?.workspace.toolkit
 
   // Plain <BrowserRouter> — <Link>/navigate never scrolls to a hash on its own, so
   // SuiteShell's "Tools" nav link (/app#tools) needs this to actually land on the grid.
@@ -40,6 +22,10 @@ export function HubContent() {
     if (!hash) return
     document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' })
   }, [hash])
+
+  // Chosen-tools-first when a toolkit exists (stable sort keeps the original
+  // catalogue order within each group); unchanged for tests/demo with no toolkit.
+  const orderedTools = toolkit ? [...TOOLS].sort((a, b) => Number(toolkit.includes(b.key)) - Number(toolkit.includes(a.key))) : TOOLS
 
   return (
     <div className="mx-auto max-w-[1120px] px-[30px] pb-[60px] pt-[38px]">
@@ -60,9 +46,16 @@ export function HubContent() {
         <div aria-hidden className="h-[150px] min-[861px]:h-auto bg-gradient-to-br from-[#20222c] to-[#14151b]" />
       </div>
 
-      <p id="tools" className="mb-4 mt-9 text-xs font-semibold uppercase tracking-[0.14em] text-suite-muted">{h.toolsLabel}</p>
+      <div className="mb-4 mt-9 flex items-center justify-between">
+        <p id="tools" className="text-xs font-semibold uppercase tracking-[0.14em] text-suite-muted">{h.toolsLabel}</p>
+        {toolkit && (
+          <Link to="/app/start" className="text-xs text-suite-muted underline-offset-2 hover:text-suite-text hover:underline">
+            {t.onboarding.editToolkit}
+          </Link>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-4 min-[861px]:grid-cols-3">
-        {TOOL_META.map((tool) => {
+        {orderedTools.map((tool) => {
           const isLive = LIVE_TOOL_KEYS.includes(tool.key)
           return (
             <ToolCard
@@ -89,7 +82,16 @@ export default function Hub() {
         <title>AutoLeadss — growth suite</title>
         <meta name="robots" content="noindex" />
       </Helmet>
-      <HubContent />
+      <HubGate />
     </SuiteShell>
   )
+}
+
+/** SuiteShell only renders `children` once a session exists, so by the time this
+ * mounts `session` is guaranteed — new users (no toolkit yet) are sent to
+ * onboarding instead of the empty-ish grid. */
+function HubGate() {
+  const session = useSession()
+  if (session && !session.workspace.toolkit) return <Navigate to="/app/start" replace />
+  return <HubContent />
 }

@@ -4,6 +4,8 @@ import { clerkEnabled } from './config'
 import { reportIncident } from './lib/reportIncident'
 import { spreadVisitsByDay } from './lib/visits'
 import type { RemoteAuth } from './db/api'
+import type { BusinessTypeId } from './onboarding'
+import type { ToolKey } from './suite/tools'
 import {
   listFunnels as rListFunnels,
   createFunnel as rCreateFunnel,
@@ -326,6 +328,13 @@ export function setMarketRegion(marketRegion: 'gulf' | 'global') {
   ensureHydrated()
   if (!state.session) return
   set({ session: { ...state.session, workspace: { ...state.session.workspace, marketRegion } } })
+}
+
+/** Suite v2 onboarding (/app/start) — see `Workspace.toolkit` doc in types.ts. */
+export function setToolkit(businessType: BusinessTypeId, toolkit: ToolKey[]) {
+  ensureHydrated()
+  if (!state.session) return
+  set({ session: { ...state.session, workspace: { ...state.session.workspace, businessType, toolkit } } })
 }
 
 // ---------- funnels ----------
