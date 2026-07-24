@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { LayoutGrid, Plus, CreditCard, MessageCircle, Building2, PanelLeftClose, PanelLeftOpen, Clock, Sparkles, Menu, X, Megaphone } from 'lucide-react'
+import { LayoutGrid, Plus, CreditCard, MessageCircle, Building2, PanelLeftClose, PanelLeftOpen, Clock, Sparkles, Menu, X, Megaphone, Home } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useAgency, useFunnels } from '../store'
@@ -49,7 +49,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const recents = [...funnels].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 5)
 
   const nav = [
-    { label: t.nav.dashboard, href: '/app', icon: LayoutGrid },
+    // /app is now the suite Hub (SuiteShell, not this shell) — this link is how pages
+    // under AppShell get back to it. See docs/superpowers/specs/2026-07-24-autoleadss-suite-v2-design.md.
+    { label: isRTL ? 'الرئيسية' : 'Hub', href: '/app', icon: Home },
+    { label: t.nav.dashboard, href: '/app/pages', icon: LayoutGrid },
     { label: t.common.new, href: '/app/new', icon: Plus },
     { label: t.adSuite.navLabel, href: '/app/ads', icon: Megaphone },
     { label: 'WhatsApp', href: '/app/connect', icon: MessageCircle },

@@ -49,7 +49,7 @@ export default function Pricing() {
     // demo / billing-not-configured: set the plan locally
     setRegion(region)
     setPlan(id)
-    navigate('/app')
+    navigate('/app/pages')
   }
 
   const isFranco = locale === 'fr-eg'
@@ -105,7 +105,7 @@ export default function Pricing() {
           <Link to="/"><Logo variant="dark" size={28} /></Link>
           <div className="flex items-center gap-3">
             <LocaleSwitcher locale={locale} setLocale={setLocale} variant="dark" />
-            <Link to={session ? '/app' : '/login'} className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white">{session ? t.nav.dashboard : t.nav.login}</Link>
+            <Link to={session ? '/app/pages' : '/login'} className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white">{session ? t.nav.dashboard : t.nav.login}</Link>
           </div>
         </div>
       </header>

@@ -48,7 +48,7 @@ export default function ClerkAuth({ mode }: { mode: 'signin' | 'signup' }) {
         {isSignup ? (
           <SignUp signInUrl="/login" fallbackRedirectUrl="/app/new" />
         ) : (
-          <SignIn signUpUrl="/signup" fallbackRedirectUrl="/app" />
+          <SignIn signUpUrl="/signup" fallbackRedirectUrl="/app/pages" />
         )}
       </div>
     </div>

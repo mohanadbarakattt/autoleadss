@@ -33,7 +33,7 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
     e.preventDefault()
     if (!validate()) return
     signUp(name.trim(), email.trim(), region)
-    navigate(isSignup ? '/app/new' : '/app')
+    navigate(isSignup ? '/app/new' : '/app/pages')
   }
 
   const title = isSignup

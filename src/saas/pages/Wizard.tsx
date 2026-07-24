@@ -205,7 +205,7 @@ function WizardInner() {
 
       <div className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
         <Logo size={28} />
-        <Link to="/app" onClick={confirmLeave} className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
+        <Link to="/app/pages" onClick={confirmLeave} className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
           <X size={18} />
         </Link>
       </div>

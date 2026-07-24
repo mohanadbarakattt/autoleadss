@@ -13,6 +13,7 @@ import RemoteBridge from './saas/auth/RemoteBridge'
 import { UpgradeProvider } from './saas/billing/UpgradeContext'
 import { clerkEnabled } from './saas/config'
 import { isFunnelHost } from './saas/publish/host'
+import Hub from './saas/pages/Hub'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import AdSuite from './saas/pages/AdSuite'
@@ -67,7 +68,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/pricing" element={withSaas(<Pricing />)} />
           <Route path="/login" element={withSaas(<AuthRoute mode="signin" />)} />
           <Route path="/signup" element={withSaas(<AuthRoute mode="signup" />)} />
-          <Route path="/app" element={withSaas(<Dashboard />)} />
+          <Route path="/app" element={withSaas(<Hub />)} />
+          <Route path="/app/pages" element={withSaas(<Dashboard />)} />
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/ads" element={withSaas(<AdSuite />)} />
           <Route path="/app/funnel/:id" element={withSaas(<Editor />)} />

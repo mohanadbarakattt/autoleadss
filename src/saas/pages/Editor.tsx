@@ -48,7 +48,7 @@ function EditorInner() {
           <meta name="robots" content="noindex" />
         </Helmet>
         <p className="text-muted-fg">{isRTL ? 'القمع غير موجود.' : 'Funnel not found.'}</p>
-        <Link to="/app" className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white">{t.nav.dashboard}</Link>
+        <Link to="/app/pages" className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white">{t.nav.dashboard}</Link>
       </div>
     )
   }
@@ -96,7 +96,7 @@ function EditorInner() {
       </Helmet>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link to="/app" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
+          <Link to="/app/pages" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
             <ArrowLeft size={17} className={isRTL ? 'rotate-180' : ''} />
           </Link>
           <div>
