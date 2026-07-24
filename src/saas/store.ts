@@ -321,6 +321,13 @@ export function setRegion(region: Region) {
   set({ session: { ...state.session, workspace: { ...state.session.workspace, region } } })
 }
 
+/** Suite v2 Hub region pill only — see `Workspace.marketRegion` doc in types.ts. */
+export function setMarketRegion(marketRegion: 'gulf' | 'global') {
+  ensureHydrated()
+  if (!state.session) return
+  set({ session: { ...state.session, workspace: { ...state.session.workspace, marketRegion } } })
+}
+
 // ---------- funnels ----------
 export function getFunnelBySlug(slug: string): Funnel | undefined {
   ensureHydrated()

@@ -1,0 +1,40 @@
+/**
+ * Suite v2 design tokens — dark-luxe admin (.theme-suite) and light editorial-luxury
+ * storefront (.theme-store, tokens only — Phase 4 builds its components). Scoped
+ * classes only: the marketing site's tailwind.config.js palette and src/index.css
+ * stay untouched. Imported only where the suite shell mounts (SuiteShell.tsx), never
+ * globally, so it never affects AppShell/marketing-site pages.
+ */
+
+.theme-suite {
+  --suite-bg: #0c0d11;
+  --suite-panel: #15161c;
+  --suite-panel-2: #1b1d25;
+  --suite-line: #282a33;
+  --suite-text: #f4f2ec;
+  --suite-muted: #95938b;
+  --suite-gold: #c9a86a;
+  --suite-gold-l: #e2c690;
+  --suite-ok: #4bbf8a;
+
+  background: var(--suite-bg);
+  color: var(--suite-text);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display face is Cormorant Garamond; RTL swaps it for the Amiri → IBM Plex Sans
+   Arabic pairing (html[dir] is set by src/saas/i18n.tsx's LocaleProvider). Higher
+   specificity than the plain .font-luxe Tailwind utility, so it wins regardless of
+   stylesheet order. */
+html[dir='rtl'] .theme-suite .font-luxe {
+  font-family: 'Amiri', 'IBM Plex Sans Arabic', serif;
+}
+
+.theme-store {
+  --store-pearl: #faf9f5;
+  --store-ink: #1a1815;
+  --store-gold: #a9853f;
+}

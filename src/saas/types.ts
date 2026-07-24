@@ -107,6 +107,10 @@ export interface Workspace {
   region: Region
   plan: PlanId
   createdAt: number
+  /** Suite v2 Hub region pill (Gulf · Global) — independent of `region` above, which
+   * drives pricing/money paths and migrates separately in Phase 7. Optional so
+   * existing sessions default to 'gulf' without a migration. */
+  marketRegion?: 'gulf' | 'global'
 }
 
 export interface User {
