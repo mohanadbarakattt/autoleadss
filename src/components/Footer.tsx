@@ -2,6 +2,7 @@ import { BriefcaseBusiness, Camera, Music2, MessageCircle } from 'lucide-react'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import Logo from './Logo'
 import MbaiBadge from './MbaiBadge'
+import { SHOW_WORK } from './sections/Work'
 
 const socials = [
   { icon: Camera, href: 'https://instagram.com/autoleadss', label: 'Instagram' },
@@ -63,7 +64,7 @@ export default function Footer() {
             <div key={col} className="flex flex-col gap-4">
               <p className="eyebrow text-[#8A857D]">{t.footer.headings[col]}</p>
               <ul className="flex flex-col gap-2.5">
-                {t.footer[col].map((item, i) => (
+                {t.footer[col].filter(item => SHOW_WORK || item.href !== '#work').map((item, i) => (
                   <li key={i}>
                     <a href={item.href} className="text-sm text-[#8A857D] transition-colors duration-200 hover:text-white">
                       {item.label}

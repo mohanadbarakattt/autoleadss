@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion, type Variants } from 'framer-motion'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { SHOW_WORK } from './Work'
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
@@ -113,10 +114,12 @@ export default function Hero() {
                   {isRTL ? '←' : '→'}
                 </span>
               </a>
-              <a href="#work"
-                className="inline-flex items-center justify-center border border-white/25 text-white/90 font-medium px-8 py-4 rounded-full text-sm transition-all duration-300 hover:border-white/60 hover:bg-white/5">
-                {t.hero.ctaWork}
-              </a>
+              {SHOW_WORK && (
+                <a href="#work"
+                  className="inline-flex items-center justify-center border border-white/25 text-white/90 font-medium px-8 py-4 rounded-full text-sm transition-all duration-300 hover:border-white/60 hover:bg-white/5">
+                  {t.hero.ctaWork}
+                </a>
+              )}
             </motion.div>
 
             <motion.p custom={0.45} variants={fadeUp} initial="hidden" animate="show"

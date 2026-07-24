@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import type { Locale } from '../i18n/translations'
 import Logo from './Logo'
+import { SHOW_WORK } from './sections/Work'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR', 'fr-eg': 'FRN' }
@@ -39,7 +40,7 @@ export default function Navigation() {
 
   const navLinks = [
     { label: t.nav.services, href: '#services' },
-    { label: t.nav.work, href: '#work' },
+    ...(SHOW_WORK ? [{ label: t.nav.work, href: '#work' }] : []),
     { label: t.nav.process, href: '#process' },
     { label: t.nav.contact, href: '#contact' },
   ]

@@ -8,9 +8,16 @@ import imgAds from '../../assets/ads-management.jpg'
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 const IMAGES = [imgLanding, imgSocial, imgAds]
 
+// [NEEDS-OWNER: real case studies] — `work.cases` in src/i18n/translations.ts is
+// intentionally empty; the previous entries used invented client names, quotes, and
+// metrics. Flip this on only once real, verifiable case studies are supplied —
+// never fill it with invented ones. Nav/Hero/Footer #work links key off this flag.
+export const SHOW_WORK = false
+
 export default function Work() {
   const t = useT()
   const { isRTL } = useLocale()
+  if (!SHOW_WORK || t.work.cases.length === 0) return null
 
   return (
     <section id="work" className="relative overflow-hidden bg-muted/50 py-24">
