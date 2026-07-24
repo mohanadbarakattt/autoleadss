@@ -47,7 +47,8 @@ Each is a real, self-contained tool; the onboarding recommends a subset per busi
 ## 4. Keep vs change
 
 ### KEEP (the built engine — 8 phases, env-gated, adversarially reviewed)
-- Auth (Clerk + RLS), billing (entitlements + upgrade gates + `create-checkout`), the generation (edge function `generate-funnel`, streaming, model router), WhatsApp Cloud API (`whatsapp-webhook`) + Gemma bot, custom domains + host-based rendering, white-label/sub-accounts, analytics, `stripe-webhook`.
+- Auth (Clerk + RLS), billing entitlements + upgrade gates (client-side), the generation (`api/ai-generate`, streaming, model router), WhatsApp Cloud API (`api/whatsapp`) + Gemma bot, subdomain publish + host-based rendering, analytics/usage, white-label **UI** (`Agency.tsx`).
+- **Corrected 2026-07-24 (Phase 0 inventory):** `create-checkout` and `stripe-webhook` did NOT survive the Neon migration — `billingEnabled = false` is hardcoded in `src/saas/billing/checkout.ts` and `api/` has no checkout/webhook route (Phase 3 builds payments from scratch). Agency persistence is localStorage-only (tables deferred in migration `0001` — Phase 6 builds them). Custom-domain host lookup is unimplemented server-side (`api/published/index.ts` — Phase 4 builds it).
 - Bilingual EN/AR (full RTL), the marketing agency site, the demo-mode fallback (so the live site never breaks).
 - The C9/C10 fixes (lead-capture fail-closed, no shallow-copy leaks).
 
