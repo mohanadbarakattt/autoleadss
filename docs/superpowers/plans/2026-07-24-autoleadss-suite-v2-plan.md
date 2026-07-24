@@ -1,56 +1,95 @@
-# AutoLeadss V2 — Premium Growth Suite — Implementation Plan
+# AutoLeadss V2 — Premium Growth Suite — Build Plan
 
-> **For agentic workers (Fable 5):** REQUIRED SUB-SKILL: subagent-driven-development or executing-plans per phase. Each phase produces working, testable software. Execute in order; TDD; commit frequently. **Keep the built engine** — do not restart. Env-gated; demo-mode stays keyless as a fallback (never the pitch).
+**Goal:** a premium growth suite for the Gulf + worldwide — real tools a business picks from, anchored by a luxury storefront that takes real payments, with business-type onboarding. Built on the existing engine. Not a restart.
 
-**Goal:** Reposition AutoLeadss into a premium global growth suite — functional tools + a flagship luxury storefront + real multi-gateway payments + business-type onboarding — on the kept 8-phase engine, redesigned premium, for Gulf + worldwide.
+**Spec:** `specs/2026-07-24-autoleadss-suite-v2-design.md` · **Inventory (ground truth):** `2026-07-24-phase0-inventory.md` · **Prototypes:** `.superpowers/{al-hub, al-storefront, al-onboarding}.html`
 
-**Spec:** `docs/superpowers/specs/2026-07-24-autoleadss-suite-v2-design.md` — read fully. Prototypes: `.superpowers/{al-hub, al-storefront, al-onboarding}.html`.
+**Stack:** Vite 5 + React 18 + TS + Tailwind + Framer Motion. SaaS under `src/saas/`. Backend = Vercel functions under `api/` (funnels, leads, published, whatsapp, ai-generate, ad-suite, usage) + Clerk auth + Neon, all env-gated.
 
-**Stack notes:** Vite 5 + React 18 + TS + Tailwind + Framer Motion; SaaS under `src/saas/` (pages: Dashboard, Wizard, Editor, Published, Agency, AdSuite, Connect, Pricing); backend = Vercel functions under `api/` (funnels, leads, published, whatsapp, ai-generate, ad-suite, usage) + Clerk auth, env-gated. **Billing/checkout and agency persistence did NOT survive the Neon migration** (Phase 0 inventory) — see the corrected Phases 3/6. **framer-motion v12 gotcha:** never nest `AnimatePresence mode="wait"` (hangs) — use keyed `motion.div`. PATH fix: `export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"`.
+**Rules that don't bend:**
+- Functional or it doesn't ship. No placeholder pretending to be a feature — "Soon" is honest, fake UI is not.
+- Money paths fail-closed + idempotent webhooks. Never mark paid before the dependent write.
+- No fabricated data — copy, metrics, reviews, client names. Unknowns go to the owner.
+- Demo mode stays keyless and never breaks; it's the fallback, never the pitch.
+- EN/AR with real RTL. Arabic is native register, never transliterated.
+- Local commits only. No push, no deploy, without the owner.
 
-**Non-negotiables:** functional-not-placeholder; real gateways only; no fabrication; money paths fail-closed + idempotent (C9); demo-never-breaks-live; EN/AR RTL.
-
----
-
-## Phase 0 — Guardrails (½ day) — ✅ done 2026-07-24
-- [x] Branch `autoleadss/suite-v2` (created). Baseline green: build ✓, 27/27 tests ✓. C10 verified **N/A** here (SaaS store keeps timestamps as `Date.now()` numbers and has no defensive-copy read paths — there is no fix to "note", don't go looking for one).
-- [x] Inventory: `docs/superpowers/plans/2026-07-24-phase0-inventory.md` — **9 placeholder surfaces** (the Phase 5 backlog) + 3 corrections to this plan's assumptions, folded into Phases 3/4/6 below.
-
-## Phase 1 — Premium redesign foundation (2–3 days)
-- [ ] New design system: **dark-luxe suite** (champagne gold `#c9a86a`, Cormorant Garamond + Inter) and **light editorial-luxury storefront** register. Shared primitives; region switch (Gulf · Global); EN/AR RTL preserved. Match the prototypes. *(Phase 0: these tokens exist only in the prototype HTMLs — zero overlap with `src/`; this is a fresh design system, not a restyle of the current light/orange theme.)*
-- [ ] Rebuild the **Hub** (flagship Storefront + tool grid) per `al-hub.html`. Keep the agency marketing site; refresh where it clashes.
-
-## Phase 2 — Business-type onboarding (1–2 days)
-- [ ] The onboarding flow (per `al-onboarding.html`): pick business type → recommend + assemble a toolkit (map each type → tool set + template + default payments + region/currency). Persist the workspace's toolkit; "add/remove anytime." Optional URL/describe-your-business step (improvement #1) to auto-fill brand.
-
-## Phase 3 — Unified payments layer (3–5 days) — the biggest new build
-- [ ] A **payments abstraction** over multiple gateways: **Tap · PayTabs · Telr · Checkout.com · Tabby · Tamara** (Gulf) + **Stripe · PayPal · Apple Pay** (global). Merchant **connects their own account** (store credentials/OAuth per gateway); checkout routes to the connected one; currency/region aware (AED default for Gulf).
-- [ ] **Money discipline:** fail-closed activation, **idempotent webhooks** per gateway, never mark paid before the dependent write. Adversarially test each gateway's webhook (poison-test double-charge / missed-grant).
-- [ ] **Corrected scope (Phase 0):** there is NO `stripe-webhook`/`create-checkout` to reuse — they died with the Supabase project (`src/saas/billing/checkout.ts` hardcodes `billingEnabled = false`; `api/` has no checkout or webhook route; zero gateway code anywhere). This is a from-scratch build under `api/` — reuse the *discipline*, not code.
-- [ ] KYC/merchant-account is merchant-side — build the connect flow + a clear "not connected yet" state; ship each gateway behind a flag until its integration is verified live.
-
-## Phase 4 — Sites (merge Storefront + Landing, make it luxury + functional) (4–5 days)
-- [ ] Merge Storefront + Landing into one **Sites** tool, two modes:
-  - **Sell:** premium catalogue + cart + **real-gateway checkout** (Phase 3) + orders + inventory. **Corrected scope (Phase 0): all new** — no cart/product/inventory model exists anywhere today; "merge" really means "build Sell mode beside the existing Capture engine." The published store must match `al-storefront.html`'s luxury bar.
-  - **Capture:** lead/booking page + forms + thank-you + follow-up. Leads are real, fail-closed (C9).
-- [ ] Premium templates; custom domain/subdomain publish (reuse `publish/host.ts` — **subdomains only**; custom-domain host lookup is unimplemented server-side, `api/published/index.ts`, and must be built here); SEO. Editor polish (inline edit, AI-assist, bigger live preview — improvement #6).
-- [ ] Everything real-backed; demo fallback keyless but clearly labeled.
-
-## Phase 5 — Make the other tools functional (3–4 days)
-- [ ] **Ads**, **WhatsApp** (bot+broadcast+**shared inbox**), **Leads & CRM**, **Social**, **Insights** — activate real backends, remove placeholder surfaces; show the funnel as a **connected system** (ad → page → capture → WhatsApp/email), improvement #4. Scaffold **Reviews/Bookings** as "soon" (no fake UI).
-
-## Phase 6 — Agency / white-label first-class (2 days)
-- [ ] Make white-label a prominent, real flow: sub-accounts, per-client branding, build-for-clients, propagation. This is the wedge vs ibni — surface it, don't bury it.
-- [ ] **Corrected scope (Phase 0):** only the phase-7 **UI** survives (`Agency.tsx`); persistence is localStorage-only even with Clerk configured (`src/saas/store.ts` ~207 — the agency/sub-account tables were deferred in migration `0001`). This phase includes building the schema + `api/` routes, not just surfacing the tab.
-
-## Phase 7 — Globalize, launch prep, verify (2 days)
-- [ ] Region/currency (AED etc.), Gulf-first defaults, drop Egypt-only defaults; EN/AR + region awareness.
-- [ ] Close `docs/SETUP.md` go-live: gateways live (per-merchant connect + KYC owner-side), each tool's real backend on, redesign shipped, DNS `autoleadss.site` + wildcard.
-- [ ] Full verify: onboard by business type → tailored toolkit → luxury storefront takes a **real test payment** through a Gulf gateway → tools work → agency runs it white-labeled. Nothing placeholder; nothing fabricated. Do NOT deploy without the owner.
+**Gotchas:** never nest `AnimatePresence mode="wait"` (hangs) · PATH fix: `export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"` · Node's built-in `localStorage` shadows jsdom (polyfilled in `src/test/setup.ts`).
 
 ---
 
-## Execution notes for Fable 5
-- Each phase is its own plan — verify against the prototypes; hold the luxury bar (a clear tier above ibni).
-- **Highest-risk pieces:** the multi-gateway payments layer (Phase 3 — money discipline, per-gateway webhooks, real merchant connect) and "functional-not-placeholder" (Phase 5 — no fake features). Test both adversarially with real flows.
-- Keep C9/C10 discipline, demo-never-breaks-live, EN/AR RTL, the framer-motion v12 gotcha. Commit locally; do not push/deploy without the owner; no fabricated data or fake features anywhere.
+## ✅ Phase 0 — Guardrails (done 2026-07-24)
+
+Baseline green, C10 verified N/A (store uses numeric timestamps, no defensive-copy reads), full inventory written. Found 9 placeholder surfaces and 3 wrong assumptions in the original plan — folded in below.
+
+## ✅ Phase 1 — Design system + Hub (done 2026-07-25)
+
+Dark-luxe tokens (`suite.*`) + storefront tokens (`store.*`), namespaced so the marketing site is untouched · `src/saas/suite/theme.css` scoped to `.theme-suite`/`.theme-store` · Cormorant/Inter/Amiri · `SuiteShell` (dark bar, Gulf·Global region pill → new `Workspace.marketRegion`) · `Hub.tsx` at `/app` per the prototype, honest statuses (Live = Ads, WhatsApp, Landing pages only) · Dashboard moved to `/app/pages`, all funnels-list links repointed · `hub.*` in en/ar/fr-eg · 32/32 tests.
+
+Existing pages keep AppShell + the light theme until their own phase migrates them.
+
+---
+
+## Phase 2 — Business-type onboarding
+
+The front door: pick your business type → the suite assembles your toolkit.
+
+- [ ] Onboarding flow per `al-onboarding.html`, in the suite register, at `/app/start`. New users land here; existing users can re-run it.
+- [ ] Business types (real list, not invented verticals — reuse/extend `src/saas/industries.ts`) → each maps to a toolkit: which tools, which template, default payment gateways, region + currency.
+- [ ] Persist the toolkit on the workspace; the Hub renders the user's chosen set (chosen tools first, the rest available to add). "Add or remove anytime."
+- [ ] Optional first step: paste a URL or describe the business → prefill brand (name, colours, what they sell) via `api/ai-generate`. Skippable, never blocking, never fabricates facts it can't source.
+- [ ] Tests: type → expected toolkit mapping, persistence across reload, skip path.
+
+## Phase 3 — Payments (the biggest build; nothing exists today)
+
+Ground truth: `billingEnabled = false` is hardcoded in `src/saas/billing/checkout.ts`, `api/` has no checkout or webhook route, and there is zero gateway code. `create-checkout`/`stripe-webhook` died with the Supabase project. This is from scratch — reuse the *discipline*, not code.
+
+- [ ] `api/payments/` — one gateway-agnostic interface (create intent, capture, refund, webhook verify) with per-gateway adapters behind it.
+- [ ] Gulf: Tap · PayTabs · Telr · Checkout.com · Tabby · Tamara. Global: Stripe · PayPal · Apple Pay. Each behind its own flag; a gateway ships only when its integration is verified live.
+- [ ] Merchant connects their *own* account (credentials/OAuth stored per workspace, encrypted). Clear "not connected yet" state. KYC is merchant-side.
+- [ ] Checkout routes to the connected gateway by region/currency (AED default for Gulf).
+- [ ] Money discipline: fail-closed activation, idempotent webhooks keyed per gateway event id, never mark paid before the dependent write. Poison-test each: replayed webhook, double-charge, missed-grant, out-of-order delivery.
+- [ ] Tests are the deliverable here as much as the code.
+
+## Phase 4 — Sites (Sell + Capture)
+
+"Merge Storefront + Landing" is really: keep the Capture engine, build Sell beside it. No cart, product, or inventory model exists anywhere today.
+
+- [ ] **Capture** (exists): lead/booking pages, forms, thank-you, follow-up. Leads real + fail-closed. Polish to the new register.
+- [ ] **Sell** (new): product model, catalogue, cart, checkout via Phase 3, orders, inventory. Published store must hit `al-storefront.html`'s bar — that's the flagship, it carries the product.
+- [ ] One editor, two modes. Editor polish: inline edit, AI-assist, bigger live preview.
+- [ ] Publishing: subdomains work today via `publish/host.ts`; **custom-domain host lookup is unimplemented server-side** (`api/published/index.ts`) — build it here. SEO per page.
+- [ ] Flip the Hub's Storefront tile Live only when Sell genuinely works end to end (the honest-status test in `Hub.test.tsx` must be updated deliberately).
+
+## Phase 5 — Make the rest functional
+
+Kill the placeholder surfaces from the inventory. Each tool either gets a real backend or stays honestly "Soon".
+
+- [ ] **Ads** — real, polish + wire to the suite.
+- [ ] **WhatsApp** — bot + broadcasts + shared inbox on the existing Cloud API work.
+- [ ] **Leads & CRM** — its own surface (today it's fragments): every lead, statuses, inbox.
+- [ ] **Social** — content + scheduling, or stays "Soon". No fake composer.
+- [ ] **Insights** — real analytics across tools (today it's embedded in `Editor.tsx`). Real numbers only; empty states start at zero, never seeded.
+- [ ] Show the funnel as a connected system: ad → page → capture → WhatsApp/email.
+- [ ] **Reviews / Bookings** — scaffold only, stay "Soon".
+
+## Phase 6 — Agency / white-label
+
+`Agency.tsx` looks complete but persists to localStorage only — the tables were deferred in migration `0001`. Build the backend.
+
+- [ ] Schema + `api/` routes for sub-accounts, per-client branding, agency settings.
+- [ ] Build-for-clients flow, branding propagation to published sites, per-client isolation.
+- [ ] Make it first-class in the suite — this is the wedge vs ibni, not a buried tab.
+
+## Phase 7 — Globalize + launch prep
+
+- [ ] Region/currency properly: migrate `Region = 'egypt' | 'gulf'` to the real market model, AED default, drop Egypt-only defaults. (Phase 1's `marketRegion` is the UI half; this is the money half.)
+- [ ] Migrate the remaining AppShell pages onto the suite register so the product is one thing.
+- [ ] Owner-side blockers tracked, not assumed: gateway merchant accounts + KYC (the long pole — start early), WhatsApp WABA, Clerk/Neon/Anthropic keys, DNS `autoleadss.site` + wildcard, rotate the old Supabase anon key in git history.
+- [ ] Full verify: onboard by business type → tailored toolkit → luxury storefront takes a **real test payment** through a Gulf gateway → tools work → agency runs it white-labeled. Preview deploy first, real test payment there, poison-test the webhook. Do not deploy without the owner.
+
+---
+
+## How we build
+
+One phase at a time. Each lands as working, tested software with local commits before the next starts. Spec-check the risky ones (payments, anything money- or data-touching) — not the cosmetic ones. Verify in the browser, both locales, before calling a phase done.
