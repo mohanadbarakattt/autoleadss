@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { ShoppingBag, Send, MessageCircle, LayoutTemplate, Users, Image, BarChart3, Star, Calendar, type LucideIcon } from 'lucide-react'
 import SuiteShell from '../suite/SuiteShell'
@@ -7,9 +9,10 @@ import { useI18n } from '../i18n'
 type ToolKey = 'storefront' | 'ads' | 'whatsapp' | 'pages' | 'leads' | 'social' | 'insights' | 'reviews' | 'bookings'
 
 /** Honest-status guard (design spec §4): today's truth, not the prototype's
- * everything-is-Live mockup. Frozen by Hub.test.tsx — later phases update this set
- * as tools genuinely go live, never the other way around. */
-export const LIVE_TOOL_KEYS: ToolKey[] = ['ads', 'whatsapp', 'pages']
+ * everything-is-Live mockup. Hub.test.tsx pins its own hardcoded copy of this set
+ * (not imported from here) — later phases update both by hand as tools genuinely
+ * go live, never the other way around. */
+const LIVE_TOOL_KEYS: ToolKey[] = ['ads', 'whatsapp', 'pages']
 
 const TOOL_META: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
   { key: 'storefront', icon: ShoppingBag },
@@ -29,6 +32,14 @@ const TOOL_META: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
 export function HubContent() {
   const { t } = useI18n()
   const h = t.hub
+  const { hash } = useLocation()
+
+  // Plain <BrowserRouter> — <Link>/navigate never scrolls to a hash on its own, so
+  // SuiteShell's "Tools" nav link (/app#tools) needs this to actually land on the grid.
+  useEffect(() => {
+    if (!hash) return
+    document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' })
+  }, [hash])
 
   return (
     <div className="mx-auto max-w-[1120px] px-[30px] pb-[60px] pt-[38px]">
@@ -37,7 +48,7 @@ export function HubContent() {
         <p className="mt-1.5 text-base text-suite-muted">{h.head.subtitle}</p>
       </div>
 
-      <div className="mt-7 grid grid-cols-1 overflow-hidden rounded-[20px] border border-suite-line bg-gradient-to-br from-[#16171d] to-[#101116] md:grid-cols-[1.2fr_1fr]">
+      <div className="mt-7 grid grid-cols-1 overflow-hidden rounded-[20px] border border-suite-line bg-gradient-to-br from-[#16171d] to-[#101116] min-[861px]:grid-cols-[1.2fr_1fr]">
         <div className="p-8">
           <Tag>{h.flagship.tag}</Tag>
           <h2 className="font-luxe mt-3 text-[30px] font-semibold text-suite-text">{h.flagship.title}</h2>
@@ -46,11 +57,11 @@ export function HubContent() {
             {h.flagship.cta}
           </GoldButton>
         </div>
-        <div aria-hidden className="min-h-[150px] bg-gradient-to-br from-[#20222c] to-[#14151b]" />
+        <div aria-hidden className="h-[150px] min-[861px]:h-auto bg-gradient-to-br from-[#20222c] to-[#14151b]" />
       </div>
 
       <p id="tools" className="mb-4 mt-9 text-xs font-semibold uppercase tracking-[0.14em] text-suite-muted">{h.toolsLabel}</p>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 min-[861px]:grid-cols-3">
         {TOOL_META.map((tool) => {
           const isLive = LIVE_TOOL_KEYS.includes(tool.key)
           return (

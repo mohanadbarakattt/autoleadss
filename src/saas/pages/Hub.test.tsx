@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { HubContent, LIVE_TOOL_KEYS } from './Hub'
+import { HubContent } from './Hub'
 import { LocaleProvider, LOCALE_KEY } from '../i18n'
 
 function renderHub() {
@@ -14,7 +14,11 @@ function renderHub() {
   )
 }
 
+// Frozen truth — deliberately hardcoded, NOT imported from Hub.tsx, so this test
+// actually pins the implementation instead of just echoing it back. Later phases
+// update these two lists by hand as tools genuinely go live (design spec §4).
 const ALL_TOOL_KEYS = ['storefront', 'ads', 'whatsapp', 'pages', 'leads', 'social', 'insights', 'reviews', 'bookings']
+const LIVE_TOOL_KEYS = ['ads', 'whatsapp', 'pages']
 
 beforeEach(() => {
   window.localStorage.clear()

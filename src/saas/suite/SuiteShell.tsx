@@ -31,7 +31,7 @@ export default function SuiteShell({ children }: { children: ReactNode }) {
             <Link to="/app" className="font-luxe text-2xl font-semibold tracking-wide text-suite-text">
               Auto<span className="text-suite-gold">Leadss</span>
             </Link>
-            <nav className="hidden items-center gap-[26px] text-sm text-suite-muted md:flex">
+            <nav className="hidden items-center gap-[26px] text-sm text-suite-muted min-[861px]:flex">
               {nav.map((n, i) => (
                 <Link key={n.href} to={n.href} className={i === 0 ? 'text-suite-text' : 'text-suite-muted transition-colors hover:text-suite-text'}>
                   {n.label}
