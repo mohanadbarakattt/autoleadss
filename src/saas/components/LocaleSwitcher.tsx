@@ -5,7 +5,9 @@ const LOCALES: UILocale[] = ['en', 'ar', 'fr-eg']
 
 /** Compact 3-way EN / AR / Franco pill switcher for the SaaS app — mirrors the
  * marketing site's Navigation switcher. `variant="dark"` for dark headers/panels
- * (Pricing hero, AuthForm's dark side panel), `variant="light"` for the app shell. */
+ * (Pricing hero, AuthForm's dark side panel), `variant="light"` for the app shell,
+ * `variant="suite"` for SuiteShell's dark-luxe bar (gold-toned, matches RegionSwitch
+ * beside it rather than the plain white/dark chip). */
 export default function LocaleSwitcher({
   locale,
   setLocale,
@@ -14,12 +16,13 @@ export default function LocaleSwitcher({
 }: {
   locale: UILocale
   setLocale: (l: UILocale) => void
-  variant?: 'dark' | 'light'
+  variant?: 'dark' | 'light' | 'suite'
   size?: 'md' | 'sm'
 }) {
-  const border = variant === 'dark' ? 'border-white/20' : 'border-border'
-  const inactiveText = variant === 'dark' ? 'text-white/70 hover:text-white' : 'text-muted-fg hover:text-foreground'
-  const activeBg = variant === 'dark' ? 'bg-white text-[#0A0A0B]' : 'bg-foreground text-background'
+  const border = variant === 'dark' ? 'border-white/20' : variant === 'suite' ? 'border-suite-line' : 'border-border'
+  const inactiveText =
+    variant === 'dark' ? 'text-white/70 hover:text-white' : variant === 'suite' ? 'text-suite-muted hover:text-suite-text' : 'text-muted-fg hover:text-foreground'
+  const activeBg = variant === 'dark' ? 'bg-white text-[#0A0A0B]' : variant === 'suite' ? 'bg-suite-panel2 text-suite-gold-l' : 'bg-foreground text-background'
 
   return (
     <div className={`inline-flex items-center gap-0.5 rounded-full border ${border} ${size === 'sm' ? 'p-0.5' : 'p-1'}`}>

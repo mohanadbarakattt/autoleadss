@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Globe } from 'lucide-react'
 import './theme.css'
 import { useI18n } from '../i18n'
@@ -10,10 +10,15 @@ import LocaleSwitcher from '../components/LocaleSwitcher'
 
 /** The dark-luxe top bar for the suite Hub (al-hub.html `.bar`). Coexists with
  * AppShell — existing SaaS pages (Dashboard, Editor, Wizard, ...) keep AppShell and
- * their current light look; only the Hub route uses this. */
-export default function SuiteShell({ children }: { children: ReactNode }) {
+ * their current light look; only the Hub route uses this.
+ *
+ * `minimal` hides the nav links (Home/Tools/Clients/Pricing) — used by the
+ * onboarding page (Start.tsx), which isn't part of that nav flow yet. The bar
+ * still shows logo + region pill + account either way. */
+export default function SuiteShell({ children, minimal = false }: { children: ReactNode; minimal?: boolean }) {
   const { t, locale, setLocale, isRTL } = useI18n()
   const session = useSession()
+  const { pathname } = useLocation()
   const h = t.hub
 
   const nav = [
@@ -31,16 +36,21 @@ export default function SuiteShell({ children }: { children: ReactNode }) {
             <Link to="/app" className="font-luxe text-2xl font-semibold tracking-wide text-suite-text">
               Auto<span className="text-suite-gold">Leadss</span>
             </Link>
-            <nav className="hidden items-center gap-[26px] text-sm text-suite-muted min-[861px]:flex">
-              {nav.map((n, i) => (
-                <Link key={n.href} to={n.href} className={i === 0 ? 'text-suite-text' : 'text-suite-muted transition-colors hover:text-suite-text'}>
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
+            {!minimal && (
+              <nav className="hidden items-center gap-[26px] text-sm text-suite-muted min-[861px]:flex">
+                {nav.map((n) => {
+                  const active = pathname === n.href.split('#')[0]
+                  return (
+                    <Link key={n.href} to={n.href} className={active ? 'text-suite-text' : 'text-suite-muted transition-colors hover:text-suite-text'}>
+                      {n.label}
+                    </Link>
+                  )
+                })}
+              </nav>
+            )}
             <div className="flex items-center gap-4">
               <RegionSwitch />
-              <LocaleSwitcher locale={locale} setLocale={setLocale} variant="dark" size="sm" />
+              <LocaleSwitcher locale={locale} setLocale={setLocale} variant="suite" size="sm" />
               <span
                 aria-hidden
                 title={session.workspace.name}
@@ -48,7 +58,7 @@ export default function SuiteShell({ children }: { children: ReactNode }) {
               >
                 {session.workspace.name.charAt(0).toUpperCase()}
               </span>
-              <LogoutButton label={isRTL ? 'خروج' : 'Log out'} />
+              <LogoutButton label={isRTL ? 'خروج' : 'Log out'} variant="suite" />
             </div>
           </header>
 
