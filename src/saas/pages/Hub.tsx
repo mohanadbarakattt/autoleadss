@@ -31,7 +31,7 @@ export function HubContent() {
   const h = t.hub
 
   return (
-    <div id="tools" className="mx-auto max-w-[1120px] px-[30px] pb-[60px] pt-[38px]">
+    <div className="mx-auto max-w-[1120px] px-[30px] pb-[60px] pt-[38px]">
       <div>
         <h1 className="font-luxe text-[40px] font-semibold tracking-wide text-suite-text">{h.head.title}</h1>
         <p className="mt-1.5 text-base text-suite-muted">{h.head.subtitle}</p>
@@ -49,7 +49,7 @@ export function HubContent() {
         <div aria-hidden className="min-h-[150px] bg-gradient-to-br from-[#20222c] to-[#14151b]" />
       </div>
 
-      <p className="mb-4 mt-9 text-xs font-semibold uppercase tracking-[0.14em] text-suite-muted">{h.toolsLabel}</p>
+      <p id="tools" className="mb-4 mt-9 text-xs font-semibold uppercase tracking-[0.14em] text-suite-muted">{h.toolsLabel}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TOOL_META.map((tool) => {
           const isLive = LIVE_TOOL_KEYS.includes(tool.key)
