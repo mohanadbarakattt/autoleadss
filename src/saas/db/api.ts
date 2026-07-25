@@ -1,4 +1,4 @@
-import type { Funnel, Lead, PublicProduct } from '../types'
+import type { Funnel, Lead, LeadWithFunnel, PublicProduct } from '../types'
 import type { FollowUpInput } from '../ai/followUp'
 
 /**
@@ -72,6 +72,23 @@ export async function deleteFunnel(auth: RemoteAuth, id: string): Promise<void> 
 
 export async function setLeadStatusRemote(auth: RemoteAuth, leadId: string, status: Lead['status']): Promise<void> {
   await authedRequest(auth, `/api/leads/${encodeURIComponent(leadId)}`, { method: 'PATCH', body: JSON.stringify({ status }) })
+}
+
+/** The caller's leads across every funnel — see api/leads/index.ts. Powers the
+ * cross-site /app/leads CRM in remote mode (demo mode reads straight off
+ * `state.funnels` instead — those already carry `.leads` locally). */
+export async function listLeadsRemote(
+  auth: RemoteAuth,
+  params: { status?: Lead['status']; funnelId?: string; limit?: number; offset?: number } = {},
+): Promise<LeadWithFunnel[]> {
+  const qs = new URLSearchParams()
+  if (params.status) qs.set('status', params.status)
+  if (params.funnelId) qs.set('funnelId', params.funnelId)
+  if (params.limit !== undefined) qs.set('limit', String(params.limit))
+  if (params.offset !== undefined) qs.set('offset', String(params.offset))
+  const query = qs.toString()
+  const { leads } = await authedRequest<{ leads: LeadWithFunnel[] }>(auth, `/api/leads${query ? `?${query}` : ''}`)
+  return leads
 }
 
 /** Gateway-backed instant-reply draft for a lead — see `api/leads/follow-up.ts`.

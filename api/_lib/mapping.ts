@@ -1,4 +1,4 @@
-import type { Funnel, FunnelSpec, Lead, Product, Order, OrderItem, Domain } from '../../src/saas/types'
+import type { Funnel, FunnelSpec, Lead, LeadWithFunnel, Product, Order, OrderItem, Domain } from '../../src/saas/types'
 import { toSafeInt } from './money'
 
 /** snake_case DB rows <-> the app's camelCase types. Mirrors the shape the old
@@ -48,6 +48,16 @@ export function leadFromRow(r: LeadRow): Lead {
     status: (r.status as Lead['status']) ?? 'new',
     createdAt: toMillis(r.created_at),
   }
+}
+
+/** `LeadRow` plus the owning funnel's name — the row shape `GET /api/leads`
+ * (the cross-site list, api/leads/index.ts) selects via a join. */
+export interface LeadWithFunnelRow extends LeadRow {
+  funnel_name: string
+}
+
+export function leadFromRowWithFunnel(r: LeadWithFunnelRow): LeadWithFunnel {
+  return { ...leadFromRow(r), funnelId: r.funnel_id, funnelName: r.funnel_name }
 }
 
 export function funnelFromRow(r: FunnelRow, leads: LeadRow[] = []): Funnel {

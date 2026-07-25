@@ -69,6 +69,14 @@ export interface Lead {
   sample?: boolean
 }
 
+/** A `Lead` plus which funnel it came from — the shape `GET /api/leads` (the
+ * cross-site list) and the demo-mode equivalent in Leads.tsx both produce, so
+ * the CRM surface can show provenance without a second round-trip per lead. */
+export interface LeadWithFunnel extends Lead {
+  funnelId: string
+  funnelName: string
+}
+
 export interface Funnel {
   id: string
   name: string
