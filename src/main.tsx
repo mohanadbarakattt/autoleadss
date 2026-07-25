@@ -24,6 +24,7 @@ import Wizard from './saas/pages/Wizard'
 import AdSuite from './saas/pages/AdSuite'
 import Editor from './saas/pages/Editor'
 import Connect from './saas/pages/Connect'
+import Whatsapp from './saas/pages/Whatsapp'
 import Agency from './saas/pages/Agency'
 import Published from './saas/pages/Published'
 import Pricing from './saas/pages/Pricing'
@@ -90,6 +91,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/app/ads" element={withSaas(<AdSuite />)} />
           <Route path="/app/funnel/:id" element={withSaas(<Editor />)} />
           <Route path="/app/connect" element={withSaas(<Connect />)} />
+          <Route path="/app/whatsapp" element={withSaas(<Whatsapp />)} />
           <Route path="/app/agency" element={withSaas(<Agency />)} />
 
           {/* Published funnels */}

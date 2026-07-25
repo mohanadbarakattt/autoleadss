@@ -314,6 +314,34 @@ const STRINGS = {
       },
       empty: { title: 'No data yet', body: 'Once your sites get visits and leads, your cross-site insights will show up here.' },
     },
+    whatsapp: {
+      title: 'WhatsApp',
+      subtitle: 'Every customer conversation, in one shared inbox.',
+      funnelLabel: 'Number',
+      list: { title: 'Conversations' },
+      locked: {
+        title: 'WhatsApp bot is a Growth feature',
+        body: 'Upgrade to connect a real WhatsApp number and reply to customers from a shared inbox.',
+        cta: 'Upgrade',
+      },
+      notConnected: {
+        title: 'Not connected yet',
+        body: 'Connect a WhatsApp number to this site to start replying to customers here.',
+        cta: 'Connect WhatsApp',
+      },
+      empty: {
+        title: 'No conversations yet',
+        body: 'Conversations will show up here once a customer messages this number.',
+      },
+      selectThread: 'Select a conversation to view it.',
+      reply: {
+        placeholder: 'Type a reply…',
+        send: 'Send',
+        sending: 'Sending…',
+        windowClosed: 'The 24-hour reply window for this contact is closed — a free-text message can’t be delivered without an approved template.',
+        error: 'Could not send — please try again.',
+      },
+    },
     storefront: {
       cart: 'Cart',
       close: 'Close',
@@ -661,6 +689,34 @@ const STRINGS = {
       },
       empty: { title: 'لا توجد بيانات بعد', body: 'بمجرد أن تحصل مواقعك على زيارات وعملاء محتملين، ستظهر تحليلاتك الشاملة هنا.' },
     },
+    whatsapp: {
+      title: 'واتساب',
+      subtitle: 'كل محادثة مع عملائك، في صندوق وارد واحد مشترك.',
+      funnelLabel: 'الرقم',
+      list: { title: 'المحادثات' },
+      locked: {
+        title: 'بوت واتساب من مزايا Growth',
+        body: 'رقِّ باقتك لربط رقم واتساب حقيقي والرد على العملاء من صندوق وارد مشترك.',
+        cta: 'رقِّ الآن',
+      },
+      notConnected: {
+        title: 'غير متصل بعد',
+        body: 'اربط رقم واتساب بهذا الموقع لتبدأ الرد على العملاء من هنا.',
+        cta: 'ربط واتساب',
+      },
+      empty: {
+        title: 'لا توجد محادثات بعد',
+        body: 'ستظهر المحادثات هنا بمجرد أن يراسل أحد العملاء هذا الرقم.',
+      },
+      selectThread: 'اختر محادثة لعرضها.',
+      reply: {
+        placeholder: 'اكتب ردّاً…',
+        send: 'إرسال',
+        sending: 'جارٍ الإرسال…',
+        windowClosed: 'نافذة الرد الممتدة 24 ساعة لهذا العميل مغلقة — لا يمكن إرسال رسالة نصية حرة بدون قالب معتمد.',
+        error: 'تعذّر الإرسال — يرجى المحاولة مرة أخرى.',
+      },
+    },
     storefront: {
       cart: 'السلة',
       close: 'إغلاق',
@@ -1007,6 +1063,34 @@ const STRINGS = {
         empty: 'Mafeesh pending orders lessa.',
       },
       empty: { title: 'Mafeesh data lessa', body: 'Lama el sites beta3tak yeb2a 3andaha visits w leads, el insights beta3tak hatzhar hena.' },
+    },
+    whatsapp: {
+      title: 'WhatsApp',
+      subtitle: 'Kol mokalma ma3 el 3omala2 beta3ak, fi inbox wa7ed moshtarak.',
+      funnelLabel: 'El Ra2m',
+      list: { title: 'El Mokalmat' },
+      locked: {
+        title: 'Bot el WhatsApp men mazaya Growth',
+        body: 'Ra22i el plan beta3ak 3ashan te-connect ra2m WhatsApp ha2i2y w tred 3ala el 3omala2 men inbox moshtarak.',
+        cta: 'Ra22i Dilwa2ti',
+      },
+      notConnected: {
+        title: 'Lessa mesh connected',
+        body: 'Connect ra2m WhatsApp lel site da 3ashan tebda2 tred 3ala el 3omala2 men hena.',
+        cta: 'Connect WhatsApp',
+      },
+      empty: {
+        title: 'Mafeesh mokalmat lessa',
+        body: 'El mokalmat hatzhar hena lama ay 3ameel yeb3atlak resala 3ala el ra2m da.',
+      },
+      selectThread: 'Ekhtar mokalma 3ashan teshoofha.',
+      reply: {
+        placeholder: 'Ektib rad…',
+        send: 'Eb3at',
+        sending: 'Bab3at…',
+        windowClosed: 'El window bta3et el rad (24 sa3a) le el 3ameel da 2afla — mesh mumkin teb3at resala 7orra men gher template mo3tamad.',
+        error: 'Ma2dernash neb3at — try tany.',
+      },
     },
     storefront: {
       cart: 'El Cart',

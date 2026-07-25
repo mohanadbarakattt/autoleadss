@@ -7,6 +7,7 @@ import { sendJson, methodNotAllowed, type VercelApiRequest, type VercelApiRespon
  *
  *   GET  ?funnelId=  -> the connection for that funnel (SECRETS STRIPPED)
  *   GET  ?conversations=<connectionId> -> latest message per contact
+ *   GET  ?messages=<connectionId>&contact=<waFrom> -> the full thread with one contact
  *   POST -> create or update a connection
  *
  * The access token is a Meta credential that can send messages as the owner's
@@ -32,6 +33,19 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
         order by wa_from, created_at desc
       `
       return sendJson(res, 200, { conversations: rows })
+    }
+
+    if (q.messages) {
+      // The full thread with one contact — the inbox's thread view. Oldest
+      // first, so a reply renders below what it replies to.
+      if (!q.contact) return sendJson(res, 400, { error: 'contact is required.' })
+      const rows = await sql`
+        select id, wa_from, body, direction, created_at
+        from autoleadss.whatsapp_messages
+        where connection_id = ${q.messages} and clerk_user_id = ${userId} and wa_from = ${q.contact}
+        order by created_at asc
+      `
+      return sendJson(res, 200, { messages: rows })
     }
 
     if (!q.funnelId) return sendJson(res, 400, { error: 'funnelId is required.' })

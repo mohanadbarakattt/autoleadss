@@ -30,6 +30,14 @@ export interface Conversation {
   at: number
 }
 
+export interface Message {
+  id: string
+  waFrom: string
+  body: string
+  direction: 'in' | 'out'
+  at: number
+}
+
 interface ConnectionRow {
   id: string
   funnel_id: string
@@ -98,4 +106,23 @@ export async function sendReply(auth: RemoteAuth, connectionId: string, to: stri
     method: 'POST',
     body: JSON.stringify({ connectionId, to, text }),
   })
+}
+
+interface MessageRow {
+  id: string
+  wa_from: string
+  body: string
+  direction: 'in' | 'out'
+  created_at: string
+}
+
+/** The full thread with one contact — the inbox's thread view, oldest first.
+ * Powers /app/whatsapp (Phase 5c); `listConversations` above stays the list
+ * view (latest message per contact only). */
+export async function listMessages(auth: RemoteAuth, connectionId: string, contact: string): Promise<Message[]> {
+  const { messages } = await authedRequest<{ messages: MessageRow[] }>(
+    auth,
+    `/api/whatsapp/connection?messages=${encodeURIComponent(connectionId)}&contact=${encodeURIComponent(contact)}`,
+  )
+  return messages.map((r) => ({ id: r.id, waFrom: r.wa_from, body: r.body, direction: r.direction, at: new Date(r.created_at).getTime() }))
 }

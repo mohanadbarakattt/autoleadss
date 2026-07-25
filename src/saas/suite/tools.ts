@@ -12,7 +12,7 @@ export const TOOLS: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
   // when status === 'live').
   { key: 'storefront', icon: ShoppingBag, href: '/app/products' },
   { key: 'ads', icon: Send, href: '/app/ads' },
-  { key: 'whatsapp', icon: MessageCircle, href: '/app/connect' },
+  { key: 'whatsapp', icon: MessageCircle, href: '/app/whatsapp' },
   { key: 'pages', icon: LayoutTemplate, href: '/app/pages' },
   { key: 'leads', icon: Users, href: '/app/leads' },
   { key: 'social', icon: Image },
