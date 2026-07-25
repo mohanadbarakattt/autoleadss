@@ -564,7 +564,7 @@ const STRINGS = {
     },
     lang: { switch: 'English', label: 'AR' },
     adSuite: {
-      navLabel: 'Ad Suite',
+      navLabel: 'مجموعة الإعلانات',
       rail: { platforms: 'المنصات', details: 'التفاصيل', generate: 'التوليد', review: 'المراجعة' },
       platformsTitle: 'على أي منصات تريد الإعلان؟',
       platformsSub: 'اختر واحدة أو أكثر — سنولّد نصوصاً مخصصة لكل منصة.',
@@ -597,7 +597,7 @@ const STRINGS = {
       videoScript: 'سكريبت فيديو 15 ثانية',
       intro: 'النص التمهيدي',
       headline: 'العنوان',
-      startOver: 'ابدأ Ad Suite جديد',
+      startOver: 'ابدأ مجموعة إعلانات جديدة',
       capNote: 'وصلت إلى حدّ توليد الذكاء الاصطناعي هذا الشهر — نعرض عيّنة مبنية على ما كتبته بدلاً من ذلك.',
     },
     hub: {

@@ -202,7 +202,7 @@ export default function Pricing() {
                     <p className="mt-2 font-display text-2xl font-bold">{priceForCurrency(pack, currency, contentLocale)}</p>
                     <ul className="mt-3 flex flex-1 flex-col gap-1.5 text-sm text-muted-fg">
                       <li>+{pack.whatsapp} {isRTL ? 'محادثة واتساب' : 'WhatsApp conversations'}</li>
-                      <li>+{pack.aiAction.toLocaleString()} {isRTL ? 'توليد ذكاء اصطناعي' : 'AI generations'}</li>
+                      <li>+{pack.aiAction.toLocaleString('en-US')} {isRTL ? 'توليد ذكاء اصطناعي' : 'AI generations'}</li>
                       <li>{isRTL ? `صالحة ${pack.expiryDays} يوماً` : `valid ${pack.expiryDays} days`}</li>
                     </ul>
                     <button onClick={() => buyTopup(pack.id)} className="mt-4 rounded-full border border-border py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent">
