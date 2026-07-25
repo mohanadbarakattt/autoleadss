@@ -508,7 +508,7 @@ const francoEg: Dict = {
   },
   hero: {
     eyebrow: 'Anzimet Nomo — El Emarat w Masr',
-    titleA: 'Bateb2a tigri wara el 3omala2.',
+    titleA: 'Batal tigri wara el 3omala2.',
     titleB: 'Khaleehom yiegu lek.',
     sub: 'Ehna bnsammem w bnshaghal kol nizam el sales bta3ak — funnels, landing pages, ads, social media, w chatbot AI, kolohom shaghalin sawa zay nizam wahed. Enta bas rakkez fi elly enta shatir feeh.',
     ctaBook: 'Ehgez call strategy majjany',
@@ -632,9 +632,9 @@ const francoEg: Dict = {
     sub: 'Mafeesh nizam tany zay da — dih hya moqarna beina w bein el taree2tein el 3adeyeen elly el shorakat betgarrabhom 3ashan tenmo.',
     columns: { agency: 'Tewazzef Agency', diy: 'Te3milha Benafsak', us: 'AutoLeadss' },
     rows: [
-      { dimension: 'El Taklefa el Shahreya', agency: 'Retainer shahry, be2edd el ad spend', diy: 'Majjany — bas wa2tak w eshtrakat el adawat', us: 'Men 1,500 genih / $59' },
+      { dimension: 'El Taklefa el Shahreya', agency: 'Retainer shahry, kaman el ad spend', diy: 'Majjany — bas wa2tak w eshtrakat el adawat', us: 'Men 1,500 genih / $59' },
       { dimension: 'El Wa2t le Awel Funnel', agency: 'Asabee3 tagheez w ta3deelat', diy: 'Men kam youm le shohoor, law 3andak el mahara asalan', us: 'Da2a2e2 ma3 el AI builder — aw a2al men 15 youm, fully managed' },
-      { dimension: 'Makhrogat 3araby w Franco w Engelizy', agency: 'Betfawwet — ghaleban Engelizy awalan wel 3araby ezafa', diy: 'Bas law enta bilingual benafsak', us: 'Asleya bel talat loghat, madmoga fel nizam' },
+      { dimension: 'Makhrogat 3araby w Franco w Engelizy', agency: 'Byekhtelef — ghaleban Engelizy awalan wel 3araby ezafa', diy: 'Bas law enta bilingual benafsak', us: 'Asleya bel talat loghat, madmoga fel nizam' },
       { dimension: 'Automation Metaba3et WhatsApp', agency: 'Naderan matkoon madmoga — ghaleban ezafa mostaqilla', diy: 'Radood yadaweya, aw wala 7aga', us: 'AI bot madmoog, byrodd fi sawany, 24/7' },
     ],
     footnote: 'Ar2am el agency w el DIY tazmenat 3amma lel industry, mesh 3aro5 as3ar men sharika mo3ayana.',
