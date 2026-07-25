@@ -54,6 +54,25 @@ describe('StorefrontRenderer', () => {
     expect(screen.getByAltText('Oud Leather Tote')).toBeInTheDocument()
   })
 
+  it('falls back to generic band copy when the merchant has not set any', () => {
+    render(<StorefrontRenderer spec={buildStorefrontSpec('Maison Noor', 'en')} slug="maison-noor-band-default" products={products()} acceptsPayments onCheckout={vi.fn()} />)
+    expect(screen.getByText('Shop the store')).toBeInTheDocument()
+    expect(screen.getByText('The full collection')).toBeInTheDocument()
+    // "Shop now" appears twice by default: the hero CTA and the band's
+    // fallback CTA both use the same generic copy.
+    expect(screen.getAllByText('Shop now').length).toBe(2)
+  })
+
+  it("renders the merchant's own band copy (Phase 4c: spec.page.finalCta) instead of the generic fallback", () => {
+    const spec = buildStorefrontSpec('Maison Noor', 'en')
+    spec.page.finalCta = { sub: 'Members only', headline: 'The winter edit', cta: 'Browse the edit' }
+    render(<StorefrontRenderer spec={spec} slug="maison-noor-band-custom" products={products()} acceptsPayments onCheckout={vi.fn()} />)
+    expect(screen.getByText('Members only')).toBeInTheDocument()
+    expect(screen.getByText('The winter edit')).toBeInTheDocument()
+    expect(screen.getByText('Browse the edit')).toBeInTheDocument()
+    expect(screen.queryByText('Shop the store')).not.toBeInTheDocument()
+  })
+
   it('adding a product to the cart bumps the header cart badge', () => {
     render(<StorefrontRenderer spec={buildStorefrontSpec('Maison Noor', 'en')} slug="maison-noor-cart" products={products()} acceptsPayments onCheckout={vi.fn()} />)
 

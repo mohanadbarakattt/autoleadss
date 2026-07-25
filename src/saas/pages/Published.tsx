@@ -6,8 +6,8 @@ import StorefrontRenderer from '../storefront/StorefrontRenderer'
 import FunnelCookieConsent, { hasFunnelAnalyticsConsent } from '../components/FunnelCookieConsent'
 import { LogoMark } from '../../components/Logo'
 import { getFunnelBySlug, recordVisit, addLead, useAgency, useProducts } from '../store'
-import { getPublishedFunnel, recordVisitRemote, captureLeadRemote, getPublishedProducts, placeOrder } from '../db/api'
-import { subdomainSlug, isFunnelHost } from '../publish/host'
+import { getPublishedFunnel, getPublishedFunnelByHost, recordVisitRemote, captureLeadRemote, getPublishedProducts, placeOrder } from '../db/api'
+import { subdomainSlug, isFunnelHost, currentHost, FUNNEL_ROOT } from '../publish/host'
 import { isValidGa4, isValidPixel } from '../lib/tracking'
 import { reportIncident } from '../lib/reportIncident'
 import type { Funnel, Product, PublicProduct } from '../types'
@@ -41,9 +41,11 @@ export default function Published() {
   // Slug source: /p/:slug param, or a {slug}.autoleadss.site subdomain.
   const subSlug = subdomainSlug()
   const slug = routeSlug ?? subSlug ?? ''
-  // On a custom-domain host with no slug, resolve the host itself. Host-based lookup
-  // has no Neon-backed equivalent yet (custom domains weren't migrated in Phase 2 —
-  // see src/saas/db/domains.ts) so this path always falls through to local lookup.
+  // On a custom-domain host with no slug, resolve the host itself (Phase 4c: a
+  // real lookup through a VERIFIED autoleadss.domains row — see
+  // api/published/index.ts's `?host=` path and db/api.ts's
+  // getPublishedFunnelByHost). There is no local/demo equivalent for a custom
+  // domain — it can only ever resolve remotely.
   const byHost = !slug && isFunnelHost()
 
   // GA4/Pixel scripts are the funnel owner's tracking — gate them behind analytics
@@ -57,25 +59,41 @@ export default function Published() {
   useEffect(() => {
     let cancelled = false
     async function load() {
-      if (!byHost) {
-        // Always try the shared Neon backend first — there's no client-side signal
-        // for whether it's configured (server-only secrets), so we just attempt the
-        // call. If it responds at all (found or not), trust it and stop — only an
-        // actual failure (network error, 501 not configured, ...) falls through to
-        // localStorage below. This fixes same-browser-only publishing whenever the
-        // backend *is* reachable.
+      if (byHost) {
+        // A custom domain only ever resolves remotely (through a verified
+        // autoleadss.domains row) — there's no localStorage equivalent to
+        // fall back to, unlike the slug path below.
         try {
-          const f = await getPublishedFunnel(slug)
+          const f = await getPublishedFunnelByHost(currentHost())
           if (!cancelled) {
             setBackendReachable(true)
             source.current = 'remote'
             setFunnel(f ?? null)
           }
           if (f) recordVisitRemote(f.slug).catch(() => {})
-          return
         } catch {
-          /* backend unreachable/unconfigured — fall back to localStorage below */
+          if (!cancelled) setFunnel(null)
         }
+        return
+      }
+
+      // Always try the shared Neon backend first — there's no client-side signal
+      // for whether it's configured (server-only secrets), so we just attempt the
+      // call. If it responds at all (found or not), trust it and stop — only an
+      // actual failure (network error, 501 not configured, ...) falls through to
+      // localStorage below. This fixes same-browser-only publishing whenever the
+      // backend *is* reachable.
+      try {
+        const f = await getPublishedFunnel(slug)
+        if (!cancelled) {
+          setBackendReachable(true)
+          source.current = 'remote'
+          setFunnel(f ?? null)
+        }
+        if (f) recordVisitRemote(f.slug).catch(() => {})
+        return
+      } catch {
+        /* backend unreachable/unconfigured — fall back to localStorage below */
       }
       const f = getFunnelBySlug(slug)
       if (!cancelled) {
@@ -172,12 +190,22 @@ export default function Published() {
   }
 
   if (funnel === undefined) {
-    return <div className="flex min-h-screen items-center justify-center bg-white"><div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" /></div>
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <Helmet defer={false}>
+          <meta name="robots" content="noindex" />
+        </Helmet>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    )
   }
 
   if (!funnel) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#0A0A0B] px-6 text-center text-white">
+        <Helmet defer={false}>
+          <meta name="robots" content="noindex" />
+        </Helmet>
         <LogoMark size={44} />
         <h1 className="font-display text-2xl font-bold">This funnel isn’t published here yet</h1>
         <p className="max-w-md text-sm text-white/60">
@@ -196,16 +224,32 @@ export default function Published() {
   // invalid id (e.g. a stored XSS payload) is simply omitted, never rendered.
   const ga4Id = tracking?.ga4Id && isValidGa4(tracking.ga4Id) ? tracking.ga4Id : undefined
   const metaPixelId = tracking?.metaPixelId && isValidPixel(tracking.metaPixelId) ? tracking.metaPixelId : undefined
+
+  // The site's real published home — the free subdomain, unless it was
+  // actually reached through a verified custom domain, in which case that's
+  // the canonical address the merchant wants indexed.
+  const canonicalHost = byHost && source.current === 'remote' ? currentHost() : `${funnel.slug}.${FUNNEL_ROOT}`
+  const canonicalUrl = `https://${canonicalHost}/`
+
+  const activeProducts = source.current === 'remote' ? remoteProducts : demoProducts.filter((p) => p.status === 'active').map(toPublicProduct)
+  // Never fabricate an OG image for a merchant's page — only a real one (a
+  // sell-mode site's own product photo) qualifies; omit the tag otherwise
+  // rather than showing AutoLeadss's own generic marketing image on a
+  // merchant's storefront/funnel.
+  const ogImage = funnel.spec.mode === 'sell' ? activeProducts.find((p) => p.imageUrl)?.imageUrl : undefined
+
   return (
     <div className="relative">
       <Helmet defer={false}>
         <html lang={funnel.language} dir={funnel.language === 'ar' ? 'rtl' : 'ltr'} />
         <title>{hero.eyebrow ? `${funnel.name} — ${hero.eyebrow}` : funnel.name}</title>
         <meta name="description" content={hero.subhead} />
+        <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={`${funnel.name} — ${hero.headline}`} />
         <meta property="og:description" content={hero.subhead} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://autoleadss.com/og-image.png" />
+        <meta property="og:url" content={canonicalUrl} />
+        {ogImage && <meta property="og:image" content={ogImage} />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content={funnel.accent} />
         {analyticsOk && ga4Id && (
@@ -227,7 +271,7 @@ export default function Published() {
         <StorefrontRenderer
           spec={funnel.spec}
           slug={funnel.slug}
-          products={source.current === 'remote' ? remoteProducts : demoProducts.filter((p) => p.status === 'active').map(toPublicProduct)}
+          products={activeProducts}
           acceptsPayments={source.current === 'remote' && remoteAcceptsPayments}
           onCheckout={handleCheckout}
         />

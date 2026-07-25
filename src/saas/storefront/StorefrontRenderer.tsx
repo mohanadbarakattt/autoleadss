@@ -9,18 +9,19 @@ import type { FunnelSpec, PublicProduct } from '../types'
 
 /**
  * The public storefront (Phase 4b) — matches `.superpowers/al-storefront.html`
- * closely: announce bar (omitted — there is no merchant-editable source for it
- * yet, see the design spec's "never fabricate delivery promises" rule; 4c
- * adds the field), sticky blurred header with a centered brand wordmark and a
- * cart icon, hero, a 4-column product grid, a full-width band CTA, and a
- * footer.
+ * closely: announce bar (still omitted — there is no merchant-editable source
+ * for it yet, see the design spec's "never fabricate delivery promises"
+ * rule), sticky blurred header with a centered brand wordmark and a cart
+ * icon, hero, a 4-column product grid, a full-width band CTA, and a footer.
  *
  * Content honesty: every string here is either the merchant's own data
- * (business name, real products) or generic, non-branded UI microcopy from
- * `t.storefront` (Curated / New arrivals / Shop now) — no invented brand
- * names, taglines, product copy, reviews, or hotlinked stock photography. A
- * product with no `imageUrl` gets a neutral placeholder block, never a stock
- * photo.
+ * (business name, real products, and — as of 4c — the hero and band copy,
+ * editable from Editor.tsx's storefront tab via `spec.page.hero` /
+ * `spec.page.finalCta`) or generic, non-branded UI microcopy from
+ * `t.storefront` (Curated / New arrivals — and the band's own fallback text
+ * until the merchant sets one) — no invented brand names, taglines, product
+ * copy, reviews, or hotlinked stock photography. A product with no
+ * `imageUrl` gets a neutral placeholder block, never a stock photo.
  */
 export default function StorefrontRenderer({
   spec,
@@ -112,13 +113,13 @@ export default function StorefrontRenderer({
 
       {products.length > 0 && (
         <section className="mt-[60px] flex h-[240px] flex-col items-center justify-center bg-store-ink px-6 text-center text-white min-[861px]:mt-[70px] min-[861px]:h-[340px]">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#e8d6ac]">{t.shopTheStore}</p>
-          <h3 className="mt-3 font-luxe text-[26px] font-medium min-[861px]:text-[40px]">{t.fullCollection}</h3>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#e8d6ac]">{spec.page.finalCta.sub || t.shopTheStore}</p>
+          <h3 className="mt-3 font-luxe text-[26px] font-medium min-[861px]:text-[40px]">{spec.page.finalCta.headline || t.fullCollection}</h3>
           <a
             href="#shop"
             className="mt-5 border border-white px-[30px] py-3 text-xs uppercase tracking-[0.16em] text-white transition-colors hover:bg-white hover:text-store-ink"
           >
-            {t.shopNow}
+            {spec.page.finalCta.cta || t.shopNow}
           </a>
         </section>
       )}

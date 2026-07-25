@@ -90,6 +90,15 @@ export async function getPublishedFunnel(slug: string): Promise<Funnel | null> {
   return funnel
 }
 
+/** Phase 4c: resolves a published funnel by a mapped custom domain's hostname
+ * instead of a slug — only a **verified** domain resolves (api/published/index.ts
+ * enforces this server-side; see also src/saas/publish/host.ts's `isFunnelHost`,
+ * which is what routes a non-app, non-subdomain host into this lookup). */
+export async function getPublishedFunnelByHost(host: string): Promise<Funnel | null> {
+  const { funnel } = await request<{ funnel: Funnel | null }>(`/api/published?host=${encodeURIComponent(host)}`)
+  return funnel
+}
+
 export async function recordVisitRemote(slug: string): Promise<void> {
   await request('/api/published/visit', { method: 'POST', body: JSON.stringify({ slug }) })
 }
