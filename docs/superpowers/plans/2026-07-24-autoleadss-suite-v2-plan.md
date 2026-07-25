@@ -40,16 +40,25 @@ The front door: pick your business type → the suite assembles your toolkit.
 - [ ] Optional first step: paste a URL or describe the business → prefill brand (name, colours, what they sell) via `api/ai-generate`. Skippable, never blocking, never fabricates facts it can't source.
 - [ ] Tests: type → expected toolkit mapping, persistence across reload, skip path.
 
-## Phase 3 — Payments (the biggest build; nothing exists today)
+## Phase 3 — Payments
 
-Ground truth: `billingEnabled = false` is hardcoded in `src/saas/billing/checkout.ts`, `api/` has no checkout or webhook route, and there is zero gateway code. `create-checkout`/`stripe-webhook` died with the Supabase project. This is from scratch — reuse the *discipline*, not code.
+**Two different jobs — do not conflate them.**
+- **Job A — our own revenue** (businesses paying us for the suite). A merchant-of-record (e.g. Lemon Squeezy) can be the seller of record and handle global VAT; owner is evaluating one as a stopgap. Nothing to build yet. Paymob is Egypt-only, so it only ever mattered here — never for Job B.
+- **Job B — merchant storefront checkout** (a Gulf retailer's shoppers paying *that retailer*). This is what the 9-gateway layer is for. **An MoR cannot do Job B** — it sells our product, not our customers' products. Job B needs real per-merchant gateways.
 
-- [ ] `api/payments/` — one gateway-agnostic interface (create intent, capture, refund, webhook verify) with per-gateway adapters behind it.
-- [ ] Gulf: Tap · PayTabs · Telr · Checkout.com · Tabby · Tamara. Global: Stripe · PayPal · Apple Pay. Each behind its own flag; a gateway ships only when its integration is verified live.
-- [ ] Merchant connects their *own* account (credentials/OAuth stored per workspace, encrypted). Clear "not connected yet" state. KYC is merchant-side.
-- [ ] Checkout routes to the connected gateway by region/currency (AED default for Gulf).
-- [ ] Money discipline: fail-closed activation, idempotent webhooks keyed per gateway event id, never mark paid before the dependent write. Poison-test each: replayed webhook, double-charge, missed-grant, out-of-order delivery.
-- [ ] Tests are the deliverable here as much as the code.
+### ✅ Phase 3a — the core (done 2026-07-25)
+
+Built from scratch (`create-checkout`/`stripe-webhook` died with the Supabase project). Lives in `api/_lib/payments/` + `api/payments/`, migration `0004_payments.sql`.
+
+- [x] Gateway-agnostic `GatewayAdapter` interface + registry. All 9 real gateways listed `implemented: false`; the only working adapter is a test-only fake behind `PAYMENTS_FAKE_ADAPTER=1`, never registered in production.
+- [x] Explicit transition map (NOT a rank — see the comment in `status.ts`, it names the bug a rank reintroduces). DB check constraints back it.
+- [x] Webhook: read-only decide phase writes nothing, then ONE statement inserts the idempotency-ledger row and flips status, each gated on the other — so any rejection or crash leaves nothing behind and the gateway's retry genuinely reprocesses.
+- [x] AES-256-GCM credential encryption that throws when `PAYMENTS_ENCRYPTION_KEY` is missing/wrong-length — never a plaintext fallback.
+- [x] Poison tests: replay, double-charge, out-of-order, tampered signature, missed-grant, amount/currency mismatch, retry-after-failure. The fake SQL harness returns bigint columns as **strings** like the real Neon driver — a harness that returns JS numbers hid a bug that 409'd every legitimate payment.
+
+### Phase 3b — real gateway adapters (PARKED)
+
+Blocked on merchant accounts + KYC (owner-side) and pending the owner's payment-strategy decision. One gateway at a time, each against its own live docs, each poison-tested before it is trusted, each flagged off until verified end to end. **Never write an adapter from memory.**
 
 ## Phase 4 — Sites (Sell + Capture)
 
@@ -57,6 +66,7 @@ Ground truth: `billingEnabled = false` is hardcoded in `src/saas/billing/checkou
 
 - [ ] **Capture** (exists): lead/booking pages, forms, thank-you, follow-up. Leads real + fail-closed. Polish to the new register.
 - [ ] **Sell** (new): product model, catalogue, cart, checkout via Phase 3, orders, inventory. Published store must hit `al-storefront.html`'s bar — that's the flagship, it carries the product.
+- [ ] **Payment-agnostic** (Phase 3b is parked): checkout sits behind `GatewayAdapter` so any gateway plugs in later with no UI rework. With no gateway connected it must be HONEST — a clear "payments not connected yet" state. **Never fake or simulate a completed purchase; never record an order paid without a real confirmed payment.** Capture mode has no payment dependency, so it goes all the way to done.
 - [ ] One editor, two modes. Editor polish: inline edit, AI-assist, bigger live preview.
 - [ ] Publishing: subdomains work today via `publish/host.ts`; **custom-domain host lookup is unimplemented server-side** (`api/published/index.ts`) — build it here. SEO per page.
 - [ ] Flip the Hub's Storefront tile Live only when Sell genuinely works end to end (the honest-status test in `Hub.test.tsx` must be updated deliberately).
