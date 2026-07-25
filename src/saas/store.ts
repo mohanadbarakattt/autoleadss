@@ -20,6 +20,13 @@ import {
   deleteProduct as rDeleteProduct,
   listOrders as rListOrders,
 } from './db/products'
+import {
+  getAgencySettingsRemote as rGetAgencySettings,
+  saveAgencySettingsRemote as rSaveAgencySettings,
+  listSubAccountsRemote as rListSubAccounts,
+  createSubAccountRemote as rCreateSubAccount,
+  deleteSubAccountRemote as rDeleteSubAccount,
+} from './db/agency'
 
 const BASE_KEY = 'autoleadss:state:v1'
 /** Marks that the one-time anonymous → first-signed-in-user migration has already run. */
@@ -73,10 +80,17 @@ const listeners = new Set<() => void>()
  * `GET /api/funnels` on sign-in (see `bridgeClerkSession`) — there's no static
  * client-side signal for "is Neon configured" the way there was for Supabase.
  *
- * Session/agency/workspace state is NOT part of this — see `saveAgencySettings` /
- * `setPlan` / `setRegion` below: those were Supabase-backed before Phase 2 and
- * weren't carried over to Neon (out of scope; see docs/SETUP.md), so they always
- * stay in the per-user-namespaced localStorage blob, remote funnels or not.
+ * Session/workspace state (plan, region, marketRegion, toolkit) is NOT part of
+ * this — see `setPlan`/`setRegion` below: those were Supabase-backed before
+ * Phase 2 and weren't carried over to Neon (out of scope; see docs/SETUP.md),
+ * so they always stay in the per-user-namespaced localStorage blob, remote
+ * funnels or not.
+ *
+ * Agency settings/sub-accounts (`saveAgencySettings` / `createSubAccount` /
+ * `deleteSubAccount` below) WERE carried over in Phase 6 —
+ * `autoleadss.agency_settings` / `autoleadss.sub_accounts` — so those now
+ * sync to Neon the same optimistic way funnels do, in addition to the local
+ * cache.
  */
 let remote: RemoteAuth | null = null
 
@@ -237,27 +251,38 @@ export function useOrders(): Order[] {
   return useSyncExternalStore(subscribe, () => state.orders, () => [])
 }
 
-// ---------- agency / white-label ----------
-// Local-only: agency settings / sub-accounts were Supabase-backed before Phase 2 and
-// weren't carried over to Neon (out of scope for the funnels/leads/publish migration —
-// see docs/SETUP.md). They persist to the per-user-namespaced localStorage blob only.
+// ---------- agency / white-label (Phase 6: real Neon persistence in remote mode) ----------
 export function saveAgencySettings(patch: Partial<AgencySettings>) {
   ensureHydrated()
   const settings: AgencySettings = { hideBadge: true, ...state.agency.settings, ...patch }
   set({ agency: { ...state.agency, settings } })
+  syncRemote('saveAgencySettings', (auth) => rSaveAgencySettings(auth, patch))
 }
 
 export function createSubAccount(name: string, contactEmail?: string): SubAccount {
   ensureHydrated()
   const sa: SubAccount = { id: uid('sa_'), name, contactEmail, createdAt: Date.now() }
   set({ agency: { ...state.agency, subAccounts: [...state.agency.subAccounts, sa] } })
+  syncRemote('createSubAccount', (auth) => rCreateSubAccount(auth, sa))
   return sa
 }
 
+/**
+ * Deletes a sub-account WITHOUT deleting or orphaning its sites — any funnel
+ * assigned to it is reassigned to "unassigned" (subAccountId cleared), never
+ * removed. Server-side this happens automatically via the `on delete set
+ * null` foreign key (migration 0008_agency.sql); the local funnel update
+ * below just keeps THIS view honest immediately, which matters in demo mode
+ * too (no server there at all to do it for us).
+ */
 export function deleteSubAccount(id: string) {
   ensureHydrated()
   const activeSubAccountId = state.agency.activeSubAccountId === id ? null : state.agency.activeSubAccountId
-  set({ agency: { ...state.agency, subAccounts: state.agency.subAccounts.filter((s) => s.id !== id), activeSubAccountId } })
+  set({
+    agency: { ...state.agency, subAccounts: state.agency.subAccounts.filter((s) => s.id !== id), activeSubAccountId },
+    funnels: state.funnels.map((f) => (f.subAccountId === id ? { ...f, subAccountId: undefined } : f)),
+  })
+  syncRemote('deleteSubAccount', (auth) => rDeleteSubAccount(auth, id))
 }
 
 export function setActiveSubAccount(id: string | null) {
@@ -318,6 +343,17 @@ export async function bridgeClerkSession(session: Session, auth: RemoteAuth) {
     set({ products, orders })
   } catch (e) {
     console.info('[remote products/orders] backend unavailable for Sell data:', e instanceof Error ? e.message : e)
+  }
+
+  // Best-effort, same independence from `remote` as products/orders above:
+  // agency settings/sub-accounts (Phase 6). `activeSubAccountId` is left
+  // untouched — it's a local UI convenience (which client you're currently
+  // viewing), not server state.
+  try {
+    const [settings, subAccounts] = await Promise.all([rGetAgencySettings(auth), rListSubAccounts(auth)])
+    set({ agency: { ...state.agency, settings, subAccounts } })
+  } catch (e) {
+    console.info('[remote agency] backend unavailable for agency settings/sub-accounts:', e instanceof Error ? e.message : e)
   }
 }
 
