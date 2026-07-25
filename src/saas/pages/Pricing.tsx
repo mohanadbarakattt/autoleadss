@@ -215,7 +215,7 @@ export default function Pricing() {
           )}
 
           <div className="mt-12 text-center">
-            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">← {isRTL ? 'العودة إلى AutoLeadss' : isFranco ? 'Erga3 le AutoLeadss' : 'Back to AutoLeadss'}</Link>
+            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">{isRTL ? '→' : '←'} {isRTL ? 'العودة إلى AutoLeadss' : isFranco ? 'Erga3 le AutoLeadss' : 'Back to AutoLeadss'}</Link>
           </div>
         </div>
       </section>

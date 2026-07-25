@@ -708,8 +708,8 @@ const francoEg: Dict = {
     greet: 'Ahlan! 👋 Ana el assistant bta3 AutoLeadss. 3ayez te3raf eh?',
     placeholder: 'Ektib resala...',
     quickReplies: ['Betqademo eh?', 'Ezay abda2?', 'Betshtaghalo fi Masr?'],
-    bookLabel: 'Ehgez call ←',
-    bookFreeLabel: 'Ehgez call majjany ←',
+    bookLabel: 'Ehgez call →',
+    bookFreeLabel: 'Ehgez call majjany →',
     fallback: 'So2al 7elw. 3ashan radd tafseely, al2a7san call sari3 — majjany khales bidoon eltizam. Aw raslna 3ala WhatsApp.',
     responses: {
       services: 'Bnshaghal el operation el sales beta3ak kolha — sales funnels, landing pages, ads 3ala Google w social, content, chatbot AI, w SEO/GEO. Kol 7aga beteshtaghal sawa zay nizam wahed 3ashan tekhod leads besabat bidoon ma tedeer khamas adawat mokhtalfa.',

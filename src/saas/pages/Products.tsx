@@ -120,7 +120,7 @@ export function ProductsContent() {
  * store without waiting on the full storefront editor (4c). Keeps whatever
  * sell-mode site already exists rather than creating a second one. */
 function StorefrontCallout({ site, onCreate }: { site: Funnel | undefined; onCreate: () => void }) {
-  const { t } = useI18n()
+  const { t, isRTL } = useI18n()
   const s = t.products.storefront
 
   if (site) {
@@ -136,7 +136,7 @@ function StorefrontCallout({ site, onCreate }: { site: Funnel | undefined; onCre
           </div>
         </div>
         <a href={`/p/${site.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-suite-gold-l hover:text-suite-gold">
-          {s.viewStore} →
+          {s.viewStore} {isRTL ? '←' : '→'}
         </a>
       </Panel>
     )

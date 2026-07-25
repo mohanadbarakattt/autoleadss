@@ -67,7 +67,7 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
 
           <div className="mt-14 border-t border-border pt-6 text-sm">
             <Link to={localePath(`/${otherKind}`)} className="font-medium text-accent hover:underline">
-              {OTHER_LINK[locale][otherKind]} →
+              {OTHER_LINK[locale][otherKind]} {isRTL ? '←' : '→'}
             </Link>
           </div>
         </div>

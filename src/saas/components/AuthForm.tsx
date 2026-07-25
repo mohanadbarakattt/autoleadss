@@ -134,7 +134,7 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
             </Link>
           </p>
           <p className="mt-3 text-center text-sm">
-            <Link to="/" className="text-muted-fg hover:text-foreground">← {isRTL ? 'العودة للموقع' : 'Back to site'}</Link>
+            <Link to="/" className="text-muted-fg hover:text-foreground">{isRTL ? '→' : '←'} {isRTL ? 'العودة للموقع' : 'Back to site'}</Link>
           </p>
         </div>
       </div>
