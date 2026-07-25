@@ -2,6 +2,7 @@ import { getSql } from '../_lib/db'
 import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { funnelFromRow, type FunnelRow, type LeadRow } from '../_lib/mapping'
+import { subAccountBelongsToCaller } from '../_lib/agency'
 import type { Funnel } from '../../src/saas/types'
 
 /** GET /api/funnels — list the caller's funnels (with leads). POST — create one. */
@@ -15,7 +16,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (req.method === 'GET') {
     const funnelRows = (await sql`
-      select id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, created_at, updated_at
+      select id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, created_at, updated_at, sub_account_id
       from autoleadss.funnels
       where clerk_user_id = ${userId}
       order by created_at desc
@@ -43,12 +44,15 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (!body?.id || !body.name || !body.slug || !body.industry || !body.language) {
       return sendJson(res, 400, { error: 'id, name, slug, industry, language are required.' })
     }
+    if (body.subAccountId && !(await subAccountBelongsToCaller(sql, body.subAccountId, userId))) {
+      return sendJson(res, 400, { error: 'subAccountId does not belong to the caller.' })
+    }
     await sql`
-      insert into autoleadss.funnels (id, clerk_user_id, name, slug, industry, language, status, accent, spec, visits, visits_by_day)
+      insert into autoleadss.funnels (id, clerk_user_id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, sub_account_id)
       values (
         ${body.id}, ${userId}, ${body.name}, ${body.slug}, ${body.industry}, ${body.language},
         ${body.status ?? 'draft'}, ${body.accent ?? null}, ${JSON.stringify(body.spec ?? {})}, ${body.visits ?? 0},
-        ${JSON.stringify(body.visitsByDay ?? {})}
+        ${JSON.stringify(body.visitsByDay ?? {})}, ${body.subAccountId ?? null}
       )
     `
     if (body.leads?.length) {

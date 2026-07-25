@@ -2,6 +2,7 @@ import { getSql } from '../_lib/db'
 import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { isValidGa4, isValidPixel } from '../../src/saas/lib/tracking'
+import { subAccountBelongsToCaller } from '../_lib/agency'
 import type { Funnel } from '../../src/saas/types'
 
 /** Strips any tracking id that fails format validation before it's ever persisted —
@@ -34,7 +35,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
   if (req.method === 'PATCH') {
     // Never rewrite the PK or the owner; whitelist columns explicitly.
-    const patch = (req.body ?? {}) as Partial<Funnel>
+    const patch = (req.body ?? {}) as Partial<Funnel> & { subAccountId?: string | null }
     const fields: string[] = []
     const values: unknown[] = []
     let i = 1
@@ -52,6 +53,12 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (patch.spec !== undefined) col('spec', JSON.stringify(sanitizeTracking(patch.spec)))
     if (patch.visits !== undefined) col('visits', patch.visits)
     if (patch.visitsByDay !== undefined) col('visits_by_day', JSON.stringify(patch.visitsByDay))
+    if (patch.subAccountId !== undefined) {
+      if (patch.subAccountId !== null && !(await subAccountBelongsToCaller(sql, patch.subAccountId, userId))) {
+        return sendJson(res, 400, { error: 'subAccountId does not belong to the caller.' })
+      }
+      col('sub_account_id', patch.subAccountId)
+    }
     col('updated_at', new Date().toISOString())
 
     if (!fields.length) return sendJson(res, 400, { error: 'No updatable fields in body.' })
