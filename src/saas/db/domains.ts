@@ -1,34 +1,35 @@
-/**
- * Custom domains were Supabase-backed (`domains` table + RLS) before the Phase 2
- * migration to the shared Neon backend. They were NOT carried over — Phase 2's
- * scope is funnels/leads/publish only (see docs/SETUP.md and
- * ~/projects/mbai-ecosystem/docs/SHARED-DB-DESIGN.md) — so this module is a stub
- * kept only so Editor.tsx's DomainPanel still compiles against the same shape.
- * `remoteEnabled` (src/saas/config.ts) is hardcoded `false` for this feature, so
- * these functions are never actually called; if that ever changes, implement them
- * against a new `autoleadss.domains` table + `api/domains/*` functions first.
- */
 import type { RemoteAuth } from './api'
+import { authedRequest } from './api'
+import type { Domain } from '../types'
 
-export interface Domain {
-  id: string
-  funnelId: string
-  hostname: string
-  verified: boolean
+export type { Domain }
+
+/** Real Neon-backed custom domains (Phase 4c) — see api/domains/*. Same
+ * throws-on-failure discipline as db/products.ts; the caller decides what to
+ * do with a failure (Editor.tsx's DomainPanel surfaces it inline). */
+
+export async function listDomains(auth: RemoteAuth, funnelId: string): Promise<Domain[]> {
+  const { domains } = await authedRequest<{ domains: Domain[] }>(auth, '/api/domains')
+  return domains.filter((d) => d.funnelId === funnelId)
 }
 
-function notMigrated(): never {
-  throw new Error('Custom domains are not available yet (not migrated to the Neon backend in Phase 2).')
+export async function addDomain(auth: RemoteAuth, funnelId: string, hostname: string): Promise<Domain> {
+  const { domain } = await authedRequest<{ domain: Domain }>(auth, '/api/domains', {
+    method: 'POST',
+    body: JSON.stringify({ funnelId, hostname }),
+  })
+  return domain
 }
 
-export async function listDomains(_auth: RemoteAuth, _funnelId: string): Promise<Domain[]> {
-  return []
+export async function deleteDomain(auth: RemoteAuth, id: string): Promise<void> {
+  await authedRequest(auth, `/api/domains/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
-export async function addDomain(_auth: RemoteAuth, _funnelId: string, _hostname: string): Promise<void> {
-  notMigrated()
-}
+export type VerifyReason = 'nxdomain' | 'no_record' | 'mismatch' | 'lookup_failed'
 
-export async function deleteDomain(_auth: RemoteAuth, _id: string): Promise<void> {
-  notMigrated()
+/** Triggers a real DNS TXT lookup server-side (api/domains/verify.ts) —
+ * never a local simulation. `reason` is only present when `verified` is
+ * false, and distinguishes why (see api/domains/verify.ts's doc comment). */
+export async function verifyDomain(auth: RemoteAuth, id: string): Promise<{ verified: boolean; reason?: VerifyReason }> {
+  return authedRequest(auth, '/api/domains/verify', { method: 'POST', body: JSON.stringify({ id }) })
 }

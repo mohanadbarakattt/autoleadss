@@ -26,10 +26,14 @@ export const clerkEnabled = !!CLERK_PUBLISHABLE_KEY
  *
  * WhatsApp was rebuilt 2026-07-21: `autoleadss.whatsapp_connections` /
  * `whatsapp_messages` tables plus `api/whatsapp/{webhook,send,connection}`.
- * Custom domains (src/saas/db/domains.ts) are still NOT migrated — they remain
- * gated by the same flag, which is the one real cost of sharing it.
+ * Custom domains were rebuilt 2026-07-25 (Phase 4c): `autoleadss.domains` +
+ * `api/domains/{index,[id],verify}` — real DNS TXT verification, no checkbox
+ * (see api/domains/verify.ts). That was the last feature still gated by this
+ * flag, so it's now unconditionally on; kept as a named export (rather than
+ * deleted) so Editor.tsx's DomainPanel still reads a single, greppable switch
+ * if a future feature ever needs the same "was Supabase-backed" gate again.
  */
-export const remoteEnabled = false
+export const remoteEnabled = true
 
 /**
  * WhatsApp connection + shared inbox, rebuilt on Neon 2026-07-21
