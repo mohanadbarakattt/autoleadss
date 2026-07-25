@@ -1,4 +1,5 @@
-import type { Funnel, FunnelSpec, Lead } from '../../src/saas/types'
+import type { Funnel, FunnelSpec, Lead, Product, Order, OrderItem } from '../../src/saas/types'
+import { toSafeInt } from './money'
 
 /** snake_case DB rows <-> the app's camelCase types. Mirrors the shape the old
  * Supabase-backed db/remote.ts used, so the frontend mapper needs no changes. */
@@ -84,4 +85,105 @@ export interface FunnelPatch {
 
 export function isFunnelPatch(body: unknown): body is FunnelPatch {
   return typeof body === 'object' && body !== null
+}
+
+// ---------------------------------------------------------------------------
+// Sell (Phase 4a): products, orders, order_items
+// ---------------------------------------------------------------------------
+
+export interface ProductRow {
+  id: string
+  name: string
+  description: string | null
+  image_url: string | null
+  price_minor: string // bigint over the wire — always route through toSafeInt()
+  currency: string
+  stock: number
+  status: string
+  created_at: string
+  updated_at: string
+}
+
+export function productFromRow(r: ProductRow): Product {
+  return {
+    id: r.id,
+    name: r.name,
+    description: r.description ?? undefined,
+    imageUrl: r.image_url ?? undefined,
+    priceMinor: toSafeInt(r.price_minor, 'price_minor'),
+    currency: r.currency,
+    stock: r.stock,
+    status: r.status as Product['status'],
+    createdAt: toMillis(r.created_at),
+    updatedAt: toMillis(r.updated_at),
+  }
+}
+
+export interface OrderRow {
+  id: string
+  status: string
+  subtotal_minor: string // bigint over the wire
+  currency: string
+  payment_id: string | null
+  buyer_name: string | null
+  buyer_email: string | null
+  buyer_phone: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderItemRow {
+  id: string
+  order_id: string
+  product_id: string | null
+  name_snapshot: string
+  unit_price_minor: string // bigint over the wire
+  quantity: number
+  currency: string
+}
+
+export function orderItemFromRow(r: OrderItemRow): OrderItem {
+  return {
+    id: r.id,
+    productId: r.product_id ?? undefined,
+    nameSnapshot: r.name_snapshot,
+    unitPriceMinor: toSafeInt(r.unit_price_minor, 'unit_price_minor'),
+    quantity: r.quantity,
+    currency: r.currency,
+  }
+}
+
+export function orderFromRow(r: OrderRow, items: OrderItemRow[] = []): Order {
+  return {
+    id: r.id,
+    status: r.status as Order['status'],
+    subtotalMinor: toSafeInt(r.subtotal_minor, 'subtotal_minor'),
+    currency: r.currency,
+    paymentId: r.payment_id ?? undefined,
+    buyerName: r.buyer_name ?? undefined,
+    buyerEmail: r.buyer_email ?? undefined,
+    buyerPhone: r.buyer_phone ?? undefined,
+    createdAt: toMillis(r.created_at),
+    updatedAt: toMillis(r.updated_at),
+    items: items.map(orderItemFromRow),
+  }
+}
+
+/** Write-path validation shared by api/products/index.ts (create) and
+ * api/products/[id].ts (update) — kept here next to the row mapping they
+ * validate for. */
+export function isValidPriceMinor(v: unknown): v is number {
+  return typeof v === 'number' && Number.isSafeInteger(v) && v > 0
+}
+
+export function isValidStock(v: unknown): v is number {
+  return typeof v === 'number' && Number.isSafeInteger(v) && v >= 0
+}
+
+/** Uppercases and validates a currency code (ISO 4217, 3 letters), matching the
+ * DB's `currency ~ '^[A-Z]{3}$'` check constraint. Returns null when invalid. */
+export function normalizeCurrency(v: unknown): string | null {
+  if (typeof v !== 'string') return null
+  const upper = v.trim().toUpperCase()
+  return /^[A-Z]{3}$/.test(upper) ? upper : null
 }
