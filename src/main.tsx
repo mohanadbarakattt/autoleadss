@@ -15,6 +15,7 @@ import { clerkEnabled } from './saas/config'
 import { isFunnelHost } from './saas/publish/host'
 import Hub from './saas/pages/Hub'
 import Start from './saas/pages/Start'
+import Products from './saas/pages/Products'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import AdSuite from './saas/pages/AdSuite'
@@ -71,6 +72,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/signup" element={withSaas(<AuthRoute mode="signup" />)} />
           <Route path="/app" element={withSaas(<Hub />)} />
           <Route path="/app/start" element={withSaas(<Start />)} />
+          <Route path="/app/products" element={withSaas(<Products />)} />
           <Route path="/app/pages" element={withSaas(<Dashboard />)} />
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/ads" element={withSaas(<AdSuite />)} />

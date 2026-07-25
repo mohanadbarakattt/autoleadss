@@ -5,7 +5,12 @@ import { ShoppingBag, Send, MessageCircle, LayoutTemplate, Users, Image, BarChar
 export type ToolKey = 'storefront' | 'ads' | 'whatsapp' | 'pages' | 'leads' | 'social' | 'insights' | 'reviews' | 'bookings'
 
 export const TOOLS: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
-  { key: 'storefront', icon: ShoppingBag },
+  // href points at the merchant-facing product manager (Phase 4a) so flipping
+  // the tile Live later (once Phase 4b's checkout genuinely works end to end)
+  // is just adding 'storefront' to LIVE_TOOL_KEYS below — href is already
+  // correct and unused while the tile stays "Soon" (ToolCard only reads href
+  // when status === 'live').
+  { key: 'storefront', icon: ShoppingBag, href: '/app/products' },
   { key: 'ads', icon: Send, href: '/app/ads' },
   { key: 'whatsapp', icon: MessageCircle, href: '/app/connect' },
   { key: 'pages', icon: LayoutTemplate, href: '/app/pages' },
