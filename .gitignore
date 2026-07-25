@@ -6,3 +6,5 @@ dist
 .env
 .env*
 .superpowers/
+pnpm-lock.yaml
+pnpm-workspace.yaml
