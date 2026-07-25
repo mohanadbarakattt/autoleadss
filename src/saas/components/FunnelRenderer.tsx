@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { Plus, Check, Star } from 'lucide-react'
+import { Plus, Check } from 'lucide-react'
 import { Icon } from './Icon'
 import type { FunnelSpec } from '../types'
 
@@ -84,16 +84,18 @@ export default function FunnelRenderer({
       </section>
 
       {/* ---- Stats ---- */}
-      <section className="border-b border-[#E2DED4] bg-[#FAFAF7] px-6 py-10 md:px-12">
-        <div className="mx-auto grid max-w-4xl grid-cols-3 gap-6 text-center">
-          {p.stats.map((s, i) => (
-            <div key={i}>
-              <p className="font-display font-bold" style={{ color: accent, fontSize: scale ? '1.6rem' : 'clamp(1.6rem, 3vw, 2.4rem)', letterSpacing: '-0.02em' }}>{s.value}</p>
-              <p className="mt-1 text-xs text-[#57544E]">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {p.stats.length > 0 && (
+        <section className="border-b border-[#E2DED4] bg-[#FAFAF7] px-6 py-10 md:px-12">
+          <div className="mx-auto grid max-w-4xl grid-cols-3 gap-6 text-center">
+            {p.stats.map((s, i) => (
+              <div key={i}>
+                <p className="font-display font-bold" style={{ color: accent, fontSize: scale ? '1.6rem' : 'clamp(1.6rem, 3vw, 2.4rem)', letterSpacing: '-0.02em' }}>{s.value}</p>
+                <p className="mt-1 text-xs text-[#57544E]">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---- Features ---- */}
       <section className="px-6 py-16 md:px-12">
@@ -111,27 +113,24 @@ export default function FunnelRenderer({
       </section>
 
       {/* ---- Testimonials ---- */}
-      <section className="bg-[#F1EFE9] px-6 py-16 md:px-12">
-        <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-3">
-          {p.testimonials.map((tt, i) => (
-            <div key={i} className="rounded-2xl border border-[#E2DED4] bg-white p-6">
-              <div className="mb-3 flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, s) => (
-                  <Star key={s} size={14} style={{ fill: accent, color: accent }} />
-                ))}
-              </div>
-              <p className="text-sm leading-relaxed text-[#0A0A0B]/90">“{tt.quote}”</p>
-              <div className="mt-4 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: accent }}>{tt.name.charAt(0)}</span>
-                <div>
-                  <p className="text-xs font-semibold">{tt.name}</p>
-                  <p className="text-[11px] text-[#57544E]">{tt.role}</p>
+      {p.testimonials.length > 0 && (
+        <section className="bg-[#F1EFE9] px-6 py-16 md:px-12">
+          <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-3">
+            {p.testimonials.map((tt, i) => (
+              <div key={i} className="rounded-2xl border border-[#E2DED4] bg-white p-6">
+                <p className="text-sm leading-relaxed text-[#0A0A0B]/90">“{tt.quote}”</p>
+                <div className="mt-4 flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: accent }}>{tt.name.charAt(0)}</span>
+                  <div>
+                    <p className="text-xs font-semibold">{tt.name}</p>
+                    <p className="text-[11px] text-[#57544E]">{tt.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---- FAQ ---- */}
       <section className="px-6 py-16 md:px-12">
