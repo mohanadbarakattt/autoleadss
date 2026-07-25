@@ -7,6 +7,11 @@
  * sanitize it (defect class SEC1 — see
  * mbai-ecosystem/docs/DEFECT-CLASS-REGISTRY.md, same discipline as
  * src/saas/lib/tracking.ts's GA4/Pixel id validators).
+ *
+ * `isValidHttpsUrl` is the general form, reused everywhere else the same
+ * defect class shows up: the funnel thank-you CTA link (FunnelRenderer.tsx,
+ * api/_lib/funnelSpec.ts) and product `imageUrl` (StorefrontRenderer.tsx,
+ * api/products/*.ts) — one validator, not three copies of the same regex.
  */
 
 const ACCENT_RE = /^#[0-9a-fA-F]{6}$/
@@ -16,16 +21,21 @@ export function isValidAccent(v: string): boolean {
   return ACCENT_RE.test(v)
 }
 
-/** https:// only — rejects javascript:, data:, and plain http: (a logo is
- * public-page content, not a place to accept an executable or embedded
- * payload). */
-export function isValidLogoUrl(v: string): boolean {
+/** https:// only — rejects javascript:, data:, vbscript:, protocol-relative
+ * (`//evil.com`, which has no scheme for `new URL` to resolve without a base
+ * and so throws), and plain http:. Public-page content is not a place to
+ * accept an executable or embedded payload. */
+export function isValidHttpsUrl(v: string): boolean {
   try {
     return new URL(v).protocol === 'https:'
   } catch {
     return false
   }
 }
+
+/** Alias kept for existing call sites (Agency.tsx, api/agency/settings.ts) —
+ * identical to isValidHttpsUrl. */
+export const isValidLogoUrl = isValidHttpsUrl
 
 export function isValidBrandName(v: string): boolean {
   const trimmed = v.trim()
@@ -44,11 +54,14 @@ if (isCli) {
     if (!cond) throw new Error(msg)
   }
   try {
-    check(!isValidLogoUrl('javascript:alert(1)'), 'logo validator should reject javascript:')
-    check(!isValidLogoUrl('data:text/html,<script>alert(1)</script>'), 'logo validator should reject data:')
-    check(!isValidLogoUrl('http://example.com/logo.png'), 'logo validator should reject plain http:')
-    check(!isValidLogoUrl('not a url'), 'logo validator should reject garbage')
-    check(isValidLogoUrl('https://cdn.example.com/logo.png'), 'logo validator should accept a real https logo')
+    check(!isValidHttpsUrl('javascript:alert(1)'), 'https validator should reject javascript:')
+    check(!isValidHttpsUrl('data:text/html,<script>alert(1)</script>'), 'https validator should reject data:')
+    check(!isValidHttpsUrl('vbscript:msgbox(1)'), 'https validator should reject vbscript:')
+    check(!isValidHttpsUrl('//evil.com/payload'), 'https validator should reject a protocol-relative URL')
+    check(!isValidHttpsUrl('http://example.com/logo.png'), 'https validator should reject plain http:')
+    check(!isValidHttpsUrl('not a url'), 'https validator should reject garbage')
+    check(isValidHttpsUrl('https://cdn.example.com/logo.png'), 'https validator should accept a real https URL')
+    check(isValidLogoUrl === isValidHttpsUrl, 'isValidLogoUrl should be the same validator as isValidHttpsUrl')
     check(!isValidAccent('red'), 'accent validator should reject a named colour')
     check(!isValidAccent('#FFF'), 'accent validator should reject a short hex')
     check(isValidAccent('#FF5C2A'), 'accent validator should accept a 6-digit hex')

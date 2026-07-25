@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import FunnelRenderer from './FunnelRenderer'
 import type { FunnelSpec } from '../types'
 
-function makeSpec(): FunnelSpec {
+function makeSpec(over: Partial<FunnelSpec['page']> = {}): FunnelSpec {
   return {
     industry: 'services',
     language: 'en',
@@ -24,6 +24,7 @@ function makeSpec(): FunnelSpec {
       faq: [{ q: 'Is it free?', a: 'Yes' }],
       finalCta: { headline: 'Ready?', sub: 'Join now', cta: 'Join' },
       leadForm: { title: 'Get in touch', fields: ['Name', 'Phone', 'Message'], button: 'Send' },
+      ...over,
     },
     ads: [],
     chatbot: { greeting: 'Hi', qualifyingQuestions: [], flow: [], bookingMessage: 'Booked' },
@@ -102,5 +103,65 @@ describe('FunnelRenderer lead form (C9)', () => {
       phone: '555-1234',
       extra: 'Interested in pricing',
     })
+  })
+})
+
+// Render-side half of the SEC1 stored-XSS fix — the write-side half lives in
+// api/_lib/funnelSpec.ts (sanitizeFunnelSpec), tested in api/funnels/[id].test.ts
+// and api/funnels/index.test.ts. This is the render check that protects a
+// visitor from a payload that reached storage some other way (a direct API
+// call, or data written before the write-side guard existed).
+describe('FunnelRenderer thank-you CTA href (SEC1)', () => {
+  it('a javascript: ctaHref never reaches a rendered <a href> — the CTA renders inert instead', async () => {
+    const onLead = vi.fn().mockResolvedValue(undefined)
+    const spec = makeSpec({ thankYou: { headline: 'Thanks', body: 'Body', ctaLabel: 'Next step', ctaHref: 'javascript:alert(1)' } })
+    render(<FunnelRenderer spec={spec} onLead={onLead} />)
+
+    fillRequiredFields()
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+    await screen.findByText('Thanks')
+
+    expect(screen.getByText('Next step')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Next step' })).not.toBeInTheDocument()
+    expect(document.querySelector('a[href^="javascript:"]')).toBeNull()
+  })
+
+  it('a data: ctaHref never reaches a rendered <a href>', async () => {
+    const onLead = vi.fn().mockResolvedValue(undefined)
+    const spec = makeSpec({ thankYou: { headline: 'Thanks', body: 'Body', ctaHref: 'data:text/html,<script>alert(1)</script>' } })
+    render(<FunnelRenderer spec={spec} onLead={onLead} />)
+
+    fillRequiredFields()
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+    await screen.findByText('Thanks')
+
+    expect(document.querySelector('a[href^="data:"]')).toBeNull()
+  })
+
+  it('a protocol-relative ctaHref never reaches a rendered <a href>', async () => {
+    const onLead = vi.fn().mockResolvedValue(undefined)
+    const spec = makeSpec({ thankYou: { headline: 'Thanks', body: 'Body', ctaLabel: 'Next step', ctaHref: '//evil.com/payload' } })
+    render(<FunnelRenderer spec={spec} onLead={onLead} />)
+
+    fillRequiredFields()
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+    await screen.findByText('Thanks')
+
+    expect(screen.getByText('Next step')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Next step' })).not.toBeInTheDocument()
+    expect(document.querySelector('a[href^="//"]')).toBeNull()
+  })
+
+  it('a valid https ctaHref still renders and still links', async () => {
+    const onLead = vi.fn().mockResolvedValue(undefined)
+    const spec = makeSpec({ thankYou: { headline: 'Thanks', body: 'Body', ctaLabel: 'Book a call', ctaHref: 'https://example.com/book' } })
+    render(<FunnelRenderer spec={spec} onLead={onLead} />)
+
+    fillRequiredFields()
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+    await screen.findByText('Thanks')
+
+    const link = screen.getByRole('link', { name: 'Book a call' })
+    expect(link).toHaveAttribute('href', 'https://example.com/book')
   })
 })

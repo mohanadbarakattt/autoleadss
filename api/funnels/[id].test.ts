@@ -7,13 +7,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
  * patch/delete behavior for the other fields is out of scope here.
  */
 
-const state: { rows: unknown[][]; queries: string[] } = { rows: [], queries: [] }
+const state: { rows: unknown[][]; queries: string[]; queryValues: unknown[][] } = { rows: [], queries: [], queryValues: [] }
 let currentUser: string | null = 'user_1'
 
 vi.mock('../_lib/db', () => ({
   getSql: () => Object.assign(
     async (s: TemplateStringsArray) => { state.queries.push(s.join('?')); return state.rows.shift() ?? [] },
-    { query: async (text: string) => { state.queries.push(text); return state.rows.shift() ?? [] } },
+    { query: async (text: string, values: unknown[]) => { state.queries.push(text); state.queryValues.push(values); return state.rows.shift() ?? [] } },
   ),
 }))
 vi.mock('../_lib/auth', () => ({ requireClerkUser: async () => currentUser }))
@@ -35,6 +35,7 @@ function req(method: string, body?: unknown, id = 'f_1') {
 beforeEach(() => {
   state.rows = []
   state.queries = []
+  state.queryValues = []
   currentUser = 'user_1'
   process.env.DATABASE_URL = 'postgresql://user:pass@ep-test.neon.tech/dbname'
 })
@@ -73,5 +74,32 @@ describe('PATCH /api/funnels/:id — subAccountId', () => {
     await handler(req('PATCH', { name: 'Renamed' }), r)
     expect(r.statusCode).toBe(200)
     expect(state.queries[0]).not.toContain('sub_account_id')
+  })
+})
+
+// The write-side half of the SEC1 stored-XSS fix — sanitizeFunnelSpec itself
+// is unit-tested in api/_lib/funnelSpec.test.ts; this proves the PATCH
+// handler actually routes the spec through it before persisting.
+describe('PATCH /api/funnels/:id — spec sanitization on write (SEC1)', () => {
+  function specWithCtaHref(ctaHref: string) {
+    return { page: { thankYou: { headline: 'Thanks', body: 'Body', ctaHref } } }
+  }
+
+  it('strips a javascript: ctaHref before persisting', async () => {
+    state.rows = [[]] // the update
+    const r = res()
+    await handler(req('PATCH', { spec: specWithCtaHref('javascript:alert(1)') }), r)
+    expect(r.statusCode).toBe(200)
+    const persistedSpec = JSON.parse(state.queryValues[0].find((v) => typeof v === 'string' && v.includes('"page"')) as string)
+    expect(persistedSpec.page.thankYou.ctaHref).toBeUndefined()
+  })
+
+  it('keeps a valid https ctaHref', async () => {
+    state.rows = [[]]
+    const r = res()
+    await handler(req('PATCH', { spec: specWithCtaHref('https://example.com/book') }), r)
+    expect(r.statusCode).toBe(200)
+    const persistedSpec = JSON.parse(state.queryValues[0].find((v) => typeof v === 'string' && v.includes('"page"')) as string)
+    expect(persistedSpec.page.thankYou.ctaHref).toBe('https://example.com/book')
   })
 })

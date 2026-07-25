@@ -9,11 +9,11 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
  * sub-account — see api/_lib/agency.ts's `subAccountBelongsToCaller`).
  */
 
-const state: { rows: unknown[][]; queries: string[] } = { rows: [], queries: [] }
+const state: { rows: unknown[][]; queries: string[]; values: unknown[][] } = { rows: [], queries: [], values: [] }
 let currentUser: string | null = 'user_1'
 
 vi.mock('../_lib/db', () => ({
-  getSql: () => (async (s: TemplateStringsArray) => { state.queries.push(s.join('?')); return state.rows.shift() ?? [] }),
+  getSql: () => (async (s: TemplateStringsArray, ...vals: unknown[]) => { state.queries.push(s.join('?')); state.values.push(vals); return state.rows.shift() ?? [] }),
 }))
 vi.mock('../_lib/auth', () => ({ requireClerkUser: async () => currentUser }))
 
@@ -38,6 +38,7 @@ function baseFunnel(over: Record<string, unknown> = {}) {
 beforeEach(() => {
   state.rows = []
   state.queries = []
+  state.values = []
   currentUser = 'user_1'
   process.env.DATABASE_URL = 'postgresql://user:pass@ep-test.neon.tech/dbname'
 })
@@ -80,5 +81,30 @@ describe('POST /api/funnels — subAccountId ownership validation', () => {
     expect(r.statusCode).toBe(400)
     // Only the ownership-check query ran — never an insert.
     expect(state.queries).toHaveLength(1)
+  })
+})
+
+// The write-side half of the SEC1 stored-XSS fix — sanitizeFunnelSpec itself
+// is unit-tested in api/_lib/funnelSpec.test.ts; this proves POST (create),
+// not just PATCH, routes a caller-supplied spec through it. A caller hitting
+// this endpoint directly (not through the Editor's create-then-patch flow)
+// must not be able to smuggle a bad ctaHref through on create.
+describe('POST /api/funnels — spec sanitization on write (SEC1)', () => {
+  it('strips a javascript: ctaHref before persisting on create', async () => {
+    state.rows = [[]] // the insert
+    const r = res()
+    await handler(req('POST', baseFunnel({ spec: { page: { thankYou: { headline: 'Thanks', body: 'Body', ctaHref: 'javascript:alert(1)' } } } })), r)
+    expect(r.statusCode).toBe(201)
+    const persistedSpec = JSON.parse(state.values[0].find((v) => typeof v === 'string' && v.includes('"page"')) as string)
+    expect(persistedSpec.page.thankYou.ctaHref).toBeUndefined()
+  })
+
+  it('keeps a valid https ctaHref on create', async () => {
+    state.rows = [[]]
+    const r = res()
+    await handler(req('POST', baseFunnel({ spec: { page: { thankYou: { headline: 'Thanks', body: 'Body', ctaHref: 'https://example.com/book' } } } })), r)
+    expect(r.statusCode).toBe(201)
+    const persistedSpec = JSON.parse(state.values[0].find((v) => typeof v === 'string' && v.includes('"page"')) as string)
+    expect(persistedSpec.page.thankYou.ctaHref).toBe('https://example.com/book')
   })
 })

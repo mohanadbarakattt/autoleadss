@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Plus, Check } from 'lucide-react'
 import { Icon } from './Icon'
+import { isValidHttpsUrl } from '../lib/agencyBrand'
 import type { FunnelSpec } from '../types'
 
 export default function FunnelRenderer({
@@ -175,15 +176,26 @@ export default function FunnelRenderer({
                   {p.thankYou?.body || (rtl ? 'سنتواصل معك قريباً.' : 'We’ll reach out shortly.')}
                 </p>
                 {p.thankYou?.ctaHref && (
-                  <a
-                    href={p.thankYou.ctaHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
-                    style={{ background: accent }}
-                  >
-                    {p.thankYou.ctaLabel || (rtl ? 'التالي' : 'Next step')}
-                  </a>
+                  // A merchant-supplied href — only a real https:// URL ever
+                  // reaches an <a href>. Anything else (javascript:, data:,
+                  // protocol-relative, ...) still shows the button, just
+                  // inert, rather than dropping it or executing it (SEC1 —
+                  // see also api/_lib/funnelSpec.ts's write-side check).
+                  isValidHttpsUrl(p.thankYou.ctaHref) ? (
+                    <a
+                      href={p.thankYou.ctaHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
+                      style={{ background: accent }}
+                    >
+                      {p.thankYou.ctaLabel || (rtl ? 'التالي' : 'Next step')}
+                    </a>
+                  ) : (
+                    <span className="mt-2 rounded-full px-6 py-3 text-sm font-medium text-white" style={{ background: accent }}>
+                      {p.thankYou.ctaLabel || (rtl ? 'التالي' : 'Next step')}
+                    </span>
+                  )
                 )}
               </div>
             ) : (

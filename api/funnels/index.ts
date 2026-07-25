@@ -3,6 +3,7 @@ import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { funnelFromRow, type FunnelRow, type LeadRow } from '../_lib/mapping'
 import { subAccountBelongsToCaller } from '../_lib/agency'
+import { sanitizeFunnelSpec } from '../_lib/funnelSpec'
 import type { Funnel } from '../../src/saas/types'
 
 /** GET /api/funnels — list the caller's funnels (with leads). POST — create one. */
@@ -47,11 +48,16 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (body.subAccountId && !(await subAccountBelongsToCaller(sql, body.subAccountId, userId))) {
       return sendJson(res, 400, { error: 'subAccountId does not belong to the caller.' })
     }
+    // Sanitize here too, not just on the PATCH path (api/funnels/[id].ts) — a
+    // caller hitting this endpoint directly, rather than through the Editor's
+    // create-then-patch flow, could otherwise smuggle a bad ctaHref/tracking
+    // id straight through on create.
+    const spec = sanitizeFunnelSpec((body.spec ?? {}) as Funnel['spec'])
     await sql`
       insert into autoleadss.funnels (id, clerk_user_id, name, slug, industry, language, status, accent, spec, visits, visits_by_day, sub_account_id)
       values (
         ${body.id}, ${userId}, ${body.name}, ${body.slug}, ${body.industry}, ${body.language},
-        ${body.status ?? 'draft'}, ${body.accent ?? null}, ${JSON.stringify(body.spec ?? {})}, ${body.visits ?? 0},
+        ${body.status ?? 'draft'}, ${body.accent ?? null}, ${JSON.stringify(spec)}, ${body.visits ?? 0},
         ${JSON.stringify(body.visitsByDay ?? {})}, ${body.subAccountId ?? null}
       )
     `
