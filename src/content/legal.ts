@@ -184,7 +184,7 @@ export const privacyContent: Record<Locale, LegalDoc> = {
       },
       {
         heading: 'تواصل معنا',
-        body: ['أسئلة حول هذه السياسة؟ راسلنا على info@autoleadss.com أو على واتساب +20 110 005 4278.'],
+        body: ['أسئلة حول هذه السياسة؟ راسلنا على info@autoleadss.com أو على واتساب ⁦+20 110 005 4278⁩.'],
       },
     ],
   },
@@ -401,7 +401,7 @@ export const termsContent: Record<Locale, LegalDoc> = {
       },
       {
         heading: 'تواصل معنا',
-        body: ['أسئلة حول هذه الشروط؟ راسلنا على info@autoleadss.com أو على واتساب +20 110 005 4278.'],
+        body: ['أسئلة حول هذه الشروط؟ راسلنا على info@autoleadss.com أو على واتساب ⁦+20 110 005 4278⁩.'],
       },
     ],
   },
