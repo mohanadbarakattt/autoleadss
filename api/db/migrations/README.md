@@ -23,6 +23,7 @@ psql "$DIRECT_URL" -f api/db/migrations/0004_payments.sql
 psql "$DIRECT_URL" -f api/db/migrations/0005_sell.sql
 psql "$DIRECT_URL" -f api/db/migrations/0006_domains.sql
 psql "$DIRECT_URL" -f api/db/migrations/0007_whatsapp.sql
+psql "$DIRECT_URL" -f api/db/migrations/0008_agency.sql
 ```
 
 Each file is idempotent (`create table/schema/index if not exists`) — safe to re-run.
@@ -36,12 +37,15 @@ Each file is idempotent (`create table/schema/index if not exists`) — safe to 
 | `0005_sell.sql` | `autoleadss.products`, `autoleadss.orders`, `autoleadss.order_items` — the Sell data model backing `api/products/*`, `api/orders`, `api/published/{products,order}` (Phase 4a). |
 | `0006_domains.sql` | `autoleadss.domains` — custom-domain mappings, verified via a real DNS TXT lookup (never a checkbox), backing `api/domains/*` and `api/published/index.ts`'s `?host=` path (Phase 4c). |
 | `0007_whatsapp.sql` | `autoleadss.whatsapp_connections`, `autoleadss.whatsapp_messages` — the WhatsApp connection + shared-inbox tables backing `api/whatsapp/*` (Phase 5c). Promoted from `api/_lib/whatsapp-schema.sql`, which was "applied by hand" and never added to this sequence — column-for-column identical, just numbered like every other table here now. |
+| `0008_agency.sql` | `autoleadss.agency_settings`, `autoleadss.sub_accounts`, and `autoleadss.funnels.sub_account_id` — white-label branding + client sub-accounts backing `api/agency/*` and the server-side brand join in `api/published/index.ts` (Phase 6). This is what makes `Funnel.brand` real: previously nothing ever set it, so a visitor to a paying agency's site always saw "Made with AutoLeadss" regardless of the owner's settings. |
 
-Not yet migrated (see `docs/SETUP.md` "Out of scope"): workspaces, agency settings,
-sub-accounts, top-up grants (`TOPUP_PACKS` in `src/saas/pricing.ts` stay
-localStorage-only — see `src/saas/billing/usage.ts`'s `purchaseTopup` doc comment
-for why). These stay in localStorage until a future migration adds tables +
-`api/` routes for them.
+Not yet migrated (see `docs/SETUP.md` "Out of scope"): workspaces, top-up grants
+(`TOPUP_PACKS` in `src/saas/pricing.ts` stay localStorage-only — see
+`src/saas/billing/usage.ts`'s `purchaseTopup` doc comment for why). These stay in
+localStorage until a future migration adds tables + `api/` routes for them. Note
+that without `workspaces`, there is still no server-side record of a caller's
+plan — see `api/_lib/mapping.ts`'s `publicBrandFromRow` doc for what this means
+for the white-label badge-removal entitlement (advisory only, not enforced).
 
 This has not been run against the real Neon project as part of this change — no
 live database credentials exist yet. Applying it is a manual step for whoever
