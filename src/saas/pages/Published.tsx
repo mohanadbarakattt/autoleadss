@@ -9,6 +9,7 @@ import { getFunnelBySlug, recordVisit, addLead, useAgency, useProducts } from '.
 import { getPublishedFunnel, getPublishedFunnelByHost, recordVisitRemote, captureLeadRemote, getPublishedProducts, placeOrder } from '../db/api'
 import { subdomainSlug, isFunnelHost, currentHost, FUNNEL_ROOT } from '../publish/host'
 import { isValidGa4, isValidPixel } from '../lib/tracking'
+import { isValidHttpsUrl } from '../lib/agencyBrand'
 import { reportIncident } from '../lib/reportIncident'
 import type { Funnel, Product, PublicProduct } from '../types'
 
@@ -235,8 +236,9 @@ export default function Published() {
   // Never fabricate an OG image for a merchant's page — only a real one (a
   // sell-mode site's own product photo) qualifies; omit the tag otherwise
   // rather than showing AutoLeadss's own generic marketing image on a
-  // merchant's storefront/funnel.
-  const ogImage = funnel.spec.mode === 'sell' ? activeProducts.find((p) => p.imageUrl)?.imageUrl : undefined
+  // merchant's storefront/funnel. Also never emit an unvalidated imageUrl
+  // (SEC1) — an invalid one is treated the same as no image at all.
+  const ogImage = funnel.spec.mode === 'sell' ? activeProducts.find((p) => p.imageUrl && isValidHttpsUrl(p.imageUrl))?.imageUrl : undefined
 
   return (
     <div className="relative">

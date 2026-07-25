@@ -176,6 +176,27 @@ describe('PATCH', () => {
     await handler(req('PATCH', 'prod_a', { stock: -1 }), r)
     expect(r.statusCode).toBe(400)
   })
+
+  it('rejects a javascript: imageUrl (SEC1 — rendered as a public <img src> / og:image)', async () => {
+    const r = res()
+    await handler(req('PATCH', 'prod_a', { imageUrl: 'javascript:alert(1)' }), r)
+    expect(r.statusCode).toBe(400)
+    expect(db.products.find((p) => p.id === 'prod_a')!.image_url).toBeNull()
+  })
+
+  it('accepts a valid https imageUrl', async () => {
+    const r = res()
+    await handler(req('PATCH', 'prod_a', { imageUrl: 'https://example.com/tote.jpg' }), r)
+    expect(r.statusCode).toBe(200)
+    expect(db.products.find((p) => p.id === 'prod_a')!.image_url).toBe('https://example.com/tote.jpg')
+  })
+
+  it('an empty-string imageUrl is not validated as a URL (matches the pre-existing "clear" convention)', async () => {
+    seedProduct({ id: 'prod_c', clerk_user_id: 'user_A', image_url: 'https://example.com/old.jpg' })
+    const r = res()
+    await handler(req('PATCH', 'prod_c', { imageUrl: '' }), r)
+    expect(r.statusCode).toBe(200)
+  })
 })
 
 describe('DELETE', () => {

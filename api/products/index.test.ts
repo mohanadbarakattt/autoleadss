@@ -159,6 +159,22 @@ describe('write validation', () => {
     expect(r.statusCode).toBe(400)
   })
 
+  it('rejects a javascript: imageUrl (SEC1 — rendered as a public <img src> / og:image)', async () => {
+    const r = res()
+    await handler(req('POST', { id: 'prod_bad', name: 'Bad', priceMinor: 100, currency: 'AED', imageUrl: 'javascript:alert(1)' }), r)
+    expect(r.statusCode).toBe(400)
+    expect(db.rows).toHaveLength(0)
+  })
+
+  it('accepts a valid https imageUrl', async () => {
+    const create = res()
+    await handler(req('POST', { id: 'prod_ok', name: 'Good', priceMinor: 100, currency: 'AED', imageUrl: 'https://example.com/tote.jpg' }), create)
+    expect(create.statusCode).toBe(201)
+    const list = res()
+    await handler(req('GET'), list)
+    expect((list.body as any).products[0]).toMatchObject({ imageUrl: 'https://example.com/tote.jpg' })
+  })
+
   it('rejects an empty/whitespace-only name', async () => {
     const r = res()
     await handler(req('POST', { id: 'prod_bad', name: '   ', priceMinor: 100, currency: 'AED' }), r)

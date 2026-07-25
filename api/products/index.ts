@@ -2,6 +2,7 @@ import { getSql } from '../_lib/db'
 import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { productFromRow, isValidPriceMinor, isValidStock, normalizeCurrency, type ProductRow } from '../_lib/mapping'
+import { isValidHttpsUrl } from '../../src/saas/lib/agencyBrand'
 import type { Product } from '../../src/saas/types'
 
 const STATUSES: Product['status'][] = ['draft', 'active', 'archived']
@@ -33,6 +34,10 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     if (!currency) return sendJson(res, 400, { error: 'currency must be a 3-letter ISO code.' })
     const stock = body.stock ?? 0
     if (!isValidStock(stock)) return sendJson(res, 400, { error: 'stock must be a non-negative integer.' })
+    // Rendered as a public <img src> and og:image on the storefront (see
+    // StorefrontRenderer.tsx, Published.tsx) — same defect class as agency
+    // logoUrl (SEC1), same validator.
+    if (body.imageUrl && !isValidHttpsUrl(body.imageUrl)) return sendJson(res, 400, { error: 'imageUrl must be an https:// URL.' })
     const status = body.status && STATUSES.includes(body.status) ? body.status : 'draft'
 
     await sql`

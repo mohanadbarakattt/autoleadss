@@ -54,6 +54,17 @@ describe('StorefrontRenderer', () => {
     expect(screen.getByAltText('Oud Leather Tote')).toBeInTheDocument()
   })
 
+  it('treats an invalid (javascript:) imageUrl the same as no image — neutral placeholder, never an <img src> (SEC1)', () => {
+    const badProducts: PublicProduct[] = [
+      { id: 'p1', name: 'Oud Leather Tote', priceMinor: 240050, currency: 'AED', imageUrl: 'javascript:alert(1)', inStock: true },
+    ]
+    const { container } = render(
+      <StorefrontRenderer spec={buildStorefrontSpec('Maison Noor', 'en')} slug="maison-noor-bad-image" products={badProducts} acceptsPayments onCheckout={vi.fn()} />,
+    )
+    expect(container.querySelectorAll('img')).toHaveLength(0)
+    expect(container.querySelectorAll('[data-testid="product-image-placeholder"]')).toHaveLength(1)
+  })
+
   it('falls back to generic band copy when the merchant has not set any', () => {
     render(<StorefrontRenderer spec={buildStorefrontSpec('Maison Noor', 'en')} slug="maison-noor-band-default" products={products()} acceptsPayments onCheckout={vi.fn()} />)
     expect(screen.getByText('Shop the store')).toBeInTheDocument()

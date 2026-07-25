@@ -96,6 +96,30 @@ describe('Published — SEO, capture mode', () => {
 })
 
 describe('Published — SEO, sell mode', () => {
+  // Runs first in this describe block, before any other test's createProduct
+  // call — store.ts's demo product catalog is a module-level singleton that
+  // `window.localStorage.clear()` (beforeEach) does not reset once hydrated,
+  // so later tests' products would otherwise leak in and mask this case.
+  it('never emits an invalid (javascript:) imageUrl as og:image — treated the same as no image (SEC1)', async () => {
+    const site = createStorefrontSite('Maison Noor Three', 'en')
+    const now = Date.now()
+    createProduct({
+      id: 'prod_seo_2',
+      name: 'Bad Product',
+      description: '',
+      imageUrl: 'javascript:alert(1)',
+      priceMinor: 100,
+      currency: 'AED',
+      stock: 1,
+      status: 'active',
+      createdAt: now,
+      updatedAt: now,
+    })
+    renderPublished(site.slug)
+    await waitFor(() => expect(document.title).toContain('Maison Noor Three'))
+    expect(document.head.querySelector('meta[property="og:image"]')).toBeNull()
+  })
+
   it('omits og:image when no product has a real photo', async () => {
     const site = createStorefrontSite('Maison Noor', 'en')
     renderPublished(site.slug)

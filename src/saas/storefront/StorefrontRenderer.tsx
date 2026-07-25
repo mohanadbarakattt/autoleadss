@@ -3,6 +3,7 @@ import { ShoppingCart, ImageOff } from 'lucide-react'
 import type { Dict } from '../i18n'
 import { dictFor } from '../i18n'
 import { formatMinorUnits } from '../lib/money/minorUnits'
+import { isValidHttpsUrl } from '../lib/agencyBrand'
 import { useCart } from './cart'
 import CartDrawer from './CartDrawer'
 import type { FunnelSpec, PublicProduct } from '../types'
@@ -153,7 +154,7 @@ function ProductCard({ product, t, onAdd }: { product: PublicProduct; t: Dict['s
   return (
     <div>
       <div className="aspect-[3/4] overflow-hidden bg-[#f0ece3]">
-        {product.imageUrl ? (
+        {product.imageUrl && isValidHttpsUrl(product.imageUrl) ? (
           <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-[#b9b2a4]" data-testid="product-image-placeholder">

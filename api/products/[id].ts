@@ -2,6 +2,7 @@ import { getSql } from '../_lib/db'
 import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { isValidPriceMinor, isValidStock, normalizeCurrency } from '../_lib/mapping'
+import { isValidHttpsUrl } from '../../src/saas/lib/agencyBrand'
 import type { Product } from '../../src/saas/types'
 
 const STATUSES: Product['status'][] = ['draft', 'active', 'archived']
@@ -61,7 +62,10 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
       col('name', patch.name.trim())
     }
     if (patch.description !== undefined) col('description', patch.description ?? null)
-    if (patch.imageUrl !== undefined) col('image_url', patch.imageUrl ?? null)
+    if (patch.imageUrl !== undefined) {
+      if (patch.imageUrl && !isValidHttpsUrl(patch.imageUrl)) return sendJson(res, 400, { error: 'imageUrl must be an https:// URL.' })
+      col('image_url', patch.imageUrl ?? null)
+    }
     if (patch.priceMinor !== undefined) {
       if (!isValidPriceMinor(patch.priceMinor)) return sendJson(res, 400, { error: 'priceMinor must be a positive integer.' })
       col('price_minor', patch.priceMinor)
