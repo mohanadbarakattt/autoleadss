@@ -1,9 +1,9 @@
 import { describe, expect, it, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { ProductsContent } from './Products'
 import { LocaleProvider, LOCALE_KEY } from '../i18n'
-import { createProduct } from '../store'
+import { createProduct, signUp } from '../store'
 
 function renderProducts() {
   return render(
@@ -62,5 +62,25 @@ describe('Products', () => {
     expect(card).toHaveTextContent('AED 2,400.50')
     expect(card).toHaveTextContent('4')
     expect(screen.queryByTestId('products-empty')).not.toBeInTheDocument()
+  })
+})
+
+// Runs last and deliberately signs in — the earlier tests above render with no
+// session, which the storefront callout's create action guards against.
+describe('storefront callout', () => {
+  it('prompts to create a storefront when the workspace has none yet', () => {
+    signUp('Test Merchant', 'merchant@example.com', 'gulf')
+    renderProducts()
+    expect(screen.getByText('No storefront yet')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /view store/i })).not.toBeInTheDocument()
+  })
+
+  it('creating a storefront switches the panel to a live "View store" link', () => {
+    renderProducts()
+    fireEvent.click(screen.getByText('Create your storefront'))
+
+    expect(screen.getByText('Your storefront is live')).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: /view store/i })
+    expect(link).toHaveAttribute('href', expect.stringMatching(/^\/p\//))
   })
 })
