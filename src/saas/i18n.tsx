@@ -243,6 +243,43 @@ const STRINGS = {
       deleteConfirm: 'Delete this product?',
       archivedNotice: 'This product is on past orders, so it was archived instead of deleted.',
       deletedNotice: 'Product deleted.',
+      storefront: {
+        createTitle: 'No storefront yet',
+        createBody: 'Create your storefront to start showcasing these products publicly.',
+        createCta: 'Create your storefront',
+        liveTitle: 'Your storefront is live',
+        liveBody: 'Products above are ready to show — checkout goes live once a payment gateway is connected.',
+        viewStore: 'View store',
+      },
+    },
+    storefront: {
+      cart: 'Cart',
+      close: 'Close',
+      curated: 'Curated for you',
+      newArrivals: 'New arrivals',
+      shopTheStore: 'Shop the store',
+      fullCollection: 'The full collection',
+      shopNow: 'Shop now',
+      shop: 'Shop',
+      addToCart: 'Add to cart',
+      outOfStock: 'Out of stock',
+      empty: 'Your cart is empty.',
+      emptyCatalogue: { title: 'No products yet', body: 'This store is getting ready — check back soon.' },
+      decrease: 'Decrease quantity',
+      increase: 'Increase quantity',
+      remove: 'Remove',
+      subtotal: 'Subtotal',
+      checkout: 'Checkout',
+      continueShopping: 'Continue shopping',
+      buyerName: 'Full name',
+      buyerEmail: 'Email (optional)',
+      buyerPhone: 'Phone',
+      placeOrder: 'Place order',
+      placingOrder: 'Placing order…',
+      gated: { title: "This store isn't accepting payments yet", body: "The shop owner hasn't connected a payment method yet — check back soon." },
+      orderError: "We couldn't place your order. Please try again.",
+      tryAgain: 'Try again',
+      orderSuccess: { title: 'Order received', body: 'Thank you — the store will be in touch to confirm.' },
     },
   },
   ar: {
@@ -465,6 +502,43 @@ const STRINGS = {
       deleteConfirm: 'حذف هذا المنتج؟',
       archivedNotice: 'هذا المنتج مرتبط بطلبات سابقة، لذا تم أرشفته بدلاً من حذفه.',
       deletedNotice: 'تم حذف المنتج.',
+      storefront: {
+        createTitle: 'لا يوجد متجر بعد',
+        createBody: 'أنشئ متجرك الإلكتروني لعرض هذه المنتجات للجمهور.',
+        createCta: 'أنشئ متجرك',
+        liveTitle: 'متجرك مباشر الآن',
+        liveBody: 'المنتجات أعلاه جاهزة للعرض — يبدأ الدفع الإلكتروني بمجرد ربط بوابة دفع.',
+        viewStore: 'عرض المتجر',
+      },
+    },
+    storefront: {
+      cart: 'السلة',
+      close: 'إغلاق',
+      curated: 'مُنتقى بعناية',
+      newArrivals: 'وصل حديثاً',
+      shopTheStore: 'تسوّق من المتجر',
+      fullCollection: 'المجموعة الكاملة',
+      shopNow: 'تسوّق الآن',
+      shop: 'تسوّق',
+      addToCart: 'أضف إلى السلة',
+      outOfStock: 'نفدت الكمية',
+      empty: 'سلتك فارغة.',
+      emptyCatalogue: { title: 'لا توجد منتجات بعد', body: 'المتجر قيد التجهيز — تفضّل بالعودة قريباً.' },
+      decrease: 'إنقاص الكمية',
+      increase: 'زيادة الكمية',
+      remove: 'إزالة',
+      subtotal: 'الإجمالي الفرعي',
+      checkout: 'إتمام الشراء',
+      continueShopping: 'متابعة التسوق',
+      buyerName: 'الاسم الكامل',
+      buyerEmail: 'البريد الإلكتروني (اختياري)',
+      buyerPhone: 'رقم الهاتف',
+      placeOrder: 'إرسال الطلب',
+      placingOrder: 'جارٍ إرسال الطلب…',
+      gated: { title: 'هذا المتجر لا يقبل المدفوعات بعد', body: 'لم يقم صاحب المتجر بربط وسيلة دفع بعد — تفضّل بالعودة قريباً.' },
+      orderError: 'تعذّر إرسال طلبك. يرجى المحاولة مرة أخرى.',
+      tryAgain: 'حاول مرة أخرى',
+      orderSuccess: { title: 'تم استلام طلبك', body: 'شكراً لك — سيتواصل معك المتجر للتأكيد.' },
     },
   },
   'fr-eg': {
@@ -687,11 +761,60 @@ const STRINGS = {
       deleteConfirm: 'Delete el product da?',
       archivedNotice: 'El product da fi orders adima, fa et3amel archive badal ma yet2ela3.',
       deletedNotice: 'Et2ala3 el product.',
+      storefront: {
+        createTitle: 'Mafeesh storefront lessa',
+        createBody: 'E3mel storefront beta3ak 3ashan te3ras el products dool lel 3ala2.',
+        createCta: 'E3mel el storefront',
+        liveTitle: 'El storefront beta3ak live',
+        liveBody: 'El products fo2 gahzeen lel 3ard — el checkout yeb2a live lama gateway el daf3 yet-connect.',
+        viewStore: 'Shoof el store',
+      },
+    },
+    storefront: {
+      cart: 'El Cart',
+      close: 'E2fel',
+      curated: 'Mokhtar 3ashanak',
+      newArrivals: 'Gedid',
+      shopTheStore: 'Etsawa2 mel store',
+      fullCollection: 'Kol el collection',
+      shopNow: 'Etsawa2 dilwa2ti',
+      shop: 'El Shop',
+      addToCart: 'Zawedha lel cart',
+      outOfStock: 'Khelset',
+      empty: 'El cart beta3ak far3gh.',
+      emptyCatalogue: { title: 'Mafeesh products lessa', body: 'El store lessa beyet-gahez — erga3 3an 2orayeb.' },
+      decrease: 'Ne2es el kammeya',
+      increase: 'Zawed el kammeya',
+      remove: 'Shel',
+      subtotal: 'El Ma7sool',
+      checkout: 'Etmam el shera2',
+      continueShopping: 'Kammel tetsawa2',
+      buyerName: 'El Esm',
+      buyerEmail: 'Email (ekhtyari)',
+      buyerPhone: 'Ra2m el mobile',
+      placeOrder: 'Eb3at el order',
+      placingOrder: 'Bab3at el order…',
+      gated: { title: 'El store da lessa mesh bya2bal madfoo3at', body: 'Sa7eb el store lessa ma-connectsh wasilet daf3 — erga3 3an 2orayeb.' },
+      orderError: 'Ma2dernash neb3at el order beta3ak. Try tany.',
+      tryAgain: 'Try tany',
+      orderSuccess: { title: 'El order wasal', body: 'Shokran — el store hayekallemak le-ta2keed el order.' },
     },
   },
 }
 
 export type Dict = (typeof STRINGS)['en']
+
+/**
+ * Looks up the Dict directly by content `Locale` ('en'|'ar'), bypassing the
+ * visitor's own UI-locale preference. The public storefront (StorefrontRenderer)
+ * needs this: a page must read in the MERCHANT's chosen `spec.language`, not
+ * whatever UI locale the shopper's browser happens to have saved from browsing
+ * autoleadss.com — same reasoning FunnelRenderer already follows for its own
+ * (inline, not-i18n-routed) EN/AR copy.
+ */
+export function dictFor(locale: Locale): Dict {
+  return STRINGS[locale]
+}
 
 const Ctx = createContext<{ locale: UILocale; t: Dict; setLocale: (l: UILocale) => void; isRTL: boolean } | null>(null)
 

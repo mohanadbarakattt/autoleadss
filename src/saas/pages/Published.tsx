@@ -2,20 +2,34 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import FunnelRenderer from '../components/FunnelRenderer'
+import StorefrontRenderer from '../storefront/StorefrontRenderer'
 import FunnelCookieConsent, { hasFunnelAnalyticsConsent } from '../components/FunnelCookieConsent'
 import { LogoMark } from '../../components/Logo'
-import { getFunnelBySlug, recordVisit, addLead, useAgency } from '../store'
-import { getPublishedFunnel, recordVisitRemote, captureLeadRemote } from '../db/api'
+import { getFunnelBySlug, recordVisit, addLead, useAgency, useProducts } from '../store'
+import { getPublishedFunnel, recordVisitRemote, captureLeadRemote, getPublishedProducts, placeOrder } from '../db/api'
 import { subdomainSlug, isFunnelHost } from '../publish/host'
 import { isValidGa4, isValidPixel } from '../lib/tracking'
 import { reportIncident } from '../lib/reportIncident'
-import type { Funnel } from '../types'
+import type { Funnel, Product, PublicProduct } from '../types'
+
+/** Demo/local products (from useProducts()) carry the full merchant `Product`
+ * shape (including raw `stock`, `status`, ...) — narrow to the same
+ * display-safe shape api/published/products.ts returns for a remote site, so
+ * StorefrontRenderer never has to special-case which mode it's fed. */
+function toPublicProduct(p: Product): PublicProduct {
+  return { id: p.id, name: p.name, description: p.description, imageUrl: p.imageUrl, priceMinor: p.priceMinor, currency: p.currency, inStock: p.stock > 0 }
+}
 
 export default function Published() {
   const { slug: routeSlug } = useParams()
   const [funnel, setFunnel] = useState<Funnel | null | undefined>(undefined)
   const [backendReachable, setBackendReachable] = useState(false)
   const { settings: brand } = useAgency()
+  // Phase 4b: a sell-mode site's public catalogue. Demo/local products come
+  // straight from the store (below); remote products are fetched once the
+  // funnel resolves (see the effect further down).
+  const [remoteProducts, setRemoteProducts] = useState<PublicProduct[]>([])
+  const demoProducts = useProducts()
   /** Which store the currently-shown funnel came from — decides where a captured
    * lead goes. Set once per load so a read/write split-brain can't happen. */
   const source = useRef<'remote' | 'local'>('local')
@@ -72,6 +86,25 @@ export default function Published() {
     }
   }, [slug, byHost])
 
+  // Phase 4b: once a remote sell-mode site resolves, fetch its public
+  // catalogue. Demo/local sell-mode sites need no fetch — their products are
+  // already live via useProducts() above (same localStorage blob as the
+  // merchant's own /app/products).
+  useEffect(() => {
+    if (!funnel || funnel.spec.mode !== 'sell' || source.current !== 'remote') return
+    let cancelled = false
+    getPublishedProducts(funnel.slug)
+      .then((products) => {
+        if (!cancelled) setRemoteProducts(products)
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteProducts([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [funnel])
+
   /**
    * Captures a lead. MUST NOT swallow — a lead is this product's revenue
    * event, and this page runs in the VISITOR's browser, so there is no local
@@ -111,6 +144,21 @@ export default function Published() {
         throw err
       }
     }
+  }
+
+  /**
+   * Places an order on a sell-mode site. Demo/local sites have no gateway
+   * connection to check (there's no local payment_connections equivalent —
+   * see the design spec §7), so they always resolve to the same fail-closed
+   * "not accepting payments yet" state a real gateway gate would produce,
+   * WITHOUT ever hitting the network or creating anything — never a
+   * simulated purchase. Remote sites hit the real, server-computed checkout
+   * (api/published/order.ts), which independently re-enforces this gate no
+   * matter what the client believes.
+   */
+  async function handleCheckout(input: { items: { productId: string; quantity: number }[]; buyer: { name: string; email?: string; phone: string } }) {
+    if (source.current !== 'remote') throw new Error('payments_not_connected')
+    return placeOrder({ slug: funnel?.slug ?? slug, ...input })
   }
 
   if (funnel === undefined) {
@@ -165,7 +213,16 @@ export default function Published() {
           <img height="1" width="1" style={{ display: 'none' }} alt="" src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} />
         </noscript>
       )}
-      <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
+      {funnel.spec.mode === 'sell' ? (
+        <StorefrontRenderer
+          spec={funnel.spec}
+          slug={funnel.slug}
+          products={source.current === 'remote' ? remoteProducts : demoProducts.filter((p) => p.status === 'active').map(toPublicProduct)}
+          onCheckout={handleCheckout}
+        />
+      ) : (
+        <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
+      )}
       {(() => {
         const b = funnel.brand ?? brand
         return !b?.hideBadge &&

@@ -37,4 +37,16 @@ html[dir='rtl'] .theme-suite .font-luxe {
   --store-pearl: #faf9f5;
   --store-ink: #1a1815;
   --store-gold: #a9853f;
+
+  background: var(--store-pearl);
+  color: var(--store-ink);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Same Cormorant Garamond → Amiri/IBM Plex Sans Arabic RTL swap as .theme-suite
+   above — Cormorant has no Arabic glyphs. */
+html[dir='rtl'] .theme-store .font-luxe {
+  font-family: 'Amiri', 'IBM Plex Sans Arabic', serif;
 }

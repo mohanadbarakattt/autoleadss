@@ -47,6 +47,12 @@ export interface FunnelSpec {
    * location) but doesn't rewrite it from scratch. Drives the "edit it in the
    * editor" disclosure shown to the funnel owner (never on the public page). */
   isDemoContent?: boolean
+  /** Phase 4b: a site's mode. Absent or 'capture' = today's lead funnel
+   * (FunnelRenderer), unchanged. 'sell' = a storefront (StorefrontRenderer) —
+   * same Funnel/FunnelSpec entity, same /p/:slug route, just a different
+   * renderer picked in Published.tsx off this field. No migration needed
+   * since `spec` is jsonb. */
+  mode?: 'capture' | 'sell'
 }
 
 export interface Lead {
@@ -118,6 +124,19 @@ export interface Product {
   status: 'draft' | 'active' | 'archived'
   createdAt: number
   updatedAt: number
+}
+
+/** Display-safe product shape returned by the public storefront API
+ * (api/published/products.ts) — never `clerk_user_id`, never the raw `stock`
+ * count, just a computed `inStock` boolean. */
+export interface PublicProduct {
+  id: string
+  name: string
+  description?: string
+  imageUrl?: string
+  priceMinor: number
+  currency: string
+  inStock: boolean
 }
 
 /** A single sold line. `nameSnapshot`/`unitPriceMinor` freeze the product's

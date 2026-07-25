@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Plus, Pencil, Trash2, PackageOpen, ImageOff } from 'lucide-react'
+import { Plus, Pencil, Trash2, PackageOpen, ImageOff, Store } from 'lucide-react'
 import SuiteShell from '../suite/SuiteShell'
 import { GoldButton, Panel, Tag } from '../suite/ui'
-import { useI18n } from '../i18n'
-import { useSession, useProducts, createProduct, updateProduct, deleteProduct, uid } from '../store'
+import { useI18n, toContentLocale } from '../i18n'
+import { useSession, useProducts, useFunnels, createProduct, updateProduct, deleteProduct, uid } from '../store'
 import { majorToMinor, formatMinorUnits, minorToMajorInput } from '../lib/money/minorUnits'
-import type { Product } from '../types'
+import { createStorefrontSite } from '../storefront/createStore'
+import type { Product, Funnel } from '../types'
 
 const STATUS_TONE: Record<Product['status'], string> = {
   draft: 'bg-suite-panel2 text-suite-muted',
@@ -21,10 +22,12 @@ const CURRENCY_RE = /^[A-Za-z]{3}$/
  * from the routed page, same split as Hub/Start, so it can be tested without an
  * authenticated session. */
 export function ProductsContent() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const p = t.products
   const session = useSession()
   const products = useProducts()
+  const funnels = useFunnels()
+  const storeSite = funnels.find((f) => f.spec.mode === 'sell')
   const defaultCurrency = session?.workspace.marketRegion === 'global' ? 'USD' : 'AED'
 
   const [editing, setEditing] = useState<Product | 'new' | null>(null)
@@ -60,6 +63,14 @@ export function ProductsContent() {
           {notice}
         </div>
       )}
+
+      <StorefrontCallout
+        site={storeSite}
+        onCreate={() => {
+          if (!session) return
+          createStorefrontSite(session.workspace.name, toContentLocale(locale))
+        }}
+      />
 
       {editing && (
         <ProductForm
@@ -102,6 +113,48 @@ export function ProductsContent() {
         </div>
       )}
     </div>
+  )
+}
+
+/** Section 6: gets a merchant from zero products to a demonstrable live
+ * store without waiting on the full storefront editor (4c). Keeps whatever
+ * sell-mode site already exists rather than creating a second one. */
+function StorefrontCallout({ site, onCreate }: { site: Funnel | undefined; onCreate: () => void }) {
+  const { t } = useI18n()
+  const s = t.products.storefront
+
+  if (site) {
+    return (
+      <Panel className="mt-6 flex flex-wrap items-center justify-between gap-4 p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-suite-line bg-suite-panel2 text-suite-gold-l">
+            <Store size={18} strokeWidth={1.6} aria-hidden />
+          </span>
+          <div>
+            <p className="font-luxe text-lg font-semibold text-suite-text">{s.liveTitle}</p>
+            <p className="text-sm text-suite-muted">{s.liveBody}</p>
+          </div>
+        </div>
+        <a href={`/p/${site.slug}`} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-suite-gold-l hover:text-suite-gold">
+          {s.viewStore} →
+        </a>
+      </Panel>
+    )
+  }
+
+  return (
+    <Panel className="mt-6 flex flex-wrap items-center justify-between gap-4 p-5">
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-suite-line bg-suite-panel2 text-suite-gold-l">
+          <Store size={18} strokeWidth={1.6} aria-hidden />
+        </span>
+        <div>
+          <p className="font-luxe text-lg font-semibold text-suite-text">{s.createTitle}</p>
+          <p className="text-sm text-suite-muted">{s.createBody}</p>
+        </div>
+      </div>
+      <GoldButton onClick={onCreate}>{s.createCta}</GoldButton>
+    </Panel>
   )
 }
 

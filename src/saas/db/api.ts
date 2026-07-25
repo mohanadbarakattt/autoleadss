@@ -1,4 +1,4 @@
-import type { Funnel, Lead } from '../types'
+import type { Funnel, Lead, PublicProduct } from '../types'
 import type { FollowUpInput } from '../ai/followUp'
 
 /**
@@ -99,4 +99,23 @@ export async function captureLeadRemote(
   lead: { name: string; phone: string; email?: string; message?: string; source?: string },
 ): Promise<void> {
   await request('/api/published/lead', { method: 'POST', body: JSON.stringify({ slug, ...lead }) })
+}
+
+/** Phase 4b: a storefront's public catalogue — display-safe fields only (see
+ * api/published/products.ts). */
+export async function getPublishedProducts(slug: string): Promise<PublicProduct[]> {
+  const { products } = await request<{ products: PublicProduct[] }>(`/api/published/products?slug=${encodeURIComponent(slug)}`)
+  return products
+}
+
+/** Phase 4b checkout. Throws on any failure, same discipline as every other
+ * function here — including the fail-closed gateway gate, whose 409 surfaces
+ * as `Error('payments_not_connected')` so the caller can show the calm
+ * "not accepting payments yet" state instead of a generic error. */
+export async function placeOrder(input: {
+  slug: string
+  items: { productId: string; quantity: number }[]
+  buyer: { name: string; email?: string; phone: string }
+}): Promise<{ orderId: string; paymentId: string }> {
+  return request('/api/published/order', { method: 'POST', body: JSON.stringify(input) })
 }
