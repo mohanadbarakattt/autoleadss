@@ -17,6 +17,7 @@ import { isFunnelHost } from './saas/publish/host'
 import Hub from './saas/pages/Hub'
 import Start from './saas/pages/Start'
 import Products from './saas/pages/Products'
+import Leads from './saas/pages/Leads'
 import Dashboard from './saas/pages/Dashboard'
 import Wizard from './saas/pages/Wizard'
 import AdSuite from './saas/pages/AdSuite'
@@ -81,6 +82,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/app" element={withSaas(<Hub />)} />
           <Route path="/app/start" element={withSaas(<Start />)} />
           <Route path="/app/products" element={withSaas(<Products />)} />
+          <Route path="/app/leads" element={withSaas(<Leads />)} />
           <Route path="/app/pages" element={withSaas(<Dashboard />)} />
           <Route path="/app/new" element={withSaas(<Wizard />)} />
           <Route path="/app/ads" element={withSaas(<AdSuite />)} />
