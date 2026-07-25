@@ -1,5 +1,6 @@
 import { getSql } from '../../_lib/db'
 import { methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../../_lib/http'
+import { toSafeInt } from '../../_lib/money'
 import { getAdapter, getGatewayInfo } from '../../_lib/payments/registry'
 import { canTransition } from '../../_lib/payments/status'
 import type { PaymentStatus } from '../../_lib/payments/types'
@@ -75,15 +76,6 @@ async function readRawBody(req: VercelApiRequest): Promise<string> {
     chunks.push(buf)
   }
   return Buffer.concat(chunks).toString('utf8')
-}
-
-/** Coerce a value that may have crossed the wire as a bigint-string (see the
- * module doc comment) into a JS number, throwing rather than silently
- * accepting anything that isn't a safe integer. */
-function toSafeInt(raw: unknown, field: string): number {
-  const n = typeof raw === 'string' ? Number(raw) : raw
-  if (typeof n !== 'number' || !Number.isSafeInteger(n)) throw new Error(`${field} is not a safe integer: ${String(raw)}`)
-  return n
 }
 
 interface PaymentRow {
