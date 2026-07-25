@@ -104,6 +104,50 @@ export interface SubAccount {
   createdAt: number
 }
 
+/** A merchant's catalogue item (Phase 4a "Sell"). `priceMinor` is integer minor
+ * units (fils/cents) — see `src/saas/lib/money/minorUnits.ts` for the
+ * major-unit conversion/formatting boundary; never do ad-hoc `/100` math. */
+export interface Product {
+  id: string
+  name: string
+  description?: string
+  imageUrl?: string
+  priceMinor: number
+  currency: string
+  stock: number
+  status: 'draft' | 'active' | 'archived'
+  createdAt: number
+  updatedAt: number
+}
+
+/** A single sold line. `nameSnapshot`/`unitPriceMinor` freeze the product's
+ * name/price AS SOLD — see the order_items comment in migration 0005_sell.sql
+ * for why this must never re-read the live product. */
+export interface OrderItem {
+  id: string
+  productId?: string
+  nameSnapshot: string
+  unitPriceMinor: number
+  quantity: number
+  currency: string
+}
+
+/** A merchant's order (Phase 4a: read-only — created only by Phase 4b's
+ * checkout, marked 'paid' only by the Phase 3a payments webhook). */
+export interface Order {
+  id: string
+  status: 'pending' | 'paid' | 'cancelled' | 'refunded'
+  subtotalMinor: number
+  currency: string
+  paymentId?: string
+  buyerName?: string
+  buyerEmail?: string
+  buyerPhone?: string
+  createdAt: number
+  updatedAt: number
+  items: OrderItem[]
+}
+
 export interface Workspace {
   id: string
   name: string

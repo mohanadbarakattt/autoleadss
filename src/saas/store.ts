@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount } from './types'
+import type { Funnel, Lead, Session, Workspace, User, PlanId, Region, AgencySettings, SubAccount, Product, Order } from './types'
 import { clerkEnabled } from './config'
 import { reportIncident } from './lib/reportIncident'
 import { spreadVisitsByDay } from './lib/visits'
@@ -13,6 +13,13 @@ import {
   deleteFunnel as rDeleteFunnel,
   setLeadStatusRemote as rSetLeadStatus,
 } from './db/api'
+import {
+  listProducts as rListProducts,
+  createProduct as rCreateProduct,
+  updateProduct as rUpdateProduct,
+  deleteProduct as rDeleteProduct,
+  listOrders as rListOrders,
+} from './db/products'
 
 const BASE_KEY = 'autoleadss:state:v1'
 /** Marks that the one-time anonymous → first-signed-in-user migration has already run. */
@@ -38,9 +45,23 @@ interface State {
   session: Session | null
   funnels: Funnel[]
   agency: AgencyState
+  /** Sell (Phase 4a). Same remote/demo split as funnels: with a backend,
+   * round-trips api/products + api/orders; without one, persists to the same
+   * namespaced localStorage blob. */
+  products: Product[]
+  /** Read-only here — nothing in this slice creates orders (see db/products.ts
+   * doc). Always empty in demo mode; in remote mode, whatever GET /api/orders
+   * returns. */
+  orders: Order[]
 }
 
-const empty: State = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
+const empty: State = {
+  session: null,
+  funnels: [],
+  agency: { settings: null, subAccounts: [], activeSubAccountId: null },
+  products: [],
+  orders: [],
+}
 
 let state: State = empty
 let hydrated = false
@@ -205,6 +226,17 @@ export function useAgency(): AgencyState {
   return useSyncExternalStore(subscribe, () => state.agency, () => empty.agency)
 }
 
+export function useProducts(): Product[] {
+  return useSyncExternalStore(subscribe, () => state.products, () => [])
+}
+export function useProduct(id: string): Product | undefined {
+  return useProducts().find((p) => p.id === id)
+}
+
+export function useOrders(): Order[] {
+  return useSyncExternalStore(subscribe, () => state.orders, () => [])
+}
+
 // ---------- agency / white-label ----------
 // Local-only: agency settings / sub-accounts were Supabase-backed before Phase 2 and
 // weren't carried over to Neon (out of scope for the funnels/leads/publish migration —
@@ -274,6 +306,18 @@ export async function bridgeClerkSession(session: Session, auth: RemoteAuth) {
     set({ funnels })
   } catch (e) {
     console.info('[remote funnels] backend unavailable, staying in localStorage mode:', e instanceof Error ? e.message : e)
+    return
+  }
+
+  // Best-effort, separate from the funnels probe above: products/orders share
+  // the same backend, but a failure here must not undo `remote` (which gates
+  // funnel sync) — it only means this session's Sell data stays whatever was
+  // last cached locally until the next successful bridge.
+  try {
+    const [products, orders] = await Promise.all([rListProducts(auth), rListOrders(auth)])
+    set({ products, orders })
+  } catch (e) {
+    console.info('[remote products/orders] backend unavailable for Sell data:', e instanceof Error ? e.message : e)
   }
 }
 
@@ -281,7 +325,7 @@ export function teardownRemote() {
   remote = null
   activeKey = BASE_KEY
   hydrated = false
-  state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null } }
+  state = { session: null, funnels: [], agency: { settings: null, subAccounts: [], activeSubAccountId: null }, products: [], orders: [] }
   emit()
 }
 
@@ -451,4 +495,42 @@ export function clearSampleData(funnelId: string) {
   const leads = f.leads.filter((l) => !l.sample)
   const visits = Math.max(0, f.visits - (f.seedVisits ?? 0))
   updateFunnel(funnelId, { leads, visits, seedVisits: 0 })
+}
+
+// ---------- products (Sell, Phase 4a) ----------
+export function createProduct(p: Product) {
+  ensureHydrated()
+  set({ products: [p, ...state.products] })
+  syncRemote('createProduct', (auth) => rCreateProduct(auth, p))
+}
+
+export function updateProduct(id: string, patch: Partial<Product>) {
+  ensureHydrated()
+  set({ products: state.products.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p)) })
+  syncRemote('updateProduct', (auth) => rUpdateProduct(auth, id, patch))
+}
+
+/**
+ * Deletes locally, unless the backend reports the product is referenced by
+ * order history — see api/products/[id].ts's archive-if-referenced rule —
+ * in which case it's archived instead. Unlike the other mutations above,
+ * this one is NOT fire-and-forget optimistic: in remote mode the outcome is
+ * only known once the server answers, and the caller needs the real answer
+ * to show it truthfully rather than guess. Demo mode has no order history to
+ * protect (nothing in this slice creates orders locally), so it always
+ * hard-deletes and resolves immediately.
+ */
+export async function deleteProduct(id: string): Promise<'deleted' | 'archived'> {
+  ensureHydrated()
+  if (!remote) {
+    set({ products: state.products.filter((p) => p.id !== id) })
+    return 'deleted'
+  }
+  const { action } = await rDeleteProduct(remote, id)
+  if (action === 'archived') {
+    set({ products: state.products.map((p) => (p.id === id ? { ...p, status: 'archived', updatedAt: Date.now() } : p)) })
+  } else {
+    set({ products: state.products.filter((p) => p.id !== id) })
+  }
+  return action
 }
