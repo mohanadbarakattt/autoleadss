@@ -97,28 +97,6 @@ function tokenPairs(input: WizardInput): [string, string][] {
   ]
 }
 
-/**
- * Replaces the template's fabricated-specific testimonials (invented names tied to
- * invented neighborhoods/numbers) with clearly-generic social proof: no invented
- * identities, no invented locations — just the real business name and a plausible,
- * unembellished reason to trust it.
- */
-function genericTestimonials(input: WizardInput): FunnelSpec['page']['testimonials'] {
-  const biz = input.businessName || (input.language === 'ar' ? 'الفريق' : 'the team')
-  if (input.language === 'ar') {
-    return [
-      { quote: `تعاملت مع ${biz} ولقيت ردود سريعة وكل التفاصيل واضحة من أول رسالة.`, name: 'عميل موثّق', role: 'عميل جديد' },
-      { quote: `أسعار واضحة وملهاش لبس، وما فيش ضغط في البيع — بالظبط اللي كنت محتاجه من ${biz}.`, name: 'عميل موثّق', role: 'عميل عائد' },
-      { quote: `قارنت بين أكثر من جهة قبل ما أقرر، و${biz} كانوا الأسهل في إنهم يردوا عليّ بوضوح.`, name: 'عميل موثّق', role: 'تمت التوصية به من صديق' },
-    ]
-  }
-  return [
-    { quote: `${biz} answered every question I had and made the whole process easy to follow from the very first message.`, name: 'Verified customer', role: 'New customer' },
-    { quote: `Clear pricing, fast replies, and no pressure — exactly what I wanted when I reached out to ${biz}.`, name: 'Verified customer', role: 'Returning customer' },
-    { quote: `I compared a few options before deciding, and ${biz} was the easiest to actually get a straight answer from.`, name: 'Verified customer', role: 'Referred by a friend' },
-  ]
-}
-
 /** Primary CTA copy, driven by BOTH the chosen goal (what action) and tone (how it's said) —
  * the two wizard inputs the old single 4-entry `goalCta` map ignored the second of. */
 const GOAL_TONE_CTA: Record<string, Record<Tone, { en: string; ar: string }>> = {
@@ -169,7 +147,10 @@ export function generateFromTemplate(input: WizardInput): FunnelSpec {
   spec.industry = input.industry
   spec.language = input.language
   spec.isDemoContent = true
-  spec.page.testimonials = genericTestimonials(input)
+  // No fabricated social proof, ever: a generated draft never puts words or a star
+  // rating in a customer's mouth. Merchants add their own real testimonials in the
+  // editor; until then the section simply doesn't exist (see FunnelRenderer).
+  spec.page.testimonials = []
 
   const cta = GOAL_TONE_CTA[input.goal]?.[input.tone]
   if (cta) {
@@ -186,7 +167,9 @@ export function generateFromTemplate(input: WizardInput): FunnelSpec {
  * template with names swapped in. */
 export function buildGenerationPrompt(input: WizardInput): { system: string; user: string } {
   const example = pickTemplate(input.industry, input.language)
-  const system = `You are AutoLeadss's funnel generator. You write high-converting, natural, market-appropriate sales-funnel copy for businesses in Egypt and the Gulf: landing-page copy, ad copy, a WhatsApp bot script, and social posts. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market. Never invent specific customer names, numbers, or stories for "testimonials" — leave that array generic or empty; the platform replaces it with verified generic phrasing. Output ONLY a JSON object exactly matching the provided schema — no prose, no markdown fences.`
+  const system = `You are AutoLeadss's funnel generator. You write high-converting, natural, market-appropriate sales-funnel copy for businesses in Egypt and the Gulf: landing-page copy, ad copy, a WhatsApp bot script, and social posts. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market.
+
+This copy gets published as-is on a real merchant's public page, ads, and social posts, often without edits. You do not know this business's real numbers, so never invent one. Do not invent, anywhere in your output — not just testimonials — any: customer/patient/member counts, ratings or review counts, revenue/yield/percentage results, delivery/refund/returns/warranty promises, discount or price commitments, or licence/certification/accreditation claims (e.g. "RERA-licensed", "DHA licensed", "certified", "accredited", "registered with…"). Leave the "testimonials" array empty. Leave the "stats" array empty. Where a section's whole point would otherwise be one of these claims, write persuasive structure instead — benefit framing, a question, a call to action — never a fabricated number or credential. Output ONLY a JSON object exactly matching the provided schema — no prose, no markdown fences.`
   const user = `Generate a complete funnel spec, tailored specifically to this business (not generic boilerplate).
 Business: ${input.businessName}
 Industry: ${input.industry}
@@ -222,9 +205,6 @@ const isRec = (v: unknown): v is Rec => !!v && typeof v === 'object'
 function validHero(v: unknown): v is FunnelSpec['page']['hero'] {
   const h = v as Rec
   return isRec(h) && isStr(h.eyebrow) && isStr(h.headline) && isStr(h.subhead) && isStr(h.ctaPrimary) && isStr(h.ctaSecondary) && isStrArray(h.badges)
-}
-function validStats(v: unknown): v is FunnelSpec['page']['stats'] {
-  return Array.isArray(v) && v.length > 0 && v.every((s) => isRec(s) && isStr(s.value) && isStr(s.label))
 }
 function validFeatures(v: unknown): v is FunnelSpec['page']['features'] {
   return Array.isArray(v) && v.length > 0 && v.every((f) => isRec(f) && isStr(f.title) && isStr(f.body) && isStr(f.icon))
@@ -264,16 +244,25 @@ function validSocial(v: unknown): v is FunnelSpec['social'] {
  * section, keeping only sections that structurally validate. Returns null
  * when the hero itself doesn't validate — that's the bar for "the AI actually
  * produced usable output"; callers fall back to the pure template in that case.
- * Testimonials are always the template's generic ones (see
- * `genericTestimonials`) regardless of what the model returned — this app
- * never puts fabricated customer identities on a funnel.
+ *
+ * `stats` is never taken from the AI response, even if it's shape-valid — shape
+ * validity proves the model returned an array of {value, label} strings, not that
+ * either string is true. There's no way to verify a model-invented number against
+ * the merchant's actual business, so the template's empty `stats` (see
+ * generateFromTemplate) always wins. Testimonials are likewise always empty —
+ * this app never puts a fabricated customer identity or star rating on a funnel.
+ *
+ * `isDemoContent` stays `true` (never flipped to `false` here): the AI can still
+ * free-write an invented number into a hero badge, feature, or FAQ answer despite
+ * the system prompt's instructions, and this merge has no way to structurally rule
+ * that out. The editor's "review before publishing" banner is keyed off this flag,
+ * so it must keep showing for AI-merged content, not just pure-template content.
  */
 export function mergeAiFunnelSpec(input: WizardInput, ai: unknown): FunnelSpec | null {
   if (!isRec(ai) || !isRec(ai.page) || !validHero(ai.page.hero)) return null
 
   const spec = generateFromTemplate(input)
   spec.page.hero = ai.page.hero
-  if (validStats(ai.page.stats)) spec.page.stats = ai.page.stats
   if (validFeatures(ai.page.features)) spec.page.features = ai.page.features
   if (validFaq(ai.page.faq)) spec.page.faq = ai.page.faq
   if (validFinalCta(ai.page.finalCta)) spec.page.finalCta = ai.page.finalCta
@@ -281,6 +270,5 @@ export function mergeAiFunnelSpec(input: WizardInput, ai: unknown): FunnelSpec |
   if (validAds(ai.ads)) spec.ads = ai.ads
   if (validChatbot(ai.chatbot)) spec.chatbot = ai.chatbot
   if (validSocial(ai.social)) spec.social = ai.social
-  spec.isDemoContent = false
   return spec
 }
