@@ -13,6 +13,15 @@ import { sendJson, methodNotAllowed, type VercelApiRequest, type VercelApiRespon
  * The access token is a Meta credential that can send messages as the owner's
  * business. It is written but NEVER read back to the browser — the connect
  * screen only needs to know a connection exists, not what the token is.
+ *
+ * POST is owner-scoped twice over: `funnelId` must belong to the caller
+ * (checked before the insert — otherwise one tenant could point a connection
+ * at another tenant's funnel), and the upsert's `on conflict ... do update`
+ * only fires `where clerk_user_id = <caller>` — so even if a caller somehow
+ * produced the same deterministic `id` as someone else's row (it's derived
+ * from funnelId+phoneNumberId, both now caller-owned), the update is a no-op
+ * against a row it doesn't own: no credential overwrite, no leak of whether
+ * that id exists.
  */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
   const sql = getSql()
@@ -70,6 +79,13 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     return sendJson(res, 400, { error: 'funnelId, phoneNumberId, accessToken and verifyToken are required.' })
   }
 
+  // funnelId must belong to the caller — otherwise one tenant could point a
+  // connection at another tenant's funnel.
+  const funnelRows = (await sql`
+    select 1 from autoleadss.funnels where id = ${funnelId} and clerk_user_id = ${userId} limit 1
+  `) as unknown as unknown[]
+  if (!funnelRows.length) return sendJson(res, 400, { error: 'funnelId does not belong to the caller.' })
+
   const id = `wac_${funnelId}_${phoneNumberId}`
   try {
     await sql`
@@ -87,6 +103,7 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
         verify_token = excluded.verify_token,
         status = 'connected',
         updated_at = now()
+      where clerk_user_id = ${userId}
     `
   } catch (err) {
     // Fail LOUD: a connection the owner believes they saved but which is not

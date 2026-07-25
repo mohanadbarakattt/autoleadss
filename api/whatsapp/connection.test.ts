@@ -108,7 +108,7 @@ describe('POST /api/whatsapp/connection', () => {
   })
 
   it('saves a connection for the caller and never echoes the access token back', async () => {
-    state.rows = [[]] // the insert/upsert statement
+    state.rows = [[{ x: 1 }], []] // funnelId ownership check finds a row, then the insert/upsert
     const r = res()
     await handler({
       method: 'POST',
@@ -118,5 +118,39 @@ describe('POST /api/whatsapp/connection', () => {
     expect(r.statusCode).toBe(200)
     expect((r.body as any).id).toBeTruthy()
     expect(JSON.stringify(r.body)).not.toContain('secret-token')
+    expect(state.queries[0]).toContain('autoleadss.funnels')
+    expect(state.queries[0]).toContain('clerk_user_id')
+  })
+
+  it("rejects a funnelId that does not belong to the caller — never attaches a connection to another tenant's funnel", async () => {
+    state.rows = [[]] // funnelId ownership check finds nothing
+    const r = res()
+    await handler({
+      method: 'POST',
+      query: {},
+      body: { funnelId: 'someone-elses-funnel', phoneNumberId: 'PN1', accessToken: 'secret-token', verifyToken: 'vt1' },
+    } as any, r)
+    expect(r.statusCode).toBe(400)
+    // Only the ownership-check query ran — never an insert/upsert.
+    expect(state.queries).toHaveLength(1)
+  })
+
+  it('the upsert only updates a conflicting row scoped to the caller — user B cannot overwrite user A\'s stored token', async () => {
+    // This proves the fix at the SQL level: the mocked driver doesn't
+    // simulate real ON CONFLICT semantics, so the guard against B silently
+    // overwriting A's row is the `where clerk_user_id = ...` clause on the
+    // DO UPDATE itself — assert it's actually in the generated query, right
+    // after the SET list (i.e. really scoping the update, not decoration).
+    state.rows = [[{ x: 1 }], []] // funnelId ownership check, then the insert/upsert
+    const r = res()
+    await handler({
+      method: 'POST',
+      query: {},
+      body: { funnelId: 'f1', phoneNumberId: 'PN1', accessToken: 'secret-token', verifyToken: 'vt1' },
+    } as any, r)
+    expect(r.statusCode).toBe(200)
+    const upsertQuery = state.queries[1]
+    expect(upsertQuery).toContain('on conflict (id) do update set')
+    expect(upsertQuery).toMatch(/do update set[\s\S]*where clerk_user_id/)
   })
 })
