@@ -2,12 +2,19 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { createHmac } from 'node:crypto'
 
 /**
- * Poison tests for api/payments/webhook/[gateway].ts. Style follows
- * api/whatsapp/webhook.test.ts (mock `../_lib/db`'s getSql), but the fake here
- * is a real in-memory table (Map), not a canned-response queue — replay,
- * double-charge, and out-of-order all need actual state to carry across two
- * handler() calls in one test, and every test below asserts that state, not
- * just the HTTP status code.
+ * Poison + regression tests for api/payments/webhook/[gateway].ts. Style
+ * follows api/whatsapp/webhook.test.ts (mock `../_lib/db`'s getSql), but the
+ * fake here is a real in-memory table (Map), not a canned-response queue —
+ * replay/double-charge/out-of-order/retry-after-failure all need actual state
+ * to carry across multiple handler() calls in one test, and every test below
+ * asserts that state, not just the HTTP status code.
+ *
+ * CRITICAL: amount_minor and count(*) are both `bigint` in Postgres (OID 20).
+ * The real Neon driver's text-mode parser returns OID 20 as a STRING, never a
+ * JS number — this fake deliberately does the same on every read, so a
+ * regression back to comparing the DB's raw value against a JS number with
+ * `!==` (which always mismatches, e.g. "5000" !== 5000) fails this suite
+ * instead of only failing against a real database.
  */
 
 const SECRET = 'fake-webhook-secret'
@@ -16,7 +23,7 @@ interface FakePayment {
   id: string
   gateway: string
   gateway_ref: string
-  amount_minor: number
+  amount_minor: number // internal source of truth; stringified on every read
   currency: string
   status: string
 }
@@ -47,27 +54,48 @@ async function fakeSql(strings: TemplateStringsArray, ...vals: unknown[]) {
   db.queries.push(text)
   if (db.failAtCall !== null && db.callCount === db.failAtCall) throw new Error('simulated db failure')
 
-  if (text.includes('insert into autoleadss.payment_events')) {
-    const [gateway, eventId] = vals as [string, string]
-    const key = `${gateway}:${eventId}`
-    if (db.events.has(key)) return []
-    db.events.add(key)
-    return [{ gateway }]
-  }
+  // Read-only phase: SELECT the payment. amount_minor comes back as a STRING
+  // — exactly like the real bigint-over-the-wire behavior.
   if (text.includes('select id, status, amount_minor, currency from autoleadss.payments')) {
     const [gateway, ref] = vals as [string, string]
     const p = findByRef(gateway, ref)
-    return p ? [{ ...p }] : []
+    return p ? [{ id: p.id, status: p.status, amount_minor: String(p.amount_minor), currency: p.currency }] : []
   }
-  if (text.includes('update autoleadss.payments')) {
-    const [newStatus, id, whereStatus] = vals as [string, string, string]
-    const p = db.payments.get(id)
-    if (p && p.status === whereStatus) {
-      p.status = newStatus
-      return [{ payment_id: id }]
+
+  // Write phase: the combined ledger-insert + status-flip CTE statement.
+  // Positions (see the route's template literal): 0 gateway, 1 eventId,
+  // 2 payment.id (ins select), 3 payment.id (ins where), 4 payment.status
+  // (ins where), 5 event.amountMinor (ins where), 6 event.currency (ins
+  // where), 7 event.status (upd set), 8 payment.id (upd where), 9
+  // payment.status (upd where), 10 event.amountMinor (upd where), 11
+  // event.currency (upd where). 2/3/8 are the same value, as are 4/9, 5/10,
+  // 6/11 — the route interpolates each literal twice, once per CTE.
+  if (text.includes('with ins as')) {
+    const gateway = vals[0] as string
+    const eventId = vals[1] as string
+    const paymentId = vals[2] as string
+    const expectedStatus = vals[4] as string
+    const expectedAmount = vals[5] as number
+    const expectedCurrency = vals[6] as string
+    const newStatus = vals[7] as string
+
+    const key = `${gateway}:${eventId}`
+    const p = db.payments.get(paymentId)
+    const stateMatches = !!p && p.status === expectedStatus && p.amount_minor === expectedAmount && p.currency === expectedCurrency
+
+    let inserted = 0
+    let updated = 0
+    if (stateMatches && !db.events.has(key)) {
+      db.events.add(key)
+      inserted = 1
+      if (p) {
+        p.status = newStatus
+        updated = 1
+      }
     }
-    return []
+    return [{ inserted: String(inserted), updated: String(updated) }]
   }
+
   throw new Error(`fake db: unmocked query shape: ${text}`)
 }
 
@@ -106,6 +134,16 @@ beforeEach(() => {
   process.env.PAYMENTS_FAKE_WEBHOOK_SECRET = SECRET
 })
 
+describe('regression: string-typed amount_minor from the DB', () => {
+  it('a correct webhook still confirms the payment (the fake always returns amount_minor as a string)', async () => {
+    const r = res()
+    await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r)
+    expect(r.statusCode).toBe(200)
+    expect(r.body).toMatchObject({ ok: true })
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
+  })
+})
+
 describe('replay', () => {
   it('same event_id twice -> exactly one state change; the replay is a no-op 200', async () => {
     const event = { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }
@@ -113,13 +151,29 @@ describe('replay', () => {
     await handler(req('fake', event), r1)
     expect(r1.statusCode).toBe(200)
     expect(db.payments.get('pay_1')?.status).toBe('paid')
-    const queriesAfterFirst = db.queries.length
 
     const r2 = res()
     await handler(req('fake', event), r2)
     expect(r2.statusCode).toBe(200)
     expect(db.payments.get('pay_1')?.status).toBe('paid') // unchanged, not re-applied
-    expect(db.queries.length).toBe(queriesAfterFirst + 1) // only the dedupe insert ran, nothing after
+    // Caught by canTransition (paid -> paid is false), not the ledger — after
+    // the first apply, the replay's claimed status equals the current status,
+    // so the read-only phase alone rejects it without an ins/upd attempt.
+    expect((r2.body as any).noop).toBe(true)
+  })
+
+  it('a concurrent-delivery race for an event id already claimed is deduped even though canTransition would allow it', async () => {
+    // Simulates a second, near-simultaneous delivery of the same event_id
+    // whose ledger row an in-flight request already inserted, before the
+    // payment status itself has moved off 'pending'. This is the scenario
+    // the ledger's PK actually exists for — the replay test above is instead
+    // caught earlier, by canTransition, once the status has already flipped.
+    db.events.add('fake:evt_1')
+    const r = res()
+    await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r)
+    expect(r.statusCode).toBe(200)
+    expect((r.body as any).deduped).toBe(true)
+    expect(db.payments.get('pay_1')?.status).toBe('pending') // this call did not apply it
   })
 })
 
@@ -133,19 +187,70 @@ describe('double-charge', () => {
     const r2 = res()
     await handler(req('fake', { eventId: 'evt_B', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r2)
     expect(r2.statusCode).toBe(200)
+    expect((r2.body as any).noop).toBe(true) // canTransition(paid, paid) is false — rejected before any write attempt
     expect(db.payments.get('pay_1')?.status).toBe('paid') // still paid, not double-applied
   })
 })
 
-describe('missed grant / atomicity', () => {
-  it('the dependent write failing leaves the payment NOT paid (fail-closed)', async () => {
-    db.failAtCall = 3 // 1: dedupe insert, 2: payment select, 3: the atomic status-flip statement
+describe('missed grant / atomicity / retry-after-failure', () => {
+  it('the write statement failing leaves the payment NOT paid (fail-closed), and a clean retry then succeeds', async () => {
+    db.failAtCall = 2 // 1: read-only select, 2: the atomic write statement
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const r = res()
-    await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r)
+    const event = { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }
+
+    const r1 = res()
+    await handler(req('fake', event), r1)
     spy.mockRestore()
-    expect(r.statusCode).toBe(500) // fail closed so the gateway retries, never 200-and-lose
+    expect(r1.statusCode).toBe(500) // fail closed so the gateway retries, never 200-and-lose
     expect(db.payments.get('pay_1')?.status).toBe('pending') // proved: never flipped
+    expect(db.events.size).toBe(0) // proved: ledger not poisoned either — nothing committed at all
+
+    // The gateway retries the exact same delivery once the transient failure clears.
+    db.failAtCall = null
+    const r2 = res()
+    await handler(req('fake', event), r2)
+    expect(r2.statusCode).toBe(200)
+    expect((r2.body as any).deduped).toBeUndefined() // genuinely reprocessed, not a stale dedup
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
+  })
+})
+
+describe('payment-not-found / retry-after-failure', () => {
+  it('404 leaves nothing written; once the payment exists, a retry of the same event applies cleanly', async () => {
+    db.reset([]) // no payment seeded yet — e.g. the webhook races our own write
+    const event = { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }
+
+    const r1 = res()
+    await handler(req('fake', event), r1)
+    expect(r1.statusCode).toBe(404)
+    expect(db.events.size).toBe(0) // the event id was never consumed
+
+    db.payments.set('pay_1', { ...PAYMENT })
+    const r2 = res()
+    await handler(req('fake', event), r2)
+    expect(r2.statusCode).toBe(200)
+    expect((r2.body as any).deduped).toBeUndefined()
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
+  })
+})
+
+describe('amount mismatch / retry-after-failure', () => {
+  it('409 leaves nothing written; once amounts reconcile, a retry of the same event applies cleanly', async () => {
+    const event = { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 6000, currency: 'AED' }
+
+    const r1 = res()
+    await handler(req('fake', event), r1)
+    expect(r1.statusCode).toBe(409)
+    expect(db.payments.get('pay_1')?.status).toBe('pending')
+    expect(db.events.size).toBe(0)
+
+    const payment = db.payments.get('pay_1')
+    if (payment) payment.amount_minor = 6000 // reconciled out of band; the event id was never poisoned
+    const r2 = res()
+    await handler(req('fake', event), r2)
+    expect(r2.statusCode).toBe(200)
+    expect((r2.body as any).deduped).toBeUndefined()
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
   })
 })
 
@@ -154,13 +259,12 @@ describe('out-of-order delivery', () => {
     const r1 = res()
     await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r1)
     expect(db.payments.get('pay_1')?.status).toBe('paid')
-    const queriesAfterFirst = db.queries.length
 
     const r2 = res()
     await handler(req('fake', { eventId: 'evt_2', gatewayRef: 'ref_1', status: 'pending', amountMinor: 5000, currency: 'AED' }), r2)
     expect(r2.statusCode).toBe(200)
+    expect((r2.body as any).noop).toBe(true)
     expect(db.payments.get('pay_1')?.status).toBe('paid') // never reverted
-    expect(db.queries.length).toBe(queriesAfterFirst + 2) // dedupe insert + select only, no update attempted
   })
 })
 
@@ -177,6 +281,17 @@ describe('signature', () => {
     const r = res()
     await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }, { noSig: true }), r)
     expect(r.statusCode).toBe(400)
+    expect(db.queries).toHaveLength(0)
+  })
+})
+
+describe('oversized payload', () => {
+  it('rejects a body over the byte cap before signature verification touches it', async () => {
+    const huge = JSON.stringify({ eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED', pad: 'x'.repeat(300 * 1024) })
+    const r = res()
+    // Deliberately no valid signature — proves the size cap rejects before verifyWebhook runs.
+    await handler({ method: 'POST', query: { gateway: 'fake' }, body: huge, headers: {} } as any, r)
+    expect(r.statusCode).toBe(413)
     expect(db.queries).toHaveLength(0)
   })
 })
