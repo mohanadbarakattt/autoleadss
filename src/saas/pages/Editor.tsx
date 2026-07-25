@@ -85,7 +85,9 @@ export function EditorContent() {
     setRegenerating(true)
     await new Promise((r) => setTimeout(r, 700))
     const fresh = generateFromTemplate({ industry: funnel.industry, businessName: funnel.name, language: funnel.language, region: 'gulf', goal: 'leads', tone: 'bold', accent })
-    updateFunnel(id, { spec: fresh })
+    // Belt and braces: the button is hidden in sell mode, but never let a
+    // regenerate silently change what KIND of site this is.
+    updateFunnel(id, { spec: { ...fresh, mode: funnel.spec.mode } })
     setRegenerating(false)
   }
 
@@ -128,9 +130,15 @@ export function EditorContent() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={regenerate} disabled={regenerating} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground disabled:opacity-50">
-            {regenerating ? <Sparkles size={14} className="animate-pulse text-accent" /> : <RefreshCw size={14} />} {t.editor.regenerate}
-          </button>
+          {/* Capture-only: regenerate rebuilds the lead-page copy from the industry
+              template. A storefront has no such template — running it would strip
+              `mode: 'sell'` (turning the store back into a lead funnel) and
+              overwrite page.finalCta, which is the band section's copy. */}
+          {!sellMode && (
+            <button onClick={regenerate} disabled={regenerating} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground disabled:opacity-50">
+              {regenerating ? <Sparkles size={14} className="animate-pulse text-accent" /> : <RefreshCw size={14} />} {t.editor.regenerate}
+            </button>
+          )}
           <button onClick={copyLink} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground">
             {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />} {t.editor.copyLink}
           </button>
