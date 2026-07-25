@@ -201,7 +201,9 @@ const PLATFORM_RULES: Record<AdPlatform, string> = {
 }
 
 export function buildAdPrompt(platform: AdPlatform, input: AdSuiteInput): { system: string; user: string } {
-  const system = `You are AutoLeadss's ad-copy generator. You write high-converting, natural, market-appropriate ad campaigns for businesses in Egypt and the Gulf. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market. Never invent specific customer names, testimonials, or fabricated statistics. Output ONLY a JSON object exactly matching the schema below — no prose, no markdown fences.
+  const system = `You are AutoLeadss's ad-copy generator. You write high-converting, natural, market-appropriate ad campaigns for businesses in Egypt and the Gulf. When the language is "ar", write natural Modern Standard Arabic suited to the Gulf/Egyptian market.
+
+This copy gets published as-is in a real merchant's ad accounts, often without edits. You do not know this business's real numbers, so never invent one. Do not invent, anywhere in your output: customer/patient/member counts, ratings or review counts, revenue/yield/percentage results, delivery/refund/returns/warranty promises, discount or price commitments, or licence/certification/accreditation claims (e.g. "RERA-licensed", "DHA licensed", "certified", "accredited", "registered with…"). Never invent specific customer names or testimonials either. Where a line's whole point would otherwise be one of these claims, write persuasive structure instead — benefit framing, a question, a call to action — never a fabricated number or credential. Output ONLY a JSON object exactly matching the schema below — no prose, no markdown fences.
 
 Schema: { "copy": <platform-specific — see rules>, "audience": { "interests": string[], "jobTitles": string[], "ageBands": string[] }, "budget": { "dailyBudgetEgp": number, "strategy": string } }
 ${PLATFORM_RULES[platform]}
@@ -222,6 +224,14 @@ Tone: ${input.tone}`
 // platform; falls back to the demo sample's audience/budget section-by-section
 // when the AI's own doesn't validate (same pattern as ai/generate.ts's
 // mergeAiFunnelSpec). Returns null when the copy itself doesn't validate.
+//
+// `isDemoContent` stays `true` on the merged result (never flipped to `false`
+// here), for the same reason as mergeAiFunnelSpec: the AI can still free-write
+// an invented claim into primaryText/headlines/intro despite the system
+// prompt's instructions, and shape validation (validGoogleCopy etc.) has no
+// way to structurally rule that out. The "Sample" badge (AdSuite.tsx) is keyed
+// off this flag, so it must keep showing for AI-merged copy, not just the pure
+// demo set.
 // ---------------------------------------------------------------------------
 
 function validGoogleCopy(v: unknown): v is GoogleRsaCopy {
@@ -318,5 +328,5 @@ export function mergeAdResult(platform: AdPlatform, input: AdSuiteInput, ai: unk
     }
   }
 
-  return { platform, copy: clamped, audience, budget, isDemoContent: false }
+  return { platform, copy: clamped, audience, budget, isDemoContent: true }
 }

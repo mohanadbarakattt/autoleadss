@@ -60,8 +60,9 @@ export interface PlatformAdResult {
   copy: PlatformCopy
   audience: AudienceSuggestion
   budget: BudgetPreset
-  /** True when this result is the keyless/demo sample, not live-model output —
-   * drives the "Sample" badge in the review step (same convention as
-   * FunnelSpec.isDemoContent). */
+  /** True for the keyless/demo sample AND for AI-merged output — an AI can
+   * still free-write an unverifiable claim, so this never goes false just
+   * because a live model produced the copy. Drives the "Sample"/review badge
+   * (same convention as FunnelSpec.isDemoContent). */
   isDemoContent: boolean
 }
