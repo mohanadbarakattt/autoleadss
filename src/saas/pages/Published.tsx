@@ -279,10 +279,21 @@ export default function Published() {
         <FunnelRenderer spec={funnel.spec} accent={funnel.accent} onLead={handleLead} />
       )}
       {(() => {
-        const b = funnel.brand ?? brand
+        // Server-provided branding (api/published/index.ts) is the funnel
+        // OWNER's real white-label settings — the only trustworthy source
+        // once a visitor (who is not the owner) loads this page. `brand`
+        // (from `useAgency()`) is the VISITOR's own browser state and must
+        // never leak into what a different visitor sees; it's a legitimate
+        // fallback only in demo mode, where the funnel came from THIS same
+        // browser's localStorage (source.current !== 'remote'), so the
+        // visitor and the owner are provably the same person. This is the
+        // fix for the Phase 6 headline bug — see Funnel.brand's doc in
+        // types.ts.
+        const b = funnel.brand ?? (source.current !== 'remote' ? brand : undefined)
         return !b?.hideBadge &&
         (b?.brandName ? (
           <span className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 rounded-full bg-[#0A0A0B] px-3 py-2 text-[11px] font-medium text-white shadow-lg">
+            {b.logoUrl && <img src={b.logoUrl} alt="" className="h-4 w-4 rounded-full object-cover" />}
             Made with {b.brandName}
           </span>
         ) : (

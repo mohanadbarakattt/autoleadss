@@ -98,8 +98,12 @@ export interface Funnel {
    * data" can subtract exactly that many and leave any real, later visits intact). */
   seedVisits?: number
   subAccountId?: string
-  /** Owner's white-label branding, attached on public published fetches. */
-  brand?: { brandName?: string; hideBadge: boolean }
+  /** Owner's white-label branding, resolved server-side and attached on
+   * public published fetches (api/published/index.ts) — see that file's
+   * module doc for the Phase 6 fix this represents (previously nothing ever
+   * set this field, so Published.tsx silently fell back to the visitor's own
+   * local agency state instead). */
+  brand?: { brandName?: string; logoUrl?: string; hideBadge: boolean }
 }
 
 /** White-label branding for an agency (tier D). */
