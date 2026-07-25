@@ -3,6 +3,11 @@ import type { ToolKey } from './suite/tools'
 
 export type Locale = 'en' | 'ar'
 export type Region = 'egypt' | 'gulf'
+/** Display currency for pricing (Phase 7b). Independent of `Region` — `Region`
+ * still drives which price list (`priceEgypt`/`priceGulf`) and money path a
+ * workspace uses; `Currency` only controls what a visitor SEES. See
+ * `src/saas/currency.ts` for the pegged-vs-floating rule and conversion. */
+export type Currency = 'USD' | 'AED' | 'SAR' | 'EGP'
 export type Industry = 'real-estate' | 'ecommerce' | 'clinic' | 'restaurant' | 'fitness' | 'services' | 'other'
 export type PlanId = 'starter' | 'growth' | 'pro' | 'dwy' | 'whitelabel'
 export type Tone = 'bold' | 'friendly' | 'luxury' | 'professional'

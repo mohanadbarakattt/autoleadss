@@ -1,10 +1,16 @@
-import type { PlanId, Region, Locale } from './types'
+import type { Currency, Locale, PlanId, Region } from './types'
+import { convertUsdToCurrency, formatCurrencyAmount } from './currency'
 
-export interface Tier {
-  id: PlanId
-  name: { en: string; ar: string }
+/** Shared shape of `Tier` and `TopupPack`'s two hand-written price strings —
+ * lets `priceForCurrency` below accept either without duplicating its logic. */
+export interface PricedItem {
   priceEgypt: string
   priceGulf: string
+}
+
+export interface Tier extends PricedItem {
+  id: PlanId
+  name: { en: string; ar: string }
   popular?: boolean
   contact?: boolean
   tagline: { en: string; ar: string }
@@ -89,6 +95,26 @@ export function priceFor(tier: Tier, region: Region): string {
   return region === 'egypt' ? tier.priceEgypt : tier.priceGulf
 }
 
+/**
+ * Currency-aware price display (Phase 7b) — the successor to `priceFor` for
+ * visitor-facing pricing surfaces (Pricing.tsx, PricingTeaser.tsx,
+ * UpgradeContext). EGP always returns the hand-written `priceEgypt` string
+ * VERBATIM, in its existing "1,500 EGP" order — never reformatted, never
+ * derived (see `convertUsdToCurrency`'s doc in currency.ts for why). USD/AED/
+ * SAR all read from `priceGulf`: USD verbatim, AED/SAR converted at the peg.
+ * `locale` only affects numeral/currency-symbol placement for the converted
+ * currencies, never which number is shown.
+ */
+export function priceForCurrency(item: PricedItem, currency: Currency, locale: Locale = 'en'): string {
+  if (currency === 'EGP') return item.priceEgypt
+  const from = /^from\s+/i.test(item.priceGulf.trim())
+  const usd = Number(item.priceGulf.replace(/[^0-9.]/g, ''))
+  if (!Number.isFinite(usd)) throw new Error(`priceForCurrency: cannot parse USD price "${item.priceGulf}"`)
+  const amount = currency === 'USD' ? usd : convertUsdToCurrency(usd, currency)
+  const formatted = formatCurrencyAmount(amount, currency, locale)
+  return from ? `from ${formatted}` : formatted
+}
+
 /** Best-effort region guess for a visitor with no session/workspace yet (e.g. the
  * marketing homepage). There's no server-side geo-IP in this app, so we use the
  * browser's IANA timezone as a free, keyless proxy for "is this an Egyptian
@@ -106,10 +132,8 @@ export function planName(id: PlanId, locale: Locale): string {
   return t ? t.name[locale] : id
 }
 
-export interface TopupPack {
+export interface TopupPack extends PricedItem {
   id: 'small' | 'medium' | 'large'
-  priceEgypt: string
-  priceGulf: string
   /** Extra WhatsApp-AI conversations granted for `expiryDays` from purchase. */
   whatsapp: number
   /** Extra ad/social/page-copy AI generations granted for `expiryDays` from purchase. */
