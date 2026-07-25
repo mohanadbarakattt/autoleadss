@@ -1,3 +1,4 @@
+import { Panel } from '../suite/ui'
 import type { Funnel, Lead } from '../types'
 import { lastNDays, lastNDaysFromRollup } from '../insights/series'
 
@@ -32,67 +33,67 @@ export default function FunnelAnalytics({ funnel, isRTL }: { funnel: Funnel; isR
       {/* KPI tiles */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {kpis.map((k, i) => (
-          <div key={i} className="rounded-2xl border border-border bg-card p-5">
-            <p className="font-display text-3xl font-bold">{k.v}</p>
-            <p className="mt-0.5 text-xs text-muted-fg">{k.l}</p>
-          </div>
+          <Panel key={i} className="p-5">
+            <p className="font-luxe text-3xl font-semibold text-suite-text">{k.v}</p>
+            <p className="mt-0.5 text-xs text-suite-muted">{k.l}</p>
+          </Panel>
         ))}
       </div>
 
       {/* Visits · last 14 days */}
-      <div className="mt-4 rounded-2xl border border-border bg-card p-6">
-        <p className="mb-5 font-display font-semibold">{isRTL ? 'الزيارات · آخر 14 يوماً' : 'Visits · last 14 days'}</p>
+      <Panel className="mt-4 p-6">
+        <p className="mb-5 font-luxe font-semibold text-suite-text">{isRTL ? 'الزيارات · آخر 14 يوماً' : 'Visits · last 14 days'}</p>
         <div className="flex h-40 items-end gap-1.5" role="img" aria-label="Visits per day, last 14 days">
           {visitDays.map((d, i) => (
             <div key={i} className="group relative flex flex-1 flex-col items-center justify-end" title={`${d.label}: ${d.count}`}>
               <div
-                className="w-full rounded-t bg-foreground/40 transition-all"
-                style={{ height: d.count ? `${(d.count / visitMax) * 100}%` : '2px', opacity: d.count ? 1 : 0.18, minHeight: 2 }}
+                className="w-full rounded-t bg-suite-text/30 transition-all"
+                style={{ height: d.count ? `${(d.count / visitMax) * 100}%` : '2px', opacity: d.count ? 1 : 0.25, minHeight: 2 }}
               />
             </div>
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] text-muted-fg">
+        <div className="mt-2 flex justify-between text-[10px] text-suite-muted">
           <span>{visitDays[0].label}</span>
           <span>{visitDays[visitDays.length - 1].label}</span>
         </div>
-      </div>
+      </Panel>
 
-      {/* Leads · last 14 days — single-series bars, brand accent */}
-      <div className="mt-4 rounded-2xl border border-border bg-card p-6">
-        <p className="mb-1 font-display font-semibold">{isRTL ? 'العملاء · آخر 14 يوماً' : 'Leads · last 14 days'}</p>
-        <p className="mb-5 text-xs text-muted-fg">{isRTL ? `${leads.length} عميل` : `${leads.length} total`} · {waPct}% {isRTL ? 'واتساب' : 'via WhatsApp'}</p>
+      {/* Leads · last 14 days — single-series bars, gold accent */}
+      <Panel className="mt-4 p-6">
+        <p className="mb-1 font-luxe font-semibold text-suite-text">{isRTL ? 'العملاء · آخر 14 يوماً' : 'Leads · last 14 days'}</p>
+        <p className="mb-5 text-xs text-suite-muted">{isRTL ? `${leads.length} عميل` : `${leads.length} total`} · {waPct}% {isRTL ? 'واتساب' : 'via WhatsApp'}</p>
         <div className="flex h-40 items-end gap-1.5" role="img" aria-label="Leads per day, last 14 days">
           {days.map((d, i) => (
             <div key={i} className="group relative flex flex-1 flex-col items-center justify-end" title={`${d.label}: ${d.count}`}>
               <div
-                className="w-full rounded-t bg-accent transition-all"
-                style={{ height: d.count ? `${(d.count / max) * 100}%` : '2px', opacity: d.count ? 1 : 0.18, minHeight: 2 }}
+                className="w-full rounded-t bg-suite-gold transition-all"
+                style={{ height: d.count ? `${(d.count / max) * 100}%` : '2px', opacity: d.count ? 1 : 0.25, minHeight: 2 }}
               />
             </div>
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] text-muted-fg">
+        <div className="mt-2 flex justify-between text-[10px] text-suite-muted">
           <span>{days[0].label}</span>
           <span>{days[days.length - 1].label}</span>
         </div>
-      </div>
+      </Panel>
 
       {/* Source breakdown — direct-labeled, not colour-alone */}
-      <div className="mt-4 rounded-2xl border border-border bg-card p-6">
-        <p className="mb-4 font-display font-semibold">{isRTL ? 'مصادر العملاء' : 'Lead sources'}</p>
+      <Panel className="mt-4 p-6">
+        <p className="mb-4 font-luxe font-semibold text-suite-text">{isRTL ? 'مصادر العملاء' : 'Lead sources'}</p>
         <div className="flex flex-col gap-3">
           {sources.map((s) => (
             <div key={s.key} className="flex items-center gap-3">
-              <span className="w-28 shrink-0 text-sm text-foreground">{s.label}</span>
-              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${(s.count / srcMax) * 100}%` }} />
+              <span className="w-28 shrink-0 text-sm text-suite-text">{s.label}</span>
+              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-suite-panel2">
+                <div className="h-full rounded-full bg-suite-gold" style={{ width: `${(s.count / srcMax) * 100}%` }} />
               </div>
-              <span className="w-8 text-end text-sm font-semibold tabular-nums">{s.count}</span>
+              <span className="w-8 text-end text-sm font-semibold tabular-nums text-suite-text">{s.count}</span>
             </div>
           ))}
         </div>
-      </div>
+      </Panel>
     </div>
   )
 }

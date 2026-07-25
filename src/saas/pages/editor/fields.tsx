@@ -4,8 +4,8 @@
 
 export function FieldGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="mb-3 font-display text-sm font-semibold">{title}</p>
+    <div className="rounded-2xl border border-suite-line bg-suite-panel p-5">
+      <p className="mb-3 font-luxe text-sm font-semibold text-suite-text">{title}</p>
       <div className="flex flex-col gap-3">{children}</div>
     </div>
   )
@@ -14,9 +14,9 @@ export function FieldGroup({ title, children }: { title: string; children: React
 export function EditField({ label, value, onChange, error }: { label: string; value: string; onChange: (v: string) => void; error?: string }) {
   return (
     <label className="flex flex-col gap-1">
-      {label && <span className="text-[10px] font-medium uppercase text-muted-fg">{label}</span>}
-      <input value={value} onChange={(e) => onChange(e.target.value)} className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-accent ${error ? 'border-red-400' : 'border-border'}`} />
-      {error && <span className="text-[10px] text-red-500">{error}</span>}
+      {label && <span className="text-[10px] font-medium uppercase text-suite-muted">{label}</span>}
+      <input value={value} onChange={(e) => onChange(e.target.value)} className={`w-full rounded-lg border bg-suite-panel2 px-3 py-2 text-sm text-suite-text outline-none focus:border-suite-gold ${error ? 'border-red-400/70' : 'border-suite-line'}`} />
+      {error && <span className="text-[10px] text-red-400">{error}</span>}
     </label>
   )
 }
@@ -24,8 +24,8 @@ export function EditField({ label, value, onChange, error }: { label: string; va
 export function EditArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="flex flex-col gap-1">
-      {label && <span className="text-[10px] font-medium uppercase text-muted-fg">{label}</span>}
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent" />
+      {label && <span className="text-[10px] font-medium uppercase text-suite-muted">{label}</span>}
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} className="w-full resize-none rounded-lg border border-suite-line bg-suite-panel2 px-3 py-2 text-sm text-suite-text outline-none focus:border-suite-gold" />
     </label>
   )
 }

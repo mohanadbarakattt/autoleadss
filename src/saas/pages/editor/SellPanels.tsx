@@ -40,10 +40,10 @@ export function ProductsPanel() {
   const { t } = useI18n()
   const p = t.editor.productsPanel
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-border bg-card p-10 text-center">
-      <Package size={28} className="text-accent" />
-      <p className="text-sm text-muted-fg">{p.body}</p>
-      <Link to="/app/products" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-transform hover:-translate-y-0.5">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-suite-line bg-suite-panel p-10 text-center">
+      <Package size={28} className="text-suite-gold-l" />
+      <p className="text-sm text-suite-muted">{p.body}</p>
+      <Link to="/app/products" className="inline-flex items-center gap-2 rounded-full bg-suite-gold px-5 py-2.5 text-sm font-semibold text-[#1c150a] transition-opacity hover:opacity-90">
         {p.cta}
       </Link>
     </div>
@@ -51,10 +51,10 @@ export function ProductsPanel() {
 }
 
 const STATUS_TONE: Record<Order['status'], string> = {
-  pending: 'bg-amber-500/15 text-amber-600',
-  paid: 'bg-emerald-500/15 text-emerald-600',
-  cancelled: 'bg-muted text-muted-fg',
-  refunded: 'bg-red-500/15 text-red-600',
+  pending: 'bg-amber-500/15 text-amber-300',
+  paid: 'bg-suite-ok/15 text-suite-ok',
+  cancelled: 'bg-suite-panel2 text-suite-muted',
+  refunded: 'bg-red-500/15 text-red-300',
 }
 
 /** Real orders (GET /api/orders, via the shared store — see store.ts's
@@ -63,13 +63,13 @@ const STATUS_TONE: Record<Order['status'], string> = {
 export function OrdersPanel({ orders }: { orders: Order[] }) {
   const { t } = useI18n()
   const p = t.editor.ordersPanel
-  if (!orders.length) return <p className="py-16 text-center text-sm text-muted-fg">{p.empty}</p>
+  if (!orders.length) return <p className="py-16 text-center text-sm text-suite-muted">{p.empty}</p>
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+    <div className="overflow-x-auto rounded-2xl border border-suite-line bg-suite-panel">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-xs text-muted-fg">
+          <tr className="border-b border-suite-line text-xs text-suite-muted">
             <th className="px-5 py-3 text-start font-medium">{p.buyer}</th>
             <th className="px-5 py-3 text-start font-medium">{p.items}</th>
             <th className="px-5 py-3 text-start font-medium">{p.total}</th>
@@ -79,14 +79,14 @@ export function OrdersPanel({ orders }: { orders: Order[] }) {
         </thead>
         <tbody>
           {orders.map((o) => (
-            <tr key={o.id} className="border-b border-border/60 last:border-0">
-              <td className="px-5 py-3 font-medium">{o.buyerName || '—'}</td>
-              <td className="px-5 py-3 text-muted-fg">{o.items.map((it) => `${it.nameSnapshot} ×${it.quantity}`).join(', ')}</td>
-              <td className="px-5 py-3">{formatMinorUnits(o.subtotalMinor, o.currency)}</td>
+            <tr key={o.id} className="border-b border-suite-line/60 last:border-0">
+              <td className="px-5 py-3 font-medium text-suite-text">{o.buyerName || '—'}</td>
+              <td className="px-5 py-3 text-suite-muted">{o.items.map((it) => `${it.nameSnapshot} ×${it.quantity}`).join(', ')}</td>
+              <td className="px-5 py-3 text-suite-text">{formatMinorUnits(o.subtotalMinor, o.currency)}</td>
               <td className="px-5 py-3">
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_TONE[o.status]}`}>{p.statuses[o.status]}</span>
               </td>
-              <td className="px-5 py-3 text-muted-fg">{new Date(o.createdAt).toLocaleDateString()}</td>
+              <td className="px-5 py-3 text-suite-muted">{new Date(o.createdAt).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>

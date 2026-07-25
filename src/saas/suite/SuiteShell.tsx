@@ -8,9 +8,9 @@ import AuthGate from '../auth/authReady'
 import LogoutButton from '../auth/LogoutButton'
 import LocaleSwitcher from '../components/LocaleSwitcher'
 
-/** The dark-luxe top bar for the suite Hub (al-hub.html `.bar`). Coexists with
- * AppShell — existing SaaS pages (Dashboard, Editor, Wizard, ...) keep AppShell and
- * their current light look; only the Hub route uses this.
+/** The dark-luxe top bar for the whole suite (al-hub.html `.bar`). Every
+ * routed SaaS page now mounts this (Phase 7a finished the migration off
+ * `AppShell`, which stays in the repo unreferenced in case it's needed again).
  *
  * `minimal` hides the nav links (Home/Tools/Clients/Pricing) — used by the
  * onboarding page (Start.tsx), which isn't part of that nav flow yet. The bar
