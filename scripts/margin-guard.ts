@@ -13,6 +13,15 @@
 // AutoLeadss has no margin floor of its own yet (spec §6: "none coded"), so this
 // reuses Virlo's ecosystem-wide 55%/60% hard-floor/warn-target pair rather than
 // inventing a new one — the safer, already-vetted choice.
+//
+// Phase 7b (geo-located pricing currency): the app now displays a price in
+// whichever of EGP/USD/AED/SAR the visitor sees (src/saas/currency.ts). A
+// currency the app can show but this guard doesn't check is a guard that has
+// stopped guarding — so EVERY row below is checked for every currency the
+// pricing page can display, not just the original two region price lists.
+// AED/SAR rows run the ACTUAL display price (`convertUsdToCurrency`, the same
+// function Pricing.tsx calls) back through the margin formula, proving they
+// land in the same safe territory as USD rather than assuming it.
 
 import { TIERS, TOPUP_PACKS } from "../src/saas/pricing";
 import { ENTITLEMENTS } from "../src/saas/entitlements";
@@ -26,9 +35,15 @@ import {
 // remitted and was never ours — ignoring that overstated every margin here
 // by ~12 percentage points.
 import { computeMargin, egpToPiastres, piastresToEgp, usdToEgpRate } from "../src/saas/lib/money/index.js";
+import { convertUsdToCurrency, CURRENCY_PEGS } from "../src/saas/currency";
+import type { Currency } from "../src/saas/types";
 
 export const HARD_FLOOR = 0.55;
 export const WARN_TARGET = 0.6;
+
+/** Every currency the pricing page can display (src/saas/currency.ts's
+ * SUPPORTED_CURRENCIES) — this is the set the guard must cover. */
+export const DISPLAYED_CURRENCIES: readonly Currency[] = ["EGP", "USD", "AED", "SAR"];
 
 function parseEgp(s: string): number {
   const n = Number(s.replace(/[^0-9.]/g, ""));
@@ -41,11 +56,9 @@ function parseUsd(s: string): number {
   return n;
 }
 
-export type Region = "egypt" | "gulf";
-
 export type TierMarginRow = {
   tier: string;
-  region: Region;
+  currency: Currency;
   listPrice: number;
   fee: number;
   netRevenue: number;
@@ -57,7 +70,7 @@ export type TierMarginRow = {
 
 export type TopupMarginRow = {
   pack: string;
-  region: Region;
+  currency: Currency;
   listPrice: number;
   fee: number;
   netRevenue: number;
@@ -73,6 +86,26 @@ export type GuardResult = {
   topupRows: TopupMarginRow[];
 };
 
+/**
+ * Margin for a USD-cost-basis price point: USD itself, or a Gulf currency
+ * pegged to it (AED/SAR). All three share Stripe as the (hypothetical, since
+ * payments aren't live) processor and USD-denominated WhatsApp/AI costs, so
+ * they share this one formula — the only thing that changes per currency is
+ * `listPrice`, computed via the SAME `convertUsdToCurrency` the app uses to
+ * DISPLAY it. That price is round-tripped back to a USD equivalent to compute
+ * the fee, which is what makes this an independent proof of AED/SAR margin
+ * rather than an assumption that it matches USD's.
+ */
+function usdBasisRow(usdPrice: number, currency: "USD" | "AED" | "SAR", costUsd: number) {
+  const listPrice = currency === "USD" ? usdPrice : convertUsdToCurrency(usdPrice, currency);
+  const peg = currency === "USD" ? 1 : CURRENCY_PEGS[currency]!;
+  const usdEquivalent = listPrice / peg;
+  const fee = stripeFeeUsd(usdEquivalent) * peg;
+  const netRevenue = listPrice - fee;
+  const totalCost = costUsd * peg;
+  return { listPrice, fee, netRevenue, totalCost, marginPct: (netRevenue - totalCost) / netRevenue };
+}
+
 /** Worst-case tier economics at full cap burn — Starter/Done-with-you/White-label
  * have no numeric cap (see entitlements.ts's `null` cases) so there's nothing to
  * check for them; only Growth/Pro carry the new WhatsApp-AI/AI-action exposure. */
@@ -84,10 +117,10 @@ export function tierMarginRows(): TierMarginRow[] {
     const ent = ENTITLEMENTS[planId];
     const whatsappCap = ent.whatsappCap?.limit ?? 0;
     const aiActionCap = ent.aiActionCap?.limit ?? 0;
+    const costUsd = whatsappCap * WHATSAPP_COST_USD + aiActionCap * AI_ACTION_COST_USD;
 
     const egpPrice = parseEgp(tier.priceEgypt);
     const rate = usdToEgpRate();
-    const costUsd = whatsappCap * WHATSAPP_COST_USD + aiActionCap * AI_ACTION_COST_USD;
     const m = computeMargin({ costUsd, priceP: egpToPiastres(egpPrice), rate });
     const egpFee = piastresToEgp(m.feeP + m.vatP); // fee + VAT both leave us
     const egpNet = piastresToEgp(m.netP);
@@ -96,7 +129,7 @@ export function tierMarginRows(): TierMarginRow[] {
     const egpTotalCost = piastresToEgp(m.costP);
     rows.push({
       tier: planId,
-      region: "egypt",
+      currency: "EGP",
       listPrice: egpPrice,
       fee: egpFee,
       netRevenue: egpNet,
@@ -107,22 +140,21 @@ export function tierMarginRows(): TierMarginRow[] {
     });
 
     const usdPrice = parseUsd(tier.priceGulf);
-    const usdFee = stripeFeeUsd(usdPrice);
-    const usdNet = usdPrice - usdFee;
-    const usdWhatsappCost = whatsappCap * WHATSAPP_COST_USD;
-    const usdAiCost = aiActionCap * AI_ACTION_COST_USD;
-    const usdTotalCost = usdWhatsappCost + usdAiCost;
-    rows.push({
-      tier: planId,
-      region: "gulf",
-      listPrice: usdPrice,
-      fee: usdFee,
-      netRevenue: usdNet,
-      whatsappCost: usdWhatsappCost,
-      aiActionCost: usdAiCost,
-      totalCost: usdTotalCost,
-      marginPct: (usdNet - usdTotalCost) / usdNet,
-    });
+    for (const currency of ["USD", "AED", "SAR"] as const) {
+      const r = usdBasisRow(usdPrice, currency, costUsd);
+      const peg = currency === "USD" ? 1 : CURRENCY_PEGS[currency]!;
+      rows.push({
+        tier: planId,
+        currency,
+        listPrice: r.listPrice,
+        fee: r.fee,
+        netRevenue: r.netRevenue,
+        whatsappCost: whatsappCap * WHATSAPP_COST_USD * peg,
+        aiActionCost: aiActionCap * AI_ACTION_COST_USD * peg,
+        totalCost: r.totalCost,
+        marginPct: r.marginPct,
+      });
+    }
   }
   return rows;
 }
@@ -136,7 +168,7 @@ export function topupMarginRows(): TopupMarginRow[] {
     const packCostUsd = pack.whatsapp * WHATSAPP_COST_USD + pack.aiAction * AI_ACTION_COST_USD;
     const pm = computeMargin({ costUsd: packCostUsd, priceP: egpToPiastres(egpPrice) });
     rows.push({
-      pack: pack.id, region: "egypt", listPrice: egpPrice,
+      pack: pack.id, currency: "EGP", listPrice: egpPrice,
       fee: piastresToEgp(pm.feeP + pm.vatP),
       netRevenue: piastresToEgp(pm.netP),
       totalCost: piastresToEgp(pm.costP),
@@ -144,10 +176,10 @@ export function topupMarginRows(): TopupMarginRow[] {
     });
 
     const usdPrice = parseUsd(pack.priceGulf);
-    const usdFee = stripeFeeUsd(usdPrice);
-    const usdNet = usdPrice - usdFee;
-    const usdCost = pack.whatsapp * WHATSAPP_COST_USD + pack.aiAction * AI_ACTION_COST_USD;
-    rows.push({ pack: pack.id, region: "gulf", listPrice: usdPrice, fee: usdFee, netRevenue: usdNet, totalCost: usdCost, marginPct: (usdNet - usdCost) / usdNet });
+    for (const currency of ["USD", "AED", "SAR"] as const) {
+      const r = usdBasisRow(usdPrice, currency, packCostUsd);
+      rows.push({ pack: pack.id, currency, listPrice: r.listPrice, fee: r.fee, netRevenue: r.netRevenue, totalCost: r.totalCost, marginPct: r.marginPct });
+    }
   }
   return rows;
 }
@@ -162,7 +194,7 @@ export function runMarginGuard(): GuardResult {
 
   const tierRows = tierMarginRows();
   for (const r of tierRows) {
-    const label = `tier "${r.tier}" (${r.region})`;
+    const label = `tier "${r.tier}" (${r.currency})`;
     if (r.marginPct < HARD_FLOOR) {
       violations.push(`${label}: worst-case margin ${(r.marginPct * 100).toFixed(1)}% < hard floor ${(HARD_FLOOR * 100).toFixed(0)}%`);
     } else if (r.marginPct < WARN_TARGET) {
@@ -172,7 +204,7 @@ export function runMarginGuard(): GuardResult {
 
   const topupRows = topupMarginRows();
   for (const r of topupRows) {
-    const label = `top-up "${r.pack}" (${r.region})`;
+    const label = `top-up "${r.pack}" (${r.currency})`;
     if (r.marginPct < HARD_FLOOR) {
       violations.push(`${label}: worst-case margin ${(r.marginPct * 100).toFixed(1)}% < hard floor ${(HARD_FLOOR * 100).toFixed(0)}%`);
     } else if (r.marginPct < WARN_TARGET) {
@@ -183,20 +215,28 @@ export function runMarginGuard(): GuardResult {
   return { ok: violations.length === 0, violations, warnings, tierRows, topupRows };
 }
 
+function fmtAmount(amount: number, currency: Currency): string {
+  if (currency === "EGP") return `${amount.toFixed(2)} EGP`;
+  if (currency === "USD") return `$${amount.toFixed(2)}`;
+  return `${currency} ${amount.toFixed(2)}`;
+}
+
 export function formatReport(r: GuardResult): string {
   const lines: string[] = [];
   lines.push("");
-  lines.push(`  AutoLeadss margin-guard  ·  WhatsApp $${WHATSAPP_COST_USD}/conv  ·  AI-action $${AI_ACTION_COST_USD}/action  ·  FX ${usdToEgpRate()} EGP/$1  ·  VAT-inclusive`);
-  lines.push("  " + "-".repeat(84));
-  lines.push("  tier/pack       region   list price   net rev.     total cost   margin");
+  lines.push(
+    `  AutoLeadss margin-guard  ·  WhatsApp $${WHATSAPP_COST_USD}/conv  ·  AI-action $${AI_ACTION_COST_USD}/action  ·  FX ${usdToEgpRate()} EGP/$1  ·  AED peg ${CURRENCY_PEGS.AED}  ·  SAR peg ${CURRENCY_PEGS.SAR}  ·  VAT-inclusive`,
+  );
+  lines.push("  " + "-".repeat(88));
+  lines.push("  tier/pack       currency  list price     net rev.       total cost     margin");
   for (const t of r.tierRows) {
     lines.push(
       "  " +
         t.tier.padEnd(15) +
-        t.region.padEnd(9) +
-        (t.region === "egypt" ? `${t.listPrice.toFixed(0)} EGP` : `$${t.listPrice.toFixed(0)}`).padEnd(13) +
-        (t.region === "egypt" ? `${t.netRevenue.toFixed(2)} EGP` : `$${t.netRevenue.toFixed(2)}`).padEnd(13) +
-        (t.region === "egypt" ? `${t.totalCost.toFixed(2)} EGP` : `$${t.totalCost.toFixed(2)}`).padEnd(13) +
+        t.currency.padEnd(10) +
+        fmtAmount(t.listPrice, t.currency).padEnd(15) +
+        fmtAmount(t.netRevenue, t.currency).padEnd(15) +
+        fmtAmount(t.totalCost, t.currency).padEnd(15) +
         (t.marginPct * 100).toFixed(1) + "%",
     );
   }
@@ -204,14 +244,14 @@ export function formatReport(r: GuardResult): string {
     lines.push(
       "  " +
         `topup-${t.pack}`.padEnd(15) +
-        t.region.padEnd(9) +
-        (t.region === "egypt" ? `${t.listPrice.toFixed(0)} EGP` : `$${t.listPrice.toFixed(0)}`).padEnd(13) +
-        (t.region === "egypt" ? `${t.netRevenue.toFixed(2)} EGP` : `$${t.netRevenue.toFixed(2)}`).padEnd(13) +
-        (t.region === "egypt" ? `${t.totalCost.toFixed(2)} EGP` : `$${t.totalCost.toFixed(2)}`).padEnd(13) +
+        t.currency.padEnd(10) +
+        fmtAmount(t.listPrice, t.currency).padEnd(15) +
+        fmtAmount(t.netRevenue, t.currency).padEnd(15) +
+        fmtAmount(t.totalCost, t.currency).padEnd(15) +
         (t.marginPct * 100).toFixed(1) + "%",
     );
   }
-  lines.push("  " + "-".repeat(84));
+  lines.push("  " + "-".repeat(88));
   lines.push(`  hard floor ${(HARD_FLOOR * 100).toFixed(0)}%  ·  warn target ${(WARN_TARGET * 100).toFixed(0)}%`);
   lines.push("");
   for (const w of r.warnings) lines.push("  ⚠ warn:  " + w);
