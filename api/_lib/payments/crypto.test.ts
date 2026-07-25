@@ -41,4 +41,13 @@ describe('crypto round trip', () => {
     process.env.PAYMENTS_ENCRYPTION_KEY = Buffer.from('too-short').toString('base64')
     expect(() => encryptCredentials('x')).toThrow(/32 bytes/)
   })
+
+  it('a single tampered ciphertext byte fails GCM authentication under the CORRECT key', () => {
+    process.env.PAYMENTS_ENCRYPTION_KEY = GOOD_KEY
+    const ciphertext = encryptCredentials('sk_live_super_secret_value')
+    const raw = Buffer.from(ciphertext, 'base64')
+    raw[raw.length - 1] ^= 0xff // flip the last byte of the ciphertext (after iv|tag)
+    const tampered = raw.toString('base64')
+    expect(() => decryptCredentials(tampered)).toThrow()
+  })
 })
