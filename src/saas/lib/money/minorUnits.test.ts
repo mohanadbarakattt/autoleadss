@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { majorToMinor, formatMinorUnits } from './minorUnits'
+import { majorToMinor, formatMinorUnits, minorToMajorInput } from './minorUnits'
 
 describe('majorToMinor', () => {
   it('is exact for classic float-drift decimals', () => {
@@ -43,6 +43,17 @@ describe('majorToMinor', () => {
     expect(() => majorToMinor('')).toThrow()
     expect(() => majorToMinor('12.5.5')).toThrow()
     expect(() => majorToMinor('1e3')).toThrow()
+  })
+})
+
+describe('minorToMajorInput', () => {
+  it('round-trips through majorToMinor', () => {
+    expect(minorToMajorInput(240050)).toBe('2400.50')
+    expect(majorToMinor(minorToMajorInput(240050))).toBe(240050)
+  })
+
+  it('always shows 2 decimal places, even for a whole amount', () => {
+    expect(minorToMajorInput(5000)).toBe('50.00')
   })
 })
 

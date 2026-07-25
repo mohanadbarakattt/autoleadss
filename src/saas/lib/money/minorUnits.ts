@@ -29,6 +29,17 @@ export function majorToMinor(major: string | number): number {
   return minor
 }
 
+/** Inverse of majorToMinor, for pre-filling an EDITABLE price input with a
+ * stored value (e.g. opening the edit form for a 240050-minor-unit product
+ * shows "2400.50"). Not for display — use formatMinorUnits for that (it adds
+ * the currency code and drops trailing zeros, neither of which belongs in an
+ * editable numeric field). Keeping this here, rather than a bare `minor /
+ * 100` in the component, is what makes "never do ad-hoc /100 arithmetic
+ * outside this file" actually true. */
+export function minorToMajorInput(minor: number): string {
+  return (minor / 100).toFixed(2)
+}
+
 /** Formats integer minor units + an ISO currency code for display, e.g.
  * `formatMinorUnits(240000, 'AED')` -> "AED 2,400", `formatMinorUnits(240050, 'AED')`
  * -> "AED 2,400.50". Drops ".00" on whole amounts, like the vendored formatEgp's

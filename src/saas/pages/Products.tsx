@@ -5,7 +5,7 @@ import SuiteShell from '../suite/SuiteShell'
 import { GoldButton, Panel, Tag } from '../suite/ui'
 import { useI18n } from '../i18n'
 import { useSession, useProducts, createProduct, updateProduct, deleteProduct, uid } from '../store'
-import { majorToMinor, formatMinorUnits } from '../lib/money/minorUnits'
+import { majorToMinor, formatMinorUnits, minorToMajorInput } from '../lib/money/minorUnits'
 import type { Product } from '../types'
 
 const STATUS_TONE: Record<Product['status'], string> = {
@@ -167,7 +167,7 @@ function ProductForm({
   const [name, setName] = useState(product?.name ?? '')
   const [description, setDescription] = useState(product?.description ?? '')
   const [imageUrl, setImageUrl] = useState(product?.imageUrl ?? '')
-  const [price, setPrice] = useState(product ? (product.priceMinor / 100).toString() : '')
+  const [price, setPrice] = useState(product ? minorToMajorInput(product.priceMinor) : '')
   const [currency, setCurrency] = useState(product?.currency ?? defaultCurrency)
   const [stock, setStock] = useState(product ? String(product.stock) : '0')
   const [status, setStatus] = useState<Product['status']>(product?.status ?? 'draft')
