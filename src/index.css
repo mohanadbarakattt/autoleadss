@@ -55,6 +55,16 @@ html[dir="rtl"] .font-display {
   font-family: 'IBM Plex Sans Arabic', 'General Sans', sans-serif !important;
 }
 
+/* Arabic is cursive — positive tracking (letter-spacing) pulls joined
+   letterforms apart and reads as broken. Reset it under RTL only, so Latin
+   tracking (English/Franco, both LTR) is untouched. `html[dir="rtl"] *` has
+   higher specificity (0,1,1) than any single Tailwind tracking-* utility
+   (0,1,0) — e.g. .tracking-wide, .tracking-[0.05em] — so this wins without
+   `!important` and without touching every call site individually. */
+html[dir="rtl"] * {
+  letter-spacing: normal;
+}
+
 @layer utilities {
   .section-padding {
     @apply py-[120px] max-md:py-20;
