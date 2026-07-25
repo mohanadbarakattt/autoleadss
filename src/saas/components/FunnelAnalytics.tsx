@@ -1,40 +1,5 @@
 import type { Funnel, Lead } from '../types'
-
-const DAY = 86_400_000
-
-function lastNDays(leads: Lead[], n: number): { label: string; day: number; count: number }[] {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const base = today.getTime()
-  const buckets: { label: string; day: number; count: number }[] = []
-  for (let i = n - 1; i >= 0; i--) {
-    const start = base - i * DAY
-    const d = new Date(start)
-    buckets.push({ label: `${d.getMonth() + 1}/${d.getDate()}`, day: start, count: 0 })
-  }
-  for (const l of leads) {
-    const d = new Date(l.createdAt)
-    d.setHours(0, 0, 0, 0)
-    const idx = Math.round((d.getTime() - (base - (n - 1) * DAY)) / DAY)
-    if (idx >= 0 && idx < n) buckets[idx].count++
-  }
-  return buckets
-}
-
-/** Same last-N-days bucketing as `lastNDays`, but reading straight from the
- * `visitsByDay` rollup (keyed by UTC 'YYYY-MM-DD') instead of a Lead[] array —
- * there's no per-visit event to bucket, just a per-day count. */
-function lastNDaysFromRollup(visitsByDay: Record<string, number> | undefined, n: number): { label: string; count: number }[] {
-  const today = new Date()
-  today.setUTCHours(0, 0, 0, 0)
-  const buckets: { label: string; count: number }[] = []
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today.getTime() - i * DAY)
-    const key = d.toISOString().slice(0, 10)
-    buckets.push({ label: `${d.getUTCMonth() + 1}/${d.getUTCDate()}`, count: visitsByDay?.[key] ?? 0 })
-  }
-  return buckets
-}
+import { lastNDays, lastNDaysFromRollup } from '../insights/series'
 
 export default function FunnelAnalytics({ funnel, isRTL }: { funnel: Funnel; isRTL: boolean }) {
   const leads = funnel.leads
