@@ -19,8 +19,8 @@ import {
   ClipboardList,
   Users,
 } from 'lucide-react'
-import Logo from '../../components/Logo'
-import AuthGate from '../auth/authReady'
+import SuiteShell from '../suite/SuiteShell'
+import { GoldButton } from '../suite/ui'
 import { useI18n, toContentLocale } from '../i18n'
 import { useSession, useFunnels, slugify } from '../store'
 import { useUpgrade } from '../billing/UpgradeContext'
@@ -36,6 +36,10 @@ const ACCENT = '#FF5C2A'
 
 const PLATFORM_ICONS: Record<PlatformInfo['icon'], typeof Search> = { Search, Megaphone, Briefcase, Music2 }
 
+/** The Ad Suite wizard (Phase 4 wizard, brought onto the suite v2 dark-luxe
+ * register in Phase 5c — same header/nav/tokens as Leads/Insights/WhatsApp, so
+ * the product reads as one thing). Generation logic and api/ad-suite.ts are
+ * untouched by that move; only the surrounding chrome and color tokens changed. */
 function AdSuiteInner() {
   const { t, locale, isRTL } = useI18n()
   const session = useSession()
@@ -187,21 +191,17 @@ function AdSuiteInner() {
   }
 
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="relative min-h-screen overflow-hidden bg-background">
-      <Helmet defer={false}>
-        <title>{t.adSuite.navLabel} — AutoLeadss</title>
-        <meta name="robots" content="noindex" />
-      </Helmet>
-      <div aria-hidden className="absolute inset-0 grid-bg" style={{ maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)' }} />
+    <div className="relative mx-auto max-w-[1120px] px-[30px] pb-[60px] pt-9">
+      <div aria-hidden className="pointer-events-none absolute inset-0 grid-bg-dark opacity-50" style={{ maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 70%)' }} />
 
-      <div className="relative z-10 flex items-center justify-between px-6 py-5 md:px-10">
-        <Logo size={28} />
-        <Link to="/app/pages" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-fg transition-colors hover:text-foreground">
-          <X size={18} />
+      <div className="relative z-10 mb-6 flex items-center justify-between">
+        <h1 className="font-luxe text-[28px] font-semibold text-suite-text">{t.adSuite.navLabel}</h1>
+        <Link to="/app/pages" className="flex h-9 w-9 items-center justify-center rounded-full border border-suite-line text-suite-muted transition-colors hover:text-suite-text">
+          <X size={16} />
         </Link>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 pb-24 lg:grid lg:grid-cols-[200px_1fr] lg:gap-12">
+      <div className="relative z-10 lg:grid lg:grid-cols-[200px_1fr] lg:gap-12">
         <aside className="mb-8 lg:sticky lg:top-24 lg:mb-0 lg:self-start">
           <Rail items={railItems} current={railIndex} />
         </aside>
@@ -209,8 +209,8 @@ function AdSuiteInner() {
         <div className="min-w-0">
           {phase === 'form' && step === 0 && (
             <motion.div key="platforms" initial={{ opacity: 0, x: isRTL ? -20 : 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease }}>
-              <h2 className="mb-2 font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.adSuite.platformsTitle}</h2>
-              <p className="mb-6 text-sm text-muted-fg">{t.adSuite.platformsSub}</p>
+              <h2 className="mb-2 font-luxe text-2xl font-semibold text-suite-text">{t.adSuite.platformsTitle}</h2>
+              <p className="mb-6 text-sm text-suite-muted">{t.adSuite.platformsSub}</p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {AD_PLATFORMS.map((id) => {
                   const info = PLATFORM_INFO[id]
@@ -220,18 +220,18 @@ function AdSuiteInner() {
                     <button
                       key={id}
                       onClick={() => togglePlatform(id)}
-                      className={`flex flex-col items-start gap-3 rounded-2xl border p-5 text-start transition-all ${active ? 'border-accent bg-accent/5 shadow-[0_10px_30px_-14px_rgba(255,92,42,0.5)]' : 'border-border bg-card hover:border-accent/40'}`}
+                      className={`flex flex-col items-start gap-3 rounded-2xl border p-5 text-start transition-all ${active ? 'border-suite-gold bg-suite-gold/5 shadow-[0_10px_30px_-14px_rgba(201,168,106,0.4)]' : 'border-suite-line bg-suite-panel hover:border-suite-gold/40'}`}
                     >
                       <div className="flex w-full items-center justify-between">
-                        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? 'bg-accent text-white' : 'bg-muted text-muted-fg'}`}>
+                        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? 'bg-suite-gold text-[#1c150a]' : 'bg-suite-panel2 text-suite-muted'}`}>
                           <Icon size={18} />
                         </span>
-                        {active && <Check size={16} className="text-accent" />}
+                        {active && <Check size={16} className="text-suite-gold-l" />}
                       </div>
-                      <span className="text-sm font-semibold">{info.name}</span>
+                      <span className="text-sm font-semibold text-suite-text">{info.name}</span>
                       <div className="flex flex-wrap gap-1.5">
                         {info.chips.map((c) => (
-                          <span key={c.en} className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-fg">
+                          <span key={c.en} className="rounded-full bg-suite-panel2 px-2 py-0.5 text-[11px] text-suite-muted">
                             {contentLocale === 'ar' ? c.ar : c.en}
                           </span>
                         ))}
@@ -241,13 +241,9 @@ function AdSuiteInner() {
                 })}
               </div>
               <div className="mt-10 flex justify-end">
-                <button
-                  onClick={() => selected.length > 0 && setStep(1)}
-                  disabled={selected.length === 0}
-                  className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
-                >
-                  {t.common.next} <Arrow size={16} className="transition-transform group-hover:translate-x-0.5" />
-                </button>
+                <GoldButton onClick={() => selected.length > 0 && setStep(1)} disabled={selected.length === 0}>
+                  {t.common.next} <Arrow size={16} />
+                </GoldButton>
               </div>
             </motion.div>
           )}
@@ -256,8 +252,12 @@ function AdSuiteInner() {
             <motion.div key="details" initial={{ opacity: 0, x: isRTL ? -20 : 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease }}>
               {funnels.length > 0 && (
                 <div className="mb-6">
-                  <label className="mb-1.5 block text-xs font-medium text-muted-fg">{t.adSuite.useFunnel}</label>
-                  <select value={funnelId} onChange={(e) => applyFunnel(e.target.value)} className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20">
+                  <label className="mb-1.5 block text-xs font-medium text-suite-muted">{t.adSuite.useFunnel}</label>
+                  <select
+                    value={funnelId}
+                    onChange={(e) => applyFunnel(e.target.value)}
+                    className="w-full rounded-xl border border-suite-line bg-suite-panel2 px-4 py-2.5 text-sm text-suite-text outline-none focus:border-suite-gold"
+                  >
                     <option value="">{t.adSuite.useFunnelNone}</option>
                     {funnels.map((f) => (
                       <option key={f.id} value={f.id}>{f.name}</option>
@@ -266,28 +266,32 @@ function AdSuiteInner() {
                 </div>
               )}
 
-              <h2 className="mb-4 text-center font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.adSuite.detailsTitle}</h2>
+              <h2 className="mb-4 text-center font-luxe text-2xl font-semibold text-suite-text">{t.adSuite.detailsTitle}</h2>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t.adSuite.detailsPlaceholder}
                 rows={4}
-                className="w-full resize-none rounded-2xl border border-border bg-card px-5 py-4 text-base outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                className="w-full resize-none rounded-2xl border border-suite-line bg-suite-panel2 px-5 py-4 text-base text-suite-text outline-none focus:border-suite-gold"
               />
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-fg">{t.adSuite.businessName}</label>
+                  <label className="mb-1.5 block text-xs font-medium text-suite-muted">{t.adSuite.businessName}</label>
                   <input
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     placeholder={industryNamePlaceholder(industry, contentLocale)}
-                    className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                    className="w-full rounded-xl border border-suite-line bg-suite-panel2 px-4 py-2.5 text-sm text-suite-text outline-none focus:border-suite-gold"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-fg">{t.adSuite.industryLabel}</label>
-                  <select value={industry ?? ''} onChange={(e) => setIndustry(e.target.value as Industry)} className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20">
+                  <label className="mb-1.5 block text-xs font-medium text-suite-muted">{t.adSuite.industryLabel}</label>
+                  <select
+                    value={industry ?? ''}
+                    onChange={(e) => setIndustry(e.target.value as Industry)}
+                    className="w-full rounded-xl border border-suite-line bg-suite-panel2 px-4 py-2.5 text-sm text-suite-text outline-none focus:border-suite-gold"
+                  >
                     <option value="" disabled>{t.adSuite.industryLabel}</option>
                     {INDUSTRIES.map((ind) => (
                       <option key={ind.id} value={ind.id}>{industryLabel(ind.id, contentLocale)}</option>
@@ -297,10 +301,10 @@ function AdSuiteInner() {
               </div>
 
               <div className="mt-6">
-                <p className="mb-2 text-xs font-medium text-muted-fg">{t.adSuite.toneLabel}</p>
+                <p className="mb-2 text-xs font-medium text-suite-muted">{t.adSuite.toneLabel}</p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {tones.map((tn) => (
-                    <button key={tn} onClick={() => setTone(tn)} className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${tone === tn ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-fg hover:border-accent/40'}`}>
+                    <button key={tn} onClick={() => setTone(tn)} className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${tone === tn ? 'border-suite-gold bg-suite-gold/10 text-suite-gold-l' : 'border-suite-line text-suite-muted hover:border-suite-gold/40'}`}>
                       {t.tones[tn]}
                     </button>
                   ))}
@@ -308,10 +312,10 @@ function AdSuiteInner() {
               </div>
 
               <div className="mt-6">
-                <p className="mb-2 text-xs font-medium text-muted-fg">{t.adSuite.adLanguage}</p>
+                <p className="mb-2 text-xs font-medium text-suite-muted">{t.adSuite.adLanguage}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {(['en', 'ar'] as const).map((l) => (
-                    <button key={l} onClick={() => setLanguage(l)} className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${language === l ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-fg hover:border-accent/40'}`}>
+                    <button key={l} onClick={() => setLanguage(l)} className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${language === l ? 'border-suite-gold bg-suite-gold/10 text-suite-gold-l' : 'border-suite-line text-suite-muted hover:border-suite-gold/40'}`}>
                       {l === 'en' ? 'English' : 'العربية'}
                     </button>
                   ))}
@@ -319,16 +323,12 @@ function AdSuiteInner() {
               </div>
 
               <div className="mt-10 flex items-center justify-between">
-                <button onClick={() => setStep(0)} className="rounded-full px-5 py-2.5 text-sm font-medium text-muted-fg transition-colors hover:text-foreground">
+                <button onClick={() => setStep(0)} className="rounded-full px-5 py-2.5 text-sm font-medium text-suite-muted transition-colors hover:text-suite-text">
                   {t.common.back}
                 </button>
-                <button
-                  onClick={startGeneration}
-                  disabled={!detailsValid}
-                  className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_36px_-8px_rgba(255,92,42,0.6)] disabled:opacity-40"
-                >
+                <GoldButton onClick={startGeneration} disabled={!detailsValid}>
                   <Sparkles size={16} /> {t.adSuite.generateCta}
-                </button>
+                </GoldButton>
               </div>
             </motion.div>
           )}
@@ -341,17 +341,17 @@ function AdSuiteInner() {
                   <Sparkles size={34} className="animate-pulse text-white" />
                 </span>
               </div>
-              <h2 className="font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.adSuite.generatingTitle}</h2>
-              <p className="mt-2 text-sm text-muted-fg">{t.adSuite.generatingSub}</p>
+              <h2 className="font-luxe text-2xl font-semibold text-suite-text">{t.adSuite.generatingTitle}</h2>
+              <p className="mt-2 text-sm text-suite-muted">{t.adSuite.generatingSub}</p>
               <div className="mt-8 flex w-full max-w-xs flex-col gap-2.5">
                 {selected.map((p) => {
                   const done = !!results[p]
                   return (
                     <div key={p} className="flex items-center gap-3 text-sm">
-                      <span className={`flex h-5 w-5 items-center justify-center rounded-full ${done ? 'bg-accent text-white' : 'bg-accent/20'}`}>
-                        {done ? <Check size={12} /> : <Loader2 size={12} className="animate-spin text-accent" />}
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full ${done ? 'bg-suite-gold text-[#1c150a]' : 'bg-suite-gold/20'}`}>
+                        {done ? <Check size={12} /> : <Loader2 size={12} className="animate-spin text-suite-gold-l" />}
                       </span>
-                      <span className="font-medium text-foreground">{PLATFORM_INFO[p].name}</span>
+                      <span className="font-medium text-suite-text">{PLATFORM_INFO[p].name}</span>
                     </div>
                   )
                 })}
@@ -363,21 +363,21 @@ function AdSuiteInner() {
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h2 className="font-display text-2xl font-bold" style={{ letterSpacing: '-0.02em' }}>{t.adSuite.readyTitle}</h2>
-                  <p className="mt-1 text-sm text-muted-fg">{t.adSuite.readySub}</p>
+                  <h2 className="font-luxe text-2xl font-semibold text-suite-text">{t.adSuite.readyTitle}</h2>
+                  <p className="mt-1 text-sm text-suite-muted">{t.adSuite.readySub}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={exportAll} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:border-accent/40">
+                  <button onClick={exportAll} className="inline-flex items-center gap-2 rounded-[11px] border border-suite-line px-4 py-2.5 text-sm font-medium text-suite-muted transition-colors hover:text-suite-text">
                     <FileDown size={15} /> {t.adSuite.exportAll}
                   </button>
-                  <button onClick={startOver} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:border-accent/40">
+                  <button onClick={startOver} className="inline-flex items-center gap-2 rounded-[11px] border border-suite-line px-4 py-2.5 text-sm font-medium text-suite-muted transition-colors hover:text-suite-text">
                     {t.adSuite.startOver}
                   </button>
                 </div>
               </div>
 
               {capNote && (
-                <div className="mb-6 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+                <div className="mb-6 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-300">
                   {t.adSuite.capNote}
                 </div>
               )}
@@ -414,8 +414,8 @@ function Rail({ items, current }: { items: string[]; current: number }) {
         {items.map((label, i) => {
           const state = i < current ? 'done' : i === current ? 'active' : 'todo'
           return (
-            <div key={label} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${state === 'active' ? 'bg-accent/10 text-accent' : state === 'done' ? 'text-foreground' : 'text-muted-fg'}`}>
-              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${state === 'active' ? 'bg-accent text-white' : state === 'done' ? 'bg-accent/20 text-accent' : 'border border-border text-muted-fg'}`}>
+            <div key={label} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${state === 'active' ? 'bg-suite-gold/10 text-suite-gold-l' : state === 'done' ? 'text-suite-text' : 'text-suite-muted'}`}>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${state === 'active' ? 'bg-suite-gold text-[#1c150a]' : state === 'done' ? 'bg-suite-gold/20 text-suite-gold-l' : 'border border-suite-line text-suite-muted'}`}>
                 {state === 'done' ? <Check size={12} /> : i + 1}
               </span>
               {label}
@@ -428,10 +428,10 @@ function Rail({ items, current }: { items: string[]; current: number }) {
           const state = i < current ? 'done' : i === current ? 'active' : 'todo'
           return (
             <div key={label} className="flex flex-1 items-center gap-2">
-              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${state === 'active' ? 'bg-accent text-white' : state === 'done' ? 'bg-accent/20 text-accent' : 'border border-border text-muted-fg'}`}>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${state === 'active' ? 'bg-suite-gold text-[#1c150a]' : state === 'done' ? 'bg-suite-gold/20 text-suite-gold-l' : 'border border-suite-line text-suite-muted'}`}>
                 {state === 'done' ? <Check size={12} /> : i + 1}
               </span>
-              {i < items.length - 1 && <span className={`h-0.5 flex-1 rounded-full ${state === 'done' ? 'bg-accent/40' : 'bg-border'}`} />}
+              {i < items.length - 1 && <span className={`h-0.5 flex-1 rounded-full ${state === 'done' ? 'bg-suite-gold/40' : 'bg-suite-line'}`} />}
             </div>
           )
         })}
@@ -449,7 +449,7 @@ function CopyBtn({ text }: { text: string }) {
         setC(true)
         setTimeout(() => setC(false), 1400)
       }}
-      className="shrink-0 text-muted-fg transition-colors hover:text-foreground"
+      className="shrink-0 text-suite-muted transition-colors hover:text-suite-text"
     >
       {c ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
     </button>
@@ -457,7 +457,7 @@ function CopyBtn({ text }: { text: string }) {
 }
 
 function CharCount({ len, max }: { len: number; max: number }) {
-  return <span className={`shrink-0 text-[10px] tabular-nums ${len > max ? 'text-red-500' : 'text-muted-fg'}`}>{len}/{max}</span>
+  return <span className={`shrink-0 text-[10px] tabular-nums ${len > max ? 'text-red-400' : 'text-suite-muted'}`}>{len}/{max}</span>
 }
 
 function PlatformCard({
@@ -479,16 +479,16 @@ function PlatformCard({
   const Icon = PLATFORM_ICONS[info.icon]
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+    <div className="flex flex-col gap-4 rounded-2xl border border-suite-line bg-suite-panel p-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl text-white" style={{ background: accent }}>
             <Icon size={16} />
           </span>
-          <span className="text-sm font-semibold">{info.name}</span>
-          {result.isDemoContent && <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-fg">{t.adSuite.sample}</span>}
+          <span className="text-sm font-semibold text-suite-text">{info.name}</span>
+          {result.isDemoContent && <span className="rounded-full bg-suite-gold/15 px-2 py-0.5 text-[10px] font-semibold text-suite-gold-l">{t.adSuite.sample}</span>}
         </div>
-        <button onClick={onRegenerate} disabled={regenerating} className="flex items-center gap-1.5 text-xs font-medium text-muted-fg transition-colors hover:text-foreground disabled:opacity-50">
+        <button onClick={onRegenerate} disabled={regenerating} className="flex items-center gap-1.5 text-xs font-medium text-suite-muted transition-colors hover:text-suite-text disabled:opacity-50">
           {regenerating ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />} {t.adSuite.regenerate}
         </button>
       </div>
@@ -497,20 +497,20 @@ function PlatformCard({
       {result.platform === 'linkedin' && <LinkedInCopyBlock copy={result.copy as LinkedInCopy} t={t} />}
       {(result.platform === 'meta' || result.platform === 'tiktok') && <SocialCopy copy={result.copy as SocialVideoCopy} t={t} platform={result.platform} />}
 
-      <div className="rounded-xl bg-muted/50 p-3 text-xs">
-        <p className="mb-1.5 flex items-center gap-1.5 font-semibold text-muted-fg"><Users size={12} /> {t.adSuite.audienceLabel}</p>
-        <p><span className="text-muted-fg">{t.adSuite.interests}:</span> {result.audience.interests.join(', ')}</p>
-        <p><span className="text-muted-fg">{t.adSuite.jobTitles}:</span> {result.audience.jobTitles.join(', ')}</p>
-        <p><span className="text-muted-fg">{t.adSuite.ageBands}:</span> {result.audience.ageBands.join(', ')}</p>
+      <div className="rounded-xl bg-suite-panel2 p-3 text-xs">
+        <p className="mb-1.5 flex items-center gap-1.5 font-semibold text-suite-muted"><Users size={12} /> {t.adSuite.audienceLabel}</p>
+        <p><span className="text-suite-muted">{t.adSuite.interests}:</span> {result.audience.interests.join(', ')}</p>
+        <p><span className="text-suite-muted">{t.adSuite.jobTitles}:</span> {result.audience.jobTitles.join(', ')}</p>
+        <p><span className="text-suite-muted">{t.adSuite.ageBands}:</span> {result.audience.ageBands.join(', ')}</p>
       </div>
 
-      <div className="rounded-xl bg-muted/50 p-3 text-xs">
-        <p className="mb-1 font-semibold text-muted-fg">{t.adSuite.budgetLabel}</p>
+      <div className="rounded-xl bg-suite-panel2 p-3 text-xs">
+        <p className="mb-1 font-semibold text-suite-muted">{t.adSuite.budgetLabel}</p>
         <p>{result.budget.dailyBudgetEgp} {t.adSuite.perDay} — {result.budget.strategy}</p>
       </div>
 
-      <details className="rounded-xl bg-muted/50 p-3 text-xs">
-        <summary className="flex cursor-pointer items-center gap-1.5 font-semibold text-muted-fg"><ClipboardList size={12} /> {t.adSuite.checklistLabel}</summary>
+      <details className="rounded-xl bg-suite-panel2 p-3 text-xs">
+        <summary className="flex cursor-pointer items-center gap-1.5 font-semibold text-suite-muted"><ClipboardList size={12} /> {t.adSuite.checklistLabel}</summary>
         <ol className="mt-2 list-decimal space-y-1.5 ps-4">
           {info.checklist[locale].map((step, i) => (
             <li key={i}>{step}</li>
@@ -525,10 +525,10 @@ function GoogleCopy({ copy, t }: { copy: GoogleRsaCopy; t: ReturnType<typeof use
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-fg">{t.adSuite.headlines}</p>
+        <p className="mb-1 text-xs font-semibold text-suite-muted">{t.adSuite.headlines}</p>
         <ul className="flex flex-col gap-1">
           {copy.headlines.map((h, i) => (
-            <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5">
+            <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">
               <span className="min-w-0 truncate">{h}</span>
               <span className="flex shrink-0 items-center gap-2"><CharCount len={h.length} max={GOOGLE_RSA.headlineMax} /><CopyBtn text={h} /></span>
             </li>
@@ -536,10 +536,10 @@ function GoogleCopy({ copy, t }: { copy: GoogleRsaCopy; t: ReturnType<typeof use
         </ul>
       </div>
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-fg">{t.adSuite.descriptions}</p>
+        <p className="mb-1 text-xs font-semibold text-suite-muted">{t.adSuite.descriptions}</p>
         <ul className="flex flex-col gap-1">
           {copy.descriptions.map((d, i) => (
-            <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5">
+            <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">
               <span className="min-w-0 truncate">{d}</span>
               <span className="flex shrink-0 items-center gap-2"><CharCount len={d.length} max={GOOGLE_RSA.descriptionMax} /><CopyBtn text={d} /></span>
             </li>
@@ -555,17 +555,17 @@ function LinkedInCopyBlock({ copy, t }: { copy: LinkedInCopy; t: ReturnType<type
     <div className="flex flex-col gap-3 text-sm">
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <p className="text-xs font-semibold text-muted-fg">{t.adSuite.intro}</p>
+          <p className="text-xs font-semibold text-suite-muted">{t.adSuite.intro}</p>
           <span className="flex items-center gap-2"><CharCount len={copy.intro.length} max={LINKEDIN_LIMITS.introMax} /><CopyBtn text={copy.intro} /></span>
         </div>
-        <p className="rounded-lg bg-muted/60 px-2.5 py-1.5">{copy.intro}</p>
+        <p className="rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">{copy.intro}</p>
       </div>
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <p className="text-xs font-semibold text-muted-fg">{t.adSuite.headline}</p>
+          <p className="text-xs font-semibold text-suite-muted">{t.adSuite.headline}</p>
           <CopyBtn text={copy.headline} />
         </div>
-        <p className="rounded-lg bg-muted/60 px-2.5 py-1.5">{copy.headline}</p>
+        <p className="rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">{copy.headline}</p>
       </div>
     </div>
   )
@@ -576,25 +576,25 @@ function SocialCopy({ copy, t, platform }: { copy: SocialVideoCopy; t: ReturnTyp
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-fg">{t.adSuite.variants}</p>
+        <p className="mb-1 text-xs font-semibold text-suite-muted">{t.adSuite.variants}</p>
         <ul className="flex flex-col gap-2">
           {copy.variants.map((v, i) => (
-            <li key={i} className="rounded-lg bg-muted/60 px-2.5 py-1.5">
+            <li key={i} className="rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold">{v.headline}</span>
                 <span className="flex shrink-0 items-center gap-2"><CharCount len={v.primaryText.length} max={max} /><CopyBtn text={`${v.headline}\n${v.primaryText}`} /></span>
               </div>
-              <p className="mt-0.5 text-muted-fg">{v.primaryText}</p>
+              <p className="mt-0.5 text-suite-muted">{v.primaryText}</p>
             </li>
           ))}
         </ul>
       </div>
       <div>
-        <p className="mb-1 text-xs font-semibold text-muted-fg">{t.adSuite.videoScript}</p>
+        <p className="mb-1 text-xs font-semibold text-suite-muted">{t.adSuite.videoScript}</p>
         <ul className="flex flex-col gap-1">
           {copy.videoScript.map((b, i) => (
-            <li key={i} className="rounded-lg bg-muted/60 px-2.5 py-1.5">
-              <span className="font-semibold text-accent">{b.time}</span> — {b.beat}
+            <li key={i} className="rounded-lg bg-suite-panel2/60 px-2.5 py-1.5">
+              <span className="font-semibold text-suite-gold-l">{b.time}</span> — {b.beat}
             </li>
           ))}
         </ul>
@@ -603,12 +603,17 @@ function SocialCopy({ copy, t, platform }: { copy: SocialVideoCopy; t: ReturnTyp
   )
 }
 
-/** Route entry: same Clerk-aware gate as Wizard.tsx, full-screen wizard experience
- * (not nested in AppShell — matches the existing /app/new pattern). */
+/** Route entry: suite v2 register (SuiteShell — same header/nav as Leads/
+ * Insights/WhatsApp), same Clerk-aware auth gate SuiteShell already applies to
+ * every other Live tool. */
 export default function AdSuite() {
   return (
-    <AuthGate>
+    <SuiteShell>
+      <Helmet defer={false}>
+        <title>AutoLeadss — ads</title>
+        <meta name="robots" content="noindex" />
+      </Helmet>
       <AdSuiteInner />
-    </AuthGate>
+    </SuiteShell>
   )
 }
