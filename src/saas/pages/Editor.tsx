@@ -2,22 +2,23 @@ import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, FlaskConical, Info, Download, MessageCircle } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Copy, Check, Globe, RefreshCw, Sparkles, Info, Download, MessageCircle } from 'lucide-react'
 import AppShell from '../components/AppShell'
 import FunnelRenderer from '../components/FunnelRenderer'
 import ChatSimulator from '../components/ChatSimulator'
 import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
-import { useFunnel, useOrders, updateSpec, updateFunnel, publishFunnel, setLeadStatus, hasSampleData, clearSampleData } from '../store'
+import { useFunnel, useOrders, updateSpec, updateFunnel, publishFunnel, setLeadStatus, hasSampleData } from '../store'
 import { generateFromTemplate } from '../ai/generate'
-import { generateFollowUp } from '../ai/followUp'
 import { useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
 import { isValidGa4, isValidPixel } from '../lib/tracking'
 import { FieldGroup, EditField, EditArea } from './editor/fields'
 import DomainPanel from './editor/DomainPanel'
 import { StorefrontPanel, ProductsPanel, OrdersPanel } from './editor/SellPanels'
+import { downloadLeadsCsv } from '../leads/csv'
+import { useFollowUpDraft, SampleDataBanner } from '../leads/shared'
 import type { FunnelSpec, Lead, Funnel } from '../types'
 
 type Tab = 'page' | 'ads' | 'chatbot' | 'social' | 'leads' | 'storefront' | 'products' | 'orders' | 'insights' | 'settings' | 'domain'
@@ -306,25 +307,6 @@ export function EditorContent() {
   )
 }
 
-function csvEscape(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
-}
-
-/** Client-side CSV export — leads already live fully in `funnel.leads`, no API call needed. */
-function downloadLeadsCsv(funnelName: string, leads: Lead[]) {
-  const header = ['Name', 'Phone', 'Email', 'Source', 'Status', 'Created At']
-  const rows = leads.map((l) => [l.name, l.phone, l.email ?? '', l.source, l.status, new Date(l.createdAt).toISOString()])
-  const csv = [header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n')
-  // Leading BOM so Excel detects UTF-8 and doesn't mojibake Arabic names.
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${funnelName.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'leads'}-leads.csv`
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
 function SettingsPanel({ spec, set, isRTL }: { spec: FunnelSpec; set: (mutate: (s: FunnelSpec) => FunnelSpec) => void; isRTL: boolean }) {
   const thankYou = spec.page.thankYou
   const metaPixelId = spec.tracking?.metaPixelId ?? ''
@@ -376,26 +358,6 @@ function SettingsPanel({ spec, set, isRTL }: { spec: FunnelSpec; set: (mutate: (
           />
         </div>
       </FieldGroup>
-    </div>
-  )
-}
-
-function SampleDataBanner({ funnelId, isRTL }: { funnelId: string; isRTL: boolean }) {
-  return (
-    <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-      <span className="flex items-center gap-2 font-medium">
-        <FlaskConical size={14} /> {isRTL ? 'يتضمن هذا بيانات تجريبية (عملاء وزيارات وهمية) لتوضيح الشكل النهائي.' : 'This includes sample data (fake leads/visits) to show what a live funnel looks like.'}
-      </span>
-      <button
-        onClick={() => {
-          if (window.confirm(isRTL ? 'مسح كل العملاء والزيارات التجريبية وابدأ من صفر؟' : 'Clear all sample leads/visits and start from scratch?')) {
-            clearSampleData(funnelId)
-          }
-        }}
-        className="shrink-0 font-semibold underline decoration-dotted hover:text-amber-950"
-      >
-        {isRTL ? 'ابدأ من صفر' : 'Start from scratch'}
-      </button>
     </div>
   )
 }
@@ -471,24 +433,7 @@ function LeadsTable({ funnel, leads, locale, isRTL }: { funnel: Funnel; leads: L
 }
 
 function InstantReplyPanel({ funnel, lead, isRTL }: { funnel: Funnel; lead: Lead; isRTL: boolean }) {
-  const [draft, setDraft] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
-
-  async function regenerate() {
-    setBusy(true)
-    try {
-      setDraft(await generateFollowUp(funnel, lead))
-    } finally {
-      setBusy(false)
-    }
-  }
-  useEffect(() => {
-    regenerate()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lead.id])
-
-  const digits = lead.phone.replace(/[^0-9]/g, '')
-  const waHref = draft ? `https://wa.me/${digits}?text=${encodeURIComponent(draft)}` : undefined
+  const { draft, setDraft, busy, regenerate, waHref } = useFollowUpDraft(funnel, lead)
 
   return (
     <div className="flex flex-col gap-3">
