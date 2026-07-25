@@ -45,10 +45,12 @@ export default function ClerkAuth({ mode }: { mode: 'signin' | 'signup' }) {
         <div className="mb-8 lg:hidden">
           <Logo size={30} />
         </div>
+        {/* Both land on /app: the Hub gate routes new users (no toolkit) to
+            /app/start onboarding, returning users straight to the Hub. */}
         {isSignup ? (
-          <SignUp signInUrl="/login" fallbackRedirectUrl="/app/new" />
+          <SignUp signInUrl="/login" fallbackRedirectUrl="/app" />
         ) : (
-          <SignIn signUpUrl="/signup" fallbackRedirectUrl="/app/pages" />
+          <SignIn signUpUrl="/signup" fallbackRedirectUrl="/app" />
         )}
       </div>
     </div>

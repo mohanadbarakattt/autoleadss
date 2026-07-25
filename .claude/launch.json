@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "autoleadss-demo",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=", "npm", "run", "dev"],
+      "port": 5173
     }
   ]
 }

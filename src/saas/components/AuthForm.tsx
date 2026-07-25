@@ -33,7 +33,8 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
     e.preventDefault()
     if (!validate()) return
     signUp(name.trim(), email.trim(), region)
-    navigate(isSignup ? '/app/new' : '/app/pages')
+    // Both land on /app: the Hub gate routes new users (no toolkit) to /app/start.
+    navigate('/app')
   }
 
   const title = isSignup
