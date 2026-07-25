@@ -167,6 +167,22 @@ export interface Order {
   items: OrderItem[]
 }
 
+/** A merchant's custom domain, mapped to one of their funnels (Phase 4c).
+ * Verified via a real DNS TXT lookup at `_autoleadss.<hostname>` (see
+ * api/domains/verify.ts) — never a checkbox. Only resolves publicly once
+ * `verified` is true (see api/published/index.ts's `?host=` path). */
+export interface Domain {
+  id: string
+  funnelId: string
+  hostname: string
+  verified: boolean
+  /** The exact value the owner must publish in a TXT record at
+   * `_autoleadss.<hostname>` to prove control of the domain. */
+  verificationToken: string
+  createdAt: number
+  verifiedAt?: number
+}
+
 export interface Workspace {
   id: string
   name: string

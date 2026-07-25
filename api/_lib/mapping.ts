@@ -1,4 +1,4 @@
-import type { Funnel, FunnelSpec, Lead, Product, Order, OrderItem } from '../../src/saas/types'
+import type { Funnel, FunnelSpec, Lead, Product, Order, OrderItem, Domain } from '../../src/saas/types'
 import { toSafeInt } from './money'
 
 /** snake_case DB rows <-> the app's camelCase types. Mirrors the shape the old
@@ -186,4 +186,30 @@ export function normalizeCurrency(v: unknown): string | null {
   if (typeof v !== 'string') return null
   const upper = v.trim().toUpperCase()
   return /^[A-Z]{3}$/.test(upper) ? upper : null
+}
+
+// ---------------------------------------------------------------------------
+// Domains (Phase 4c)
+// ---------------------------------------------------------------------------
+
+export interface DomainRow {
+  id: string
+  funnel_id: string
+  hostname: string
+  verified: boolean
+  verification_token: string
+  created_at: string
+  verified_at: string | null
+}
+
+export function domainFromRow(r: DomainRow): Domain {
+  return {
+    id: r.id,
+    funnelId: r.funnel_id,
+    hostname: r.hostname,
+    verified: r.verified,
+    verificationToken: r.verification_token,
+    createdAt: toMillis(r.created_at),
+    verifiedAt: r.verified_at ? toMillis(r.verified_at) : undefined,
+  }
 }

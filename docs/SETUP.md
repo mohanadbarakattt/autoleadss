@@ -61,8 +61,6 @@ limited to the browser that created the funnel.
 **Out of scope for this phase** (existed as Supabase-backed features in the old
 Phases 3–8 below; not carried over — the app degrades gracefully rather than
 breaking):
-- **Custom domains / host-based publishing** (`src/saas/db/domains.ts`) — the editor's
-  Domain tab always shows "not available yet"; no `autoleadss.domains` table exists.
 - **WhatsApp remote persistence / shared inbox** (`src/saas/db/whatsapp.ts`) — the
   Connect page always shows demo-mode copy; no `autoleadss.whatsapp_*` tables exist.
 - **Agency / white-label settings, sub-accounts, workspace plan & region** — these
@@ -123,9 +121,13 @@ Depended on Phase 5's webhook (removed).
 
 ## Phase 6 (historical) — Custom domains / real publishing
 
-`/p/:slug` cross-device publishing is now covered by "Phase 2 — Shared Neon backend"
-above. Host-based rendering (subdomains + custom domains) was Supabase-backed and
-was not carried over — see "Out of scope" above.
+`/p/:slug` cross-device publishing is covered by "Phase 2 — Shared Neon backend"
+above. Host-based rendering was Supabase-backed and not carried over at the time —
+**since rebuilt on Neon in Phase 4c (2026-07-25)**: `autoleadss.domains` +
+`api/domains/{index,[id],verify}`, with real DNS TXT verification (never a
+checkbox — see `api/domains/verify.ts`) and `api/published/index.ts`'s `?host=`
+path, which only ever resolves a **verified** domain. Migrate with
+`api/db/migrations/0006_domains.sql`.
 
 ## Phase 7 (historical) — White-label / agency mode
 

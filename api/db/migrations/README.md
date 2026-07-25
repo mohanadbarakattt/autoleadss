@@ -20,6 +20,8 @@ psql "$DIRECT_URL" -f api/db/migrations/0001_autoleadss_schema.sql
 psql "$DIRECT_URL" -f api/db/migrations/0002_usage_counters.sql
 psql "$DIRECT_URL" -f api/db/migrations/0003_visits_by_day.sql
 psql "$DIRECT_URL" -f api/db/migrations/0004_payments.sql
+psql "$DIRECT_URL" -f api/db/migrations/0005_sell.sql
+psql "$DIRECT_URL" -f api/db/migrations/0006_domains.sql
 ```
 
 Each file is idempotent (`create table/schema/index if not exists`) — safe to re-run.
@@ -30,9 +32,11 @@ Each file is idempotent (`create table/schema/index if not exists`) — safe to 
 | `0002_usage_counters.sql` | `autoleadss.usage_counters` — per-user, per-month WhatsApp-AI/AI-action usage counts backing `api/usage` and the entitlement caps in `src/saas/entitlements.ts` |
 | `0003_visits_by_day.sql` | `autoleadss.funnels.visits_by_day` — daily visit rollup backing the visits trend chart in `src/saas/components/FunnelAnalytics.tsx` |
 | `0004_payments.sql` | `autoleadss.payment_connections`, `autoleadss.payments`, `autoleadss.payment_events` — the gateway-agnostic merchant payments CORE backing `api/payments/*` (Phase 3a). Gateway adapters land in Phase 3b. |
+| `0005_sell.sql` | `autoleadss.products`, `autoleadss.orders`, `autoleadss.order_items` — the Sell data model backing `api/products/*`, `api/orders`, `api/published/{products,order}` (Phase 4a). |
+| `0006_domains.sql` | `autoleadss.domains` — custom-domain mappings, verified via a real DNS TXT lookup (never a checkbox), backing `api/domains/*` and `api/published/index.ts`'s `?host=` path (Phase 4c). |
 
 Not yet migrated (see `docs/SETUP.md` "Out of scope"): workspaces, agency settings,
-sub-accounts, domains, WhatsApp connections/messages, top-up grants (`TOPUP_PACKS`
+sub-accounts, WhatsApp connections/messages, top-up grants (`TOPUP_PACKS`
 in `src/saas/pricing.ts` stay localStorage-only — see `src/saas/billing/usage.ts`'s
 `purchaseTopup` doc comment for why). These stay in localStorage until a future
 migration adds tables + `api/` routes for them.
