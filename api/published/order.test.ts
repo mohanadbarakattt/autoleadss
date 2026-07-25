@@ -214,6 +214,19 @@ describe('gateway gate (fail-closed)', () => {
     expect(totalRowCount()).toBe(0)
   })
 
+  it('refuses regardless of a client-claimed acceptsPayments hint — the field is never read, only the DB is', async () => {
+    seedSellSite()
+    seedProduct()
+    // No connected+implemented gateway in the DB at all — a client asserting
+    // otherwise (e.g. a stale/tampered acceptsPayments from the products
+    // endpoint) must not change the outcome.
+    const r = res()
+    await handler(req('POST', { slug: 'noor', items: [{ productId: 'prod_1', quantity: 1 }], buyer: BUYER, acceptsPayments: true }), r)
+    expect(r.statusCode).toBe(409)
+    expect(r.body).toEqual({ error: 'payments_not_connected' })
+    expect(totalRowCount()).toBe(0)
+  })
+
   it('succeeds once the fake (test-only, PAYMENTS_FAKE_ADAPTER=1) gateway is connected', async () => {
     process.env.PAYMENTS_FAKE_ADAPTER = '1'
     seedSellSite()

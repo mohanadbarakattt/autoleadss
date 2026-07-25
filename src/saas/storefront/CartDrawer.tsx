@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { X, Minus, Plus, Trash2 } from 'lucide-react'
 import type { PublicProduct } from '../types'
 import type { Dict } from '../i18n'
@@ -8,17 +8,63 @@ import type { Cart } from './cart'
 type Step = 'cart' | 'checkout' | 'gated' | 'success' | 'error'
 
 /**
+ * Locks background scroll while the drawer is open and restores the exact
+ * prior scroll position on close, with no layout shift: `position: fixed`
+ * takes body out of flow (so the page behind can't scroll), and
+ * `padding-inline-end` backfills the width the vanished scrollbar leaves
+ * behind so content doesn't reflow. The logical property (not `padding-right`)
+ * keeps this correct in RTL — it always pads the edge the scrollbar actually
+ * disappeared from, mirrored automatically by direction.
+ */
+function useLockBodyScroll(active: boolean) {
+  useEffect(() => {
+    if (!active) return
+    const { body } = document
+    const scrollY = window.scrollY
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      paddingInlineEnd: body.style.paddingInlineEnd,
+    }
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+    if (scrollbarWidth > 0) body.style.paddingInlineEnd = `${scrollbarWidth}px`
+    return () => {
+      body.style.position = prev.position
+      body.style.top = prev.top
+      body.style.left = prev.left
+      body.style.right = prev.right
+      body.style.width = prev.width
+      body.style.paddingInlineEnd = prev.paddingInlineEnd
+      window.scrollTo(0, scrollY)
+    }
+  }, [active])
+}
+
+/**
  * The cart panel + checkout form for the public storefront. `onCheckout`
  * throwing `Error('payments_not_connected')` is how the caller (Published.tsx)
  * signals the fail-closed gateway gate — see api/published/order.ts's 409 —
  * so this never simulates a purchase; any other failure shows a generic
- * retry state instead.
+ * retry state instead. That's a defense-in-depth fallback for a mid-session
+ * race (gateway disconnected between page load and submit) — the primary
+ * defense is `acceptsPayments`, which hides the checkout button (and with it
+ * the contact form) entirely so a shopper is never asked for their name/
+ * email/phone for an order the store categorically cannot accept.
  */
 export default function CartDrawer({
   open,
   onClose,
   cart,
   products,
+  acceptsPayments,
   t,
   onCheckout,
 }: {
@@ -26,6 +72,7 @@ export default function CartDrawer({
   onClose: () => void
   cart: Cart
   products: PublicProduct[]
+  acceptsPayments: boolean
   t: Dict['storefront']
   onCheckout: (input: {
     items: { productId: string; quantity: number }[]
@@ -37,6 +84,8 @@ export default function CartDrawer({
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  useLockBodyScroll(open)
 
   if (!open) return null
 
@@ -172,9 +221,16 @@ export default function CartDrawer({
                   <span>{t.subtotal}</span>
                   <span className="text-store-gold">{formatMinorUnits(subtotalMinor, currency)}</span>
                 </p>
-                <button type="button" onClick={() => setStep('checkout')} className="mt-3 w-full bg-store-ink py-3 text-xs uppercase tracking-[0.16em] text-white">
-                  {t.checkout}
-                </button>
+                {acceptsPayments ? (
+                  <button type="button" onClick={() => setStep('checkout')} className="mt-3 w-full bg-store-ink py-3 text-xs uppercase tracking-[0.16em] text-white">
+                    {t.checkout}
+                  </button>
+                ) : (
+                  <div className="mt-3 rounded border border-[#e9e4da] px-4 py-3 text-center">
+                    <p className="font-luxe text-sm text-store-ink">{t.gated.title}</p>
+                    <p className="mt-1 text-xs text-[#8a8479]">{t.gated.body}</p>
+                  </div>
+                )}
               </div>
             )}
           </>

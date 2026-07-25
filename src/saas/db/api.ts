@@ -102,10 +102,12 @@ export async function captureLeadRemote(
 }
 
 /** Phase 4b: a storefront's public catalogue — display-safe fields only (see
- * api/published/products.ts). */
-export async function getPublishedProducts(slug: string): Promise<PublicProduct[]> {
-  const { products } = await request<{ products: PublicProduct[] }>(`/api/published/products?slug=${encodeURIComponent(slug)}`)
-  return products
+ * api/published/products.ts). `acceptsPayments` is a UX hint only (lets the
+ * storefront show the "not accepting payments yet" state before ever asking
+ * for the shopper's contact details) — api/published/order.ts re-derives it
+ * server-side and is the actual enforcement. */
+export async function getPublishedProducts(slug: string): Promise<{ products: PublicProduct[]; acceptsPayments: boolean }> {
+  return request(`/api/published/products?slug=${encodeURIComponent(slug)}`)
 }
 
 /** Phase 4b checkout. Throws on any failure, same discipline as every other

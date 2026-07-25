@@ -26,11 +26,18 @@ export default function StorefrontRenderer({
   spec,
   slug,
   products,
+  acceptsPayments,
   onCheckout,
 }: {
   spec: FunnelSpec
   slug: string
   products: PublicProduct[]
+  /** Display-safe UX hint (see api/published/products.ts) — lets the cart
+   * drawer show the "not accepting payments yet" state before the contact
+   * form is ever shown, instead of after collecting the shopper's name/
+   * email/phone for an order that can't be placed. Never the enforcement:
+   * api/published/order.ts refuses independently either way. */
+  acceptsPayments: boolean
   onCheckout: (input: {
     items: { productId: string; quantity: number }[]
     buyer: { name: string; email?: string; phone: string }
@@ -128,7 +135,15 @@ export default function StorefrontRenderer({
         </div>
       </footer>
 
-      <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} cart={cart} products={products} t={t} onCheckout={onCheckout} />
+      <CartDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        cart={cart}
+        products={products}
+        acceptsPayments={acceptsPayments}
+        t={t}
+        onCheckout={onCheckout}
+      />
     </div>
   )
 }

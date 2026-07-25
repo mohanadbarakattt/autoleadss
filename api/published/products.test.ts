@@ -23,7 +23,13 @@ interface ProductRow {
   status: string
 }
 
-const db = { funnels: [] as FunnelRow[], products: [] as ProductRow[] }
+interface ConnectionRow {
+  clerk_user_id: string
+  gateway: string
+  status: string
+}
+
+const db = { funnels: [] as FunnelRow[], products: [] as ProductRow[], connections: [] as ConnectionRow[] }
 
 async function fakeSql(strings: TemplateStringsArray, ...vals: unknown[]) {
   const text = strings.join('?')
@@ -36,6 +42,10 @@ async function fakeSql(strings: TemplateStringsArray, ...vals: unknown[]) {
     return db.products
       .filter((p) => p.clerk_user_id === ownerId && p.status === 'active')
       .map((p) => ({ ...p, price_minor: String(p.price_minor) }))
+  }
+  if (text.includes('select gateway from autoleadss.payment_connections')) {
+    const [ownerId] = vals as [string]
+    return db.connections.filter((c) => c.clerk_user_id === ownerId && c.status === 'connected').map((c) => ({ gateway: c.gateway }))
   }
   throw new Error(`fake db: unmocked query shape: ${text}`)
 }
@@ -60,7 +70,9 @@ function req(query: Record<string, string> = {}) {
 beforeEach(() => {
   db.funnels = []
   db.products = []
+  db.connections = []
   process.env.DATABASE_URL = 'postgresql://user:pass@ep-test.neon.tech/dbname'
+  delete process.env.PAYMENTS_FAKE_ADAPTER
 })
 
 describe('method + config guards', () => {
@@ -121,5 +133,46 @@ describe('display-safe catalogue', () => {
     const r = res()
     await handler(req({ slug: 'noor' }), r)
     expect((r.body as any).products[0].inStock).toBe(false)
+  })
+})
+
+// The display-safe UX hint api/published/order.ts's checkout gate is
+// re-derived from — never which gateway, never a connection id.
+describe('acceptsPayments', () => {
+  it('is false when the owner has no connected gateway', async () => {
+    db.funnels.push({ slug: 'noor', clerk_user_id: 'merchant_A', status: 'published' })
+    const r = res()
+    await handler(req({ slug: 'noor' }), r)
+    expect((r.body as any).acceptsPayments).toBe(false)
+  })
+
+  it('is false when a gateway is connected but not implemented (every real gateway today)', async () => {
+    db.funnels.push({ slug: 'noor', clerk_user_id: 'merchant_A', status: 'published' })
+    db.connections.push({ clerk_user_id: 'merchant_A', gateway: 'tap', status: 'connected' })
+    const r = res()
+    await handler(req({ slug: 'noor' }), r)
+    expect((r.body as any).acceptsPayments).toBe(false)
+  })
+
+  it('is true once a connected + implemented (fake, test-only) gateway exists, and never leaks which one', async () => {
+    process.env.PAYMENTS_FAKE_ADAPTER = '1'
+    db.funnels.push({ slug: 'noor', clerk_user_id: 'merchant_A', status: 'published' })
+    db.connections.push({ clerk_user_id: 'merchant_A', gateway: 'fake', status: 'connected' })
+    const r = res()
+    await handler(req({ slug: 'noor' }), r)
+    expect((r.body as any).acceptsPayments).toBe(true)
+
+    const serialized = JSON.stringify(r.body)
+    expect(serialized).not.toContain('fake') // the gateway id itself never appears in the response
+    expect(serialized).not.toContain('merchant_A')
+  })
+
+  it("ignores another merchant's connected gateway", async () => {
+    process.env.PAYMENTS_FAKE_ADAPTER = '1'
+    db.funnels.push({ slug: 'noor', clerk_user_id: 'merchant_A', status: 'published' })
+    db.connections.push({ clerk_user_id: 'merchant_B', gateway: 'fake', status: 'connected' })
+    const r = res()
+    await handler(req({ slug: 'noor' }), r)
+    expect((r.body as any).acceptsPayments).toBe(false)
   })
 })

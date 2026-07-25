@@ -1,6 +1,7 @@
 import { getSql } from '../_lib/db'
 import { backendNotConfigured, methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { toSafeInt } from '../_lib/money'
+import { connectedImplementedGateway } from '../_lib/payments/gate'
 import type { PublicProduct } from '../../src/saas/types'
 
 interface ProductRow {
@@ -21,6 +22,15 @@ interface ProductRow {
  * `clerk_user_id`, no raw `stock` (just a computed `inStock`). Draft/archived
  * products never appear here, and never a product belonging to any other
  * merchant.
+ *
+ * Also returns `acceptsPayments: boolean` — a display-safe UX hint (never
+ * which gateway, never a connection id or anything derived from credentials)
+ * so the storefront can show the "not accepting payments yet" state BEFORE
+ * ever asking a shopper for their name/email/phone, not after collecting it.
+ * Computed via the exact same predicate api/published/order.ts enforces
+ * (connectedImplementedGateway), so the hint and the enforcement can't
+ * disagree — but it is only ever a hint: order.ts re-derives it from the DB
+ * independently and refuses regardless of what the client claims.
  */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
   if (req.method !== 'GET') return methodNotAllowed(res, ['GET'])
@@ -53,5 +63,6 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     currency: r.currency,
     inStock: r.stock > 0,
   }))
-  return sendJson(res, 200, { products })
+  const acceptsPayments = !!(await connectedImplementedGateway(sql, site.clerk_user_id))
+  return sendJson(res, 200, { products, acceptsPayments })
 }

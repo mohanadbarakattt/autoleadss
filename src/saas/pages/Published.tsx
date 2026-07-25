@@ -29,6 +29,10 @@ export default function Published() {
   // straight from the store (below); remote products are fetched once the
   // funnel resolves (see the effect further down).
   const [remoteProducts, setRemoteProducts] = useState<PublicProduct[]>([])
+  // Demo/local sites have no gateway connection concept at all (see
+  // handleCheckout's doc below) so they never accept payments; remote sites
+  // report the real, server-computed value (see the effect further down).
+  const [remoteAcceptsPayments, setRemoteAcceptsPayments] = useState(false)
   const demoProducts = useProducts()
   /** Which store the currently-shown funnel came from — decides where a captured
    * lead goes. Set once per load so a read/write split-brain can't happen. */
@@ -94,11 +98,17 @@ export default function Published() {
     if (!funnel || funnel.spec.mode !== 'sell' || source.current !== 'remote') return
     let cancelled = false
     getPublishedProducts(funnel.slug)
-      .then((products) => {
-        if (!cancelled) setRemoteProducts(products)
+      .then(({ products, acceptsPayments }) => {
+        if (!cancelled) {
+          setRemoteProducts(products)
+          setRemoteAcceptsPayments(acceptsPayments)
+        }
       })
       .catch(() => {
-        if (!cancelled) setRemoteProducts([])
+        if (!cancelled) {
+          setRemoteProducts([])
+          setRemoteAcceptsPayments(false)
+        }
       })
     return () => {
       cancelled = true
@@ -190,7 +200,7 @@ export default function Published() {
     <div className="relative">
       <Helmet defer={false}>
         <html lang={funnel.language} dir={funnel.language === 'ar' ? 'rtl' : 'ltr'} />
-        <title>{funnel.name} — {hero.eyebrow}</title>
+        <title>{hero.eyebrow ? `${funnel.name} — ${hero.eyebrow}` : funnel.name}</title>
         <meta name="description" content={hero.subhead} />
         <meta property="og:title" content={`${funnel.name} — ${hero.headline}`} />
         <meta property="og:description" content={hero.subhead} />
@@ -218,6 +228,7 @@ export default function Published() {
           spec={funnel.spec}
           slug={funnel.slug}
           products={source.current === 'remote' ? remoteProducts : demoProducts.filter((p) => p.status === 'active').map(toPublicProduct)}
+          acceptsPayments={source.current === 'remote' && remoteAcceptsPayments}
           onCheckout={handleCheckout}
         />
       ) : (

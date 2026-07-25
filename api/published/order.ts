@@ -1,7 +1,7 @@
 import { getSql } from '../_lib/db'
 import { backendNotConfigured, methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { toSafeInt } from '../_lib/money'
-import { getGatewayInfo } from '../_lib/payments/registry'
+import { connectedImplementedGateway } from '../_lib/payments/gate'
 import type { FunnelSpec } from '../../src/saas/types'
 
 /** No cart line may request more than this — "absurdly large" quantities are
@@ -22,10 +22,6 @@ interface OrderBody {
 interface SiteRow {
   clerk_user_id: string
   spec: FunnelSpec
-}
-
-interface ConnectionRow {
-  gateway: string
 }
 
 interface ProductRow {
@@ -97,11 +93,11 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   if (!site || site.spec?.mode !== 'sell') return sendJson(res, 404, { error: `Store not found or not published: ${body.slug}` })
   const ownerId = site.clerk_user_id
 
-  // ---- 2. Gateway gate — fail closed, create NOTHING. ----
-  const connectionRows = (await sql`
-    select gateway from autoleadss.payment_connections where clerk_user_id = ${ownerId} and status = 'connected'
-  `) as unknown as ConnectionRow[]
-  const connectedGateway = connectionRows.find((c) => getGatewayInfo(c.gateway)?.implemented)?.gateway
+  // ---- 2. Gateway gate — fail closed, create NOTHING. Whatever the client
+  // believes (e.g. a stale/tampered `acceptsPayments` hint from
+  // api/published/products.ts) is irrelevant — this is re-derived from the
+  // DB every time via the same shared predicate that hint is computed from. ----
+  const connectedGateway = await connectedImplementedGateway(sql, ownerId)
   if (!connectedGateway) return sendJson(res, 409, { error: 'payments_not_connected' })
 
   // Merge duplicate productIds (sum quantities) and shape-validate before any DB lookup.
