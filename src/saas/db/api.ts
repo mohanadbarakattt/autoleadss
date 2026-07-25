@@ -1,4 +1,4 @@
-import type { Funnel, Lead, LeadWithFunnel, PublicProduct } from '../types'
+import type { Funnel, InsightsSummary, Lead, LeadWithFunnel, PublicProduct } from '../types'
 import type { FollowUpInput } from '../ai/followUp'
 
 /**
@@ -89,6 +89,15 @@ export async function listLeadsRemote(
   const query = qs.toString()
   const { leads } = await authedRequest<{ leads: LeadWithFunnel[] }>(auth, `/api/leads${query ? `?${query}` : ''}`)
   return leads
+}
+
+/** Cross-site analytics rollup — see api/insights/index.ts. Powers the
+ * cross-site /app/insights page in remote mode (demo mode computes the same
+ * shape client-side from `state.funnels` — see src/saas/insights/demo.ts). */
+export async function getInsightsRemote(auth: RemoteAuth, days?: number): Promise<InsightsSummary> {
+  const query = days !== undefined ? `?days=${encodeURIComponent(String(days))}` : ''
+  const { insights } = await authedRequest<{ insights: InsightsSummary }>(auth, `/api/insights${query}`)
+  return insights
 }
 
 /** Gateway-backed instant-reply draft for a lead — see `api/leads/follow-up.ts`.

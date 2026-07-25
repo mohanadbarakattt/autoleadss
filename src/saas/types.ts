@@ -175,6 +175,62 @@ export interface Order {
   items: OrderItem[]
 }
 
+/** Cross-site lead counts by status/source — shared shape between
+ * `GET /api/insights`'s per-site + totals rollup and the demo-mode equivalent
+ * (`src/saas/insights/demo.ts`), so both sides of the remote/demo split
+ * produce the exact same aggregate shape (Phase 5b). */
+export interface LeadStatusCounts {
+  new: number
+  qualified: number
+  won: number
+  lost: number
+}
+
+export interface LeadSourceCounts {
+  page: number
+  whatsapp: number
+}
+
+/** One calendar day's count in a trend series — always UTC-keyed 'YYYY-MM-DD'
+ * (see api/insights/index.ts's module doc for why: `visits_by_day` has no
+ * per-visit timestamp to re-bucket into another timezone). Display formatting
+ * (e.g. "7/24") happens in the page, not here. */
+export interface InsightsDayCount {
+  day: string
+  count: number
+}
+
+export interface SiteInsights {
+  id: string
+  name: string
+  visits: number
+  leads: number
+  leadsByStatus: LeadStatusCounts
+  leadsBySource: LeadSourceCounts
+}
+
+/** Cross-site totals + per-site breakdown + bounded daily trend series — the
+ * response shape of `GET /api/insights` (api/insights/index.ts) and of its
+ * demo-mode equivalent (`src/saas/insights/demo.ts`). No revenue field: an
+ * order can only ever be 'paid' once a payment gateway is connected (Phase
+ * 3b, parked), so `ordersPending` is explicitly labeled pending, never shown
+ * as earned revenue (design honesty requirement b). */
+export interface InsightsSummary {
+  windowDays: number
+  totals: {
+    visits: number
+    leads: number
+    leadsByStatus: LeadStatusCounts
+    leadsBySource: LeadSourceCounts
+    ordersPending: { count: number; byCurrency: { currency: string; valueMinor: number }[] }
+  }
+  sites: SiteInsights[]
+  series: {
+    visits: InsightsDayCount[]
+    leads: InsightsDayCount[]
+  }
+}
+
 /** A merchant's custom domain, mapped to one of their funnels (Phase 4c).
  * Verified via a real DNS TXT lookup at `_autoleadss.<hostname>` (see
  * api/domains/verify.ts) — never a checkbox. Only resolves publicly once
