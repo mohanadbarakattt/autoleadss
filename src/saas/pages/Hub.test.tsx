@@ -18,7 +18,7 @@ function renderHub() {
 // actually pins the implementation instead of just echoing it back. Later phases
 // update these two lists by hand as tools genuinely go live (design spec §4).
 const ALL_TOOL_KEYS = ['storefront', 'ads', 'whatsapp', 'pages', 'leads', 'social', 'insights', 'reviews', 'bookings']
-const LIVE_TOOL_KEYS = ['ads', 'whatsapp', 'pages', 'leads']
+const LIVE_TOOL_KEYS = ['ads', 'whatsapp', 'pages', 'leads', 'insights']
 
 beforeEach(() => {
   window.localStorage.clear()
@@ -48,11 +48,11 @@ describe('Hub', () => {
     expect(screen.getByText('الإعلانات')).toBeInTheDocument()
   })
 
-  it('honest-status guard: exactly {Ads, WhatsApp, Landing pages, Leads & CRM} render as Live', () => {
+  it('honest-status guard: exactly {Ads, WhatsApp, Landing pages, Leads & CRM, Insights} render as Live', () => {
     renderHub()
     const liveTestIds = ALL_TOOL_KEYS.filter((key) => screen.getByTestId(`tool-${key}`).dataset.status === 'live')
     expect(new Set(liveTestIds)).toEqual(new Set(LIVE_TOOL_KEYS))
-    expect(liveTestIds).toHaveLength(4)
+    expect(liveTestIds).toHaveLength(5)
   })
 
   it('"Soon" tiles have no link and no live dot', () => {

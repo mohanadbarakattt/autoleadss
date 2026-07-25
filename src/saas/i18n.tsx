@@ -295,6 +295,25 @@ const STRINGS = {
         regenerate: 'Regenerate',
       },
     },
+    insights: {
+      title: 'Insights',
+      subtitle: 'How every site is doing — together, across your whole suite.',
+      kpis: { visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
+      utcNote: 'Days are shown in UTC — a Gulf-time (UTC+4) "today" can span two bars near midnight.',
+      charts: { visitsTitle: 'Visits · last 14 days', leadsTitle: 'Leads · last 14 days' },
+      funnel: { title: 'The funnel', visits: 'Visits', leads: 'Leads', whatsapp: 'WhatsApp', won: 'Won' },
+      sites: {
+        title: 'By site',
+        table: { site: 'Site', visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
+      },
+      orders: {
+        title: 'Orders',
+        pending: 'Pending',
+        pendingNote: 'Value not yet collected — no payment gateway is connected yet, so nothing here is revenue.',
+        empty: 'No pending orders yet.',
+      },
+      empty: { title: 'No data yet', body: 'Once your sites get visits and leads, your cross-site insights will show up here.' },
+    },
     storefront: {
       cart: 'Cart',
       close: 'Close',
@@ -623,6 +642,25 @@ const STRINGS = {
         regenerate: 'إعادة الصياغة',
       },
     },
+    insights: {
+      title: 'التحليلات',
+      subtitle: 'أداء كل موقع — مجتمعاً، عبر مجموعتك بالكامل.',
+      kpis: { visits: 'الزيارات', leads: 'العملاء المحتملون', conversion: 'التحويل', won: 'مكسوب' },
+      utcNote: 'الأيام معروضة بتوقيت UTC — قد يمتد "اليوم" بتوقيت الخليج (UTC+4) على عمودين قرب منتصف الليل.',
+      charts: { visitsTitle: 'الزيارات · آخر 14 يوماً', leadsTitle: 'العملاء المحتملون · آخر 14 يوماً' },
+      funnel: { title: 'رحلة العميل', visits: 'الزيارات', leads: 'العملاء المحتملون', whatsapp: 'واتساب', won: 'مكسوب' },
+      sites: {
+        title: 'حسب الموقع',
+        table: { site: 'الموقع', visits: 'الزيارات', leads: 'العملاء المحتملون', conversion: 'التحويل', won: 'مكسوب' },
+      },
+      orders: {
+        title: 'الطلبات',
+        pending: 'قيد الانتظار',
+        pendingNote: 'قيمة لم تُحصَّل بعد — لا توجد بوابة دفع متصلة حالياً، لذا لا شيء هنا إيراد.',
+        empty: 'لا توجد طلبات قيد الانتظار بعد.',
+      },
+      empty: { title: 'لا توجد بيانات بعد', body: 'بمجرد أن تحصل مواقعك على زيارات وعملاء محتملين، ستظهر تحليلاتك الشاملة هنا.' },
+    },
     storefront: {
       cart: 'السلة',
       close: 'إغلاق',
@@ -950,6 +988,25 @@ const STRINGS = {
         send: 'Eb3at via WhatsApp',
         regenerate: 'Wallad Tany',
       },
+    },
+    insights: {
+      title: 'El Insights',
+      subtitle: 'Eh elly shaghal fi kol site — sawa, 3ala kol el suite beta3ak.',
+      kpis: { visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
+      utcNote: 'El ayam mawgoda bel UTC — "el naharda" bel Khaleeg (UTC+4) momken teb2a mo2sama 3ala 3amodein 2orayeb nos el lail.',
+      charts: { visitsTitle: 'Visits · akher 14 youm', leadsTitle: 'Leads · akher 14 youm' },
+      funnel: { title: 'Rehlet el customer', visits: 'Visits', leads: 'Leads', whatsapp: 'WhatsApp', won: 'Won' },
+      sites: {
+        title: 'Hasab el site',
+        table: { site: 'El Site', visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
+      },
+      orders: {
+        title: 'El Orders',
+        pending: 'Pending',
+        pendingNote: 'Value lessa mesh matgama3a — mafeesh payment gateway connected lessa, fa mafeesh 7aga hena revenue.',
+        empty: 'Mafeesh pending orders lessa.',
+      },
+      empty: { title: 'Mafeesh data lessa', body: 'Lama el sites beta3tak yeb2a 3andaha visits w leads, el insights beta3tak hatzhar hena.' },
     },
     storefront: {
       cart: 'El Cart',

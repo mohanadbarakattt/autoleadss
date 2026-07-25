@@ -16,7 +16,7 @@ export const TOOLS: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
   { key: 'pages', icon: LayoutTemplate, href: '/app/pages' },
   { key: 'leads', icon: Users, href: '/app/leads' },
   { key: 'social', icon: Image },
-  { key: 'insights', icon: BarChart3 },
+  { key: 'insights', icon: BarChart3, href: '/app/insights' },
   { key: 'reviews', icon: Star },
   { key: 'bookings', icon: Calendar },
 ]
@@ -25,4 +25,4 @@ export const TOOLS: { key: ToolKey; icon: LucideIcon; href?: string }[] = [
  * everything-is-Live mockup. Hub.test.tsx pins its own hardcoded copy of this set
  * (not imported from here) — later phases update both by hand as tools genuinely
  * go live, never the other way around. */
-export const LIVE_TOOL_KEYS: ToolKey[] = ['ads', 'whatsapp', 'pages', 'leads']
+export const LIVE_TOOL_KEYS: ToolKey[] = ['ads', 'whatsapp', 'pages', 'leads', 'insights']
