@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
+    "typecheck": "tsc && npm run typecheck:api",
+    "typecheck:api": "tsc -p api/tsconfig.json",
+    "check:api-imports": "tsx scripts/check-api-imports.ts",
     "margin-guard": "tsx scripts/margin-guard.ts",
     "test": "vitest run",
     "test:watch": "vitest"

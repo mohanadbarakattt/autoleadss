@@ -3,6 +3,7 @@ import { requireClerkUser } from '../_lib/auth'
 import { backendNotConfigured, methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { subAccountBelongsToCaller } from '../_lib/agency'
 import { sanitizeFunnelSpec } from '../_lib/funnelSpec'
+import type { Funnel } from '../../src/saas/types'
 
 /** PATCH /api/funnels/:id — update. DELETE /api/funnels/:id — delete. Both owner-scoped. */
 export default async function handler(req: VercelApiRequest, res: VercelApiResponse) {
