@@ -90,6 +90,8 @@ export function ProductsContent() {
               product={product}
               statusLabel={p.status[product.status]}
               stockLabel={p.stockLabel}
+              editLabel={t.common.edit}
+              deleteLabel={t.common.delete}
               onEdit={() => {
                 setNotice(null)
                 setEditing(product)
@@ -107,12 +109,16 @@ function ProductCard({
   product,
   statusLabel,
   stockLabel,
+  editLabel,
+  deleteLabel,
   onEdit,
   onDelete,
 }: {
   product: Product
   statusLabel: string
   stockLabel: string
+  editLabel: string
+  deleteLabel: string
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -134,10 +140,10 @@ function ProductCard({
         </div>
       </div>
       <div className="flex flex-shrink-0 items-center gap-1">
-        <button type="button" onClick={onEdit} aria-label="edit" className="rounded-lg p-2 text-suite-muted transition-colors hover:bg-suite-panel2 hover:text-suite-text">
+        <button type="button" onClick={onEdit} aria-label={editLabel} className="rounded-lg p-2 text-suite-muted transition-colors hover:bg-suite-panel2 hover:text-suite-text">
           <Pencil size={15} strokeWidth={1.8} aria-hidden />
         </button>
-        <button type="button" onClick={onDelete} aria-label="delete" className="rounded-lg p-2 text-suite-muted transition-colors hover:bg-suite-panel2 hover:text-red-400">
+        <button type="button" onClick={onDelete} aria-label={deleteLabel} className="rounded-lg p-2 text-suite-muted transition-colors hover:bg-suite-panel2 hover:text-red-400">
           <Trash2 size={15} strokeWidth={1.8} aria-hidden />
         </button>
       </div>
