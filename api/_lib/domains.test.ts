@@ -110,4 +110,22 @@ describe('validateHostname — reserved hostnames (platform hijack prevention)',
   it('rejects any *.vercel.app subdomain', () => {
     expect(validateHostname('my-preview.vercel.app').ok).toBe(false)
   })
+
+  it('rejects any subdomain of our own apex domain (platform hijack via subdomain)', () => {
+    expect(validateHostname('app.autoleadss.com').ok).toBe(false)
+    expect(validateHostname('api.autoleadss.com').ok).toBe(false)
+    expect(validateHostname('admin.autoleadss.com').ok).toBe(false)
+  })
+
+  it('rejects an apex-domain subdomain uppercased', () => {
+    expect(validateHostname('API.AutoLeadss.com').ok).toBe(false)
+  })
+
+  it('rejects an apex-domain subdomain with a trailing dot', () => {
+    expect(validateHostname('admin.autoleadss.com.').ok).toBe(false)
+  })
+
+  it('rejects an apex-domain subdomain padded with whitespace', () => {
+    expect(validateHostname('  app.autoleadss.com  ').ok).toBe(false)
+  })
 })
