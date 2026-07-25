@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt</title>
-    <meta name="description" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
+    <!--
+      data-rh="true" below is LOAD-BEARING, not decoration. react-helmet-async
+      only reconciles tags carrying that marker, so without it every route that
+      sets a description/og:title merely APPENDED a second tag beside these —
+      and crawlers read the first one, i.e. this generic marketing copy, on
+      every published merchant page. Marking them lets Helmet adopt and replace
+      them. These tags stay here (rather than moving into Helmet) because a
+      crawler that doesn't run JS sees only this raw HTML.
+      Mark ONLY tags that src/components/DefaultSeo.tsx also renders — a marked
+      tag that nothing re-asserts is DELETED on the first Helmet render.
+      Values must stay byte-identical to DefaultSeo.tsx's.
+    -->
+    <meta name="description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
     <meta name="keywords" content="lead generation UAE, lead generation Egypt, marketing agency Dubai, marketing agency Cairo, sales funnel UAE, google ads Dubai, chatbot WhatsApp UAE, landing page Dubai, digital marketing UAE, social media management Dubai, SEO Dubai, GEO optimization" />
     <meta name="google-site-verification" content="FZa9T-HGhkkbLW1er9dCvDqJg_OectZ0SjFr58VG16M" />
 
@@ -12,19 +24,21 @@
     <link rel="alternate icon" href="/favicon.ico" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
-    <meta property="og:description" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
-    <meta property="og:url" content="https://autoleadss.com" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://autoleadss.com/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:title" data-rh="true" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
+    <meta property="og:description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
+    <meta property="og:url" data-rh="true" content="https://autoleadss.com" />
+    <meta property="og:type" data-rh="true" content="website" />
+    <meta property="og:image" data-rh="true" content="https://autoleadss.com/og-image.png" />
+    <!-- og:image:width/height deliberately dropped: a published storefront can
+         override og:image with a real product photo whose dimensions we don't
+         know, and a WRONG size hint crops badly on some unfurlers. Every major
+         unfurler fetches and measures the image itself. -->
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
-    <meta name="twitter:description" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
-    <meta name="twitter:image" content="https://autoleadss.com/og-image.png">
+    <meta name="twitter:card" data-rh="true" content="summary_large_image" />
+    <meta name="twitter:title" data-rh="true" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
+    <meta name="twitter:description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
+    <meta name="twitter:image" data-rh="true" content="https://autoleadss.com/og-image.png">
 
     <!-- hreflang (canonical set per-route via Helmet) -->
     <link rel="alternate" hreflang="en" href="https://autoleadss.com/en" />

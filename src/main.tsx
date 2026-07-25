@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import ErrorBoundary from './components/ErrorBoundary'
+import DefaultSeo from './components/DefaultSeo'
 import App from './App'
 import { LocaleProvider } from './i18n/LocaleProvider'
 import { LocaleProvider as SaasLocaleProvider } from './saas/i18n'
@@ -41,6 +42,13 @@ const withSaas = (el: React.ReactNode) => (
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
+      {/* Mounted first and outside the router so it applies on EVERY route
+          (including the funnel-host branch below). Route-level <Helmet>s mount
+          after it and win — Helmet resolves meta by name/property, last mount
+          takes precedence. Without this baseline, a route that sets no meta
+          would have index.html's marked defaults deleted with nothing to
+          replace them. See src/components/DefaultSeo.tsx. */}
+      <DefaultSeo />
       <BrowserRouter>
         <ErrorBoundary>
         {isFunnelHost() ? (
