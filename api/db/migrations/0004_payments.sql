@@ -34,7 +34,7 @@ create table if not exists autoleadss.payment_connections (
   gateway               text not null,
   credentials_encrypted text not null,
   credentials_hint      text,
-  status                text not null default 'connected',
+  status                text not null default 'connected' check (status in ('connected', 'disconnected')),
   created_at            timestamptz not null default now(),
   updated_at            timestamptz not null default now(),
   unique (clerk_user_id, gateway)
@@ -50,7 +50,8 @@ create table if not exists autoleadss.payments (
   gateway_ref   text,
   amount_minor  bigint not null check (amount_minor > 0),
   currency      text not null check (currency ~ '^[A-Z]{3}$'),
-  status        text not null default 'pending',
+  status        text not null default 'pending'
+                  check (status in ('pending', 'paid', 'failed', 'refunded', 'expired')),
   reference     text,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
