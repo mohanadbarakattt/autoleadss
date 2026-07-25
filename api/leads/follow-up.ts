@@ -1,6 +1,6 @@
 import { requireClerkUser } from '../_lib/auth'
 import { methodNotAllowed, sendJson, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
-import { buildFollowUpPrompt, templateFollowUp, type FollowUpInput } from '../../src/saas/ai/followUp'
+import { buildFollowUpPrompt, templateFollowUp, type FollowUpInput } from '../../src/saas/ai/followUpPrompt'
 
 /**
  * POST /api/leads/follow-up — drafts a WhatsApp instant-reply message for a

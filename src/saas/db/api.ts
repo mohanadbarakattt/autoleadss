@@ -1,5 +1,5 @@
 import type { Funnel, InsightsSummary, Lead, LeadWithFunnel, PublicProduct } from '../types'
-import type { FollowUpInput } from '../ai/followUp'
+import type { FollowUpInput } from '../ai/followUpPrompt'
 
 /**
  * Remote data-access layer backed by the shared Neon Postgres project, via this
