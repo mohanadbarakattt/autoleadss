@@ -3,20 +3,31 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { useT, useLocale } from '../../i18n/LocaleProvider'
 import { toContentLocale } from '../../saas/i18n'
-import { TIERS, priceFor, detectRegion } from '../../saas/pricing'
-import type { Region } from '../../saas/types'
+import { TIERS, priceForCurrency } from '../../saas/pricing'
+import { resolveCurrency, setStoredCurrency, SUPPORTED_CURRENCIES } from '../../saas/currency'
+import type { Currency } from '../../saas/types'
+
+/** Flag/globe glyphs for the currency switcher below — a display convenience,
+ * kept out of currency.ts (which stays UI-agnostic). Duplicated in
+ * saas/pages/Pricing.tsx rather than shared — four map entries isn't worth a
+ * cross-cutting UI constants module. */
+const CURRENCY_FLAG: Record<Currency, string> = { USD: '🌍', AED: '🇦🇪', SAR: '🇸🇦', EGP: '🇪🇬' }
 
 /** Teaser for the SaaS pricing page (/pricing) — the marketing homepage had no way
  * to reach it before this. Reuses the SaaS's own TIERS data so the numbers can't
- * drift between the two pages. Defaults to EGP for Egyptian visitors (see
- * `detectRegion`) and Gulf ($) otherwise, with the same Gulf/Egypt toggle /pricing
- * itself uses. */
+ * drift between the two pages. Defaults to the visitor's stored currency choice,
+ * else a timezone-based guess (see `resolveCurrency`), with the same currency
+ * switcher /pricing itself uses. */
 export default function PricingTeaser() {
   const t = useT()
   const { locale } = useLocale()
   const contentLocale = toContentLocale(locale)
   const tiers = TIERS.slice(0, 3)
-  const [region, setRegion] = useState<Region>(detectRegion)
+  const [currency, setCurrencyState] = useState<Currency>(resolveCurrency)
+  function chooseCurrency(c: Currency) {
+    setStoredCurrency(c)
+    setCurrencyState(c)
+  }
 
   return (
     <section className="relative overflow-hidden bg-background py-24">
@@ -38,15 +49,16 @@ export default function PricingTeaser() {
             {t.pricingTeaser.title}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-fg">{t.pricingTeaser.sub}</p>
-          <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1">
-            {(['gulf', 'egypt'] as Region[]).map((r) => (
+          <div role="group" aria-label="Currency" className="mt-6 inline-flex rounded-full border border-border bg-card p-1">
+            {SUPPORTED_CURRENCIES.map((c) => (
               <button
-                key={r}
+                key={c}
                 type="button"
-                onClick={() => setRegion(r)}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${region === r ? 'bg-accent text-white' : 'text-muted-fg hover:text-foreground'}`}
+                onClick={() => chooseCurrency(c)}
+                aria-pressed={currency === c}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${currency === c ? 'bg-accent text-white' : 'text-muted-fg hover:text-foreground'}`}
               >
-                {r === 'gulf' ? `🇦🇪 ${t.pricingTeaser.gulf}` : `🇪🇬 ${t.pricingTeaser.egypt}`}
+                {CURRENCY_FLAG[c]} {c}
               </button>
             ))}
           </div>
@@ -66,7 +78,7 @@ export default function PricingTeaser() {
               <p className="font-display text-lg font-bold text-foreground">{tier.name[contentLocale]}</p>
               <p className="mt-1 text-sm text-muted-fg">{tier.tagline[contentLocale]}</p>
               <p className="mt-5 font-display text-3xl font-bold text-foreground">
-                {priceFor(tier, region)}
+                {priceForCurrency(tier, currency, contentLocale)}
                 <span className="text-sm font-normal text-muted-fg">{t.pricingTeaser.mo}</span>
               </p>
               <ul className="mt-5 flex flex-1 flex-col gap-2">

@@ -5,13 +5,18 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import Logo from '../../components/Logo'
 import { useI18n, toContentLocale } from '../i18n'
-import { TIERS, TOPUP_PACKS, priceFor } from '../pricing'
+import { TIERS, TOPUP_PACKS, priceForCurrency } from '../pricing'
 import { useSession, setPlan, setRegion } from '../store'
 import { billingEnabled, startCheckout } from '../billing/checkout'
 import { useEntitlements } from '../billing/UpgradeContext'
 import { purchaseTopup } from '../billing/usage'
-import type { Region } from '../types'
+import { detectCurrency, getStoredCurrency, setStoredCurrency, SUPPORTED_CURRENCIES } from '../currency'
+import type { Currency, Region } from '../types'
 import LocaleSwitcher from '../components/LocaleSwitcher'
+
+/** Flag/globe glyphs for the currency switcher below — a display convenience,
+ * so it lives here rather than in currency.ts (which stays UI-agnostic). */
+const CURRENCY_FLAG: Record<Currency, string> = { USD: '🌍', AED: '🇦🇪', SAR: '🇸🇦', EGP: '🇪🇬' }
 
 export default function Pricing() {
   const { t, locale, isRTL, setLocale } = useI18n()
@@ -19,7 +24,18 @@ export default function Pricing() {
   const session = useSession()
   const navigate = useNavigate()
   const ent = useEntitlements()
-  const [region, setRegionState] = useState<Region>(session?.workspace.region ?? 'gulf')
+  // Stored override always wins (see currency.ts); otherwise a signed-in
+  // workspace's region is a stronger hint than timezone, since it was set at
+  // signup rather than guessed — falls through to timezone detection.
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    const stored = getStoredCurrency()
+    if (stored) return stored
+    return session?.workspace.region === 'egypt' ? 'EGP' : detectCurrency()
+  })
+  function chooseCurrency(c: Currency) {
+    setStoredCurrency(c)
+    setCurrencyState(c)
+  }
   const [bought, setBought] = useState<Set<string>>(new Set())
 
   function buyTopup(id: (typeof TOPUP_PACKS)[number]['id']) {
@@ -39,6 +55,10 @@ export default function Pricing() {
       navigate('/signup')
       return
     }
+    // EGP is Region 'egypt'; USD/AED/SAR all read the same Gulf price list, so
+    // they're all Region 'gulf' for checkout/plan-setting purposes — currency
+    // only changes what's DISPLAYED, not which money path the plan is on.
+    const region: Region = currency === 'EGP' ? 'egypt' : 'gulf'
     if (billingEnabled) {
       const url = await startCheckout(id, region, session.user.id)
       if (url) {
@@ -116,10 +136,10 @@ export default function Pricing() {
         <div className="content-width relative z-10 text-center">
           <h1 className="font-display font-bold text-white" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.6rem)', letterSpacing: '-0.03em' }}>{t.pricing.title}</h1>
           <p className="mx-auto mt-4 max-w-xl text-white/70">{t.pricing.sub}</p>
-          <div className="mt-8 inline-flex rounded-full border border-white/15 bg-white/5 p-1">
-            {(['gulf', 'egypt'] as Region[]).map((r) => (
-              <button key={r} onClick={() => setRegionState(r)} className={`rounded-full px-6 py-2 text-sm font-medium transition-colors ${region === r ? 'bg-accent text-white' : 'text-white/70 hover:text-white'}`}>
-                {r === 'gulf' ? `🇦🇪 ${t.pricing.gulf}` : `🇪🇬 ${t.pricing.egypt}`}
+          <div role="group" aria-label="Currency" className="mt-8 inline-flex rounded-full border border-white/15 bg-white/5 p-1">
+            {SUPPORTED_CURRENCIES.map((c) => (
+              <button key={c} onClick={() => chooseCurrency(c)} aria-pressed={currency === c} className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${currency === c ? 'bg-accent text-white' : 'text-white/70 hover:text-white'}`}>
+                {CURRENCY_FLAG[c]} {c}
               </button>
             ))}
           </div>
@@ -135,7 +155,7 @@ export default function Pricing() {
                 <p className="font-display text-lg font-bold">{tier.name[contentLocale]}</p>
                 <p className="mt-1 text-sm text-muted-fg">{tier.tagline[contentLocale]}</p>
                 <p className="mt-5 font-display text-4xl font-bold">
-                  {priceFor(tier, region)}
+                  {priceForCurrency(tier, currency, contentLocale)}
                   <span className="text-base font-normal text-muted-fg">{t.pricing.mo}</span>
                 </p>
                 <ul className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -158,7 +178,7 @@ export default function Pricing() {
                 <div>
                   <p className="font-display text-lg font-bold">{tier.name[contentLocale]}</p>
                   <p className="mt-1 text-sm text-white/60">{tier.tagline[contentLocale]}</p>
-                  <p className="mt-3 font-display text-2xl font-bold text-gradient-accent">{priceFor(tier, region)}</p>
+                  <p className="mt-3 font-display text-2xl font-bold text-gradient-accent">{priceForCurrency(tier, currency, contentLocale)}</p>
                 </div>
                 <button onClick={() => choose(tier.id, true)} className="shrink-0 rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10">
                   {t.pricing.contact}
@@ -179,7 +199,7 @@ export default function Pricing() {
                 {TOPUP_PACKS.map((pack) => (
                   <div key={pack.id} className="flex flex-col rounded-2xl border border-border bg-card p-5">
                     <p className="font-display font-semibold">{pack.name[contentLocale]}</p>
-                    <p className="mt-2 font-display text-2xl font-bold">{region === 'egypt' ? pack.priceEgypt : pack.priceGulf}</p>
+                    <p className="mt-2 font-display text-2xl font-bold">{priceForCurrency(pack, currency, contentLocale)}</p>
                     <ul className="mt-3 flex flex-1 flex-col gap-1.5 text-sm text-muted-fg">
                       <li>+{pack.whatsapp} {isRTL ? 'محادثة واتساب' : 'WhatsApp conversations'}</li>
                       <li>+{pack.aiAction.toLocaleString()} {isRTL ? 'توليد ذكاء اصطناعي' : 'AI generations'}</li>

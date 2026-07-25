@@ -5,7 +5,8 @@ import { Sparkles, X, Check } from 'lucide-react'
 import { useI18n, toContentLocale, type UILocale } from '../i18n'
 import { useSession } from '../store'
 import { entitlementFor, nextPlanFor, type Feature, type CapFeature } from '../entitlements'
-import { planName, TIERS, priceFor } from '../pricing'
+import { planName, TIERS, priceForCurrency } from '../pricing'
+import { resolveCurrencyForRegion } from '../currency'
 
 type Reason = Feature | 'maxFunnels' | CapFeature
 
@@ -50,7 +51,10 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
 
   const contentLocale = toContentLocale(locale)
   const plan = session?.workspace.plan ?? 'starter'
-  const region = session?.workspace.region ?? 'gulf'
+  // Same resolution Pricing.tsx uses (stored override > region hint > timezone
+  // detection) — otherwise a visitor who picked AED on /pricing would see USD
+  // here, which is exactly the inconsistency Phase 7b exists to avoid.
+  const currency = resolveCurrencyForRegion(session?.workspace.region)
   const target = reason ? nextPlanFor(reason, plan) : 'growth'
   const tier = TIERS.find((x) => x.id === target)
   const copy = reason ? (isCapReason(reason) ? CAP_COPY[reason][locale] : COPY[reason][contentLocale]) : ['', '']
@@ -88,7 +92,7 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
                 <div className="px-8 py-6">
                   <div className="flex items-baseline justify-between">
                     <p className="font-display text-lg font-bold">{planName(target, contentLocale)}</p>
-                    <p className="font-display text-2xl font-bold">{priceFor(tier, region)}<span className="text-sm font-normal text-muted-fg">{t.pricing.mo}</span></p>
+                    <p className="font-display text-2xl font-bold">{priceForCurrency(tier, currency, contentLocale)}<span className="text-sm font-normal text-muted-fg">{t.pricing.mo}</span></p>
                   </div>
                   <ul className="mt-4 flex flex-col gap-2">
                     {tier.features.slice(0, 4).map((f, i) => (
