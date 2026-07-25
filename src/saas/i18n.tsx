@@ -22,7 +22,10 @@ export function toContentLocale(l: UILocale): Locale {
   return l === 'ar' ? 'ar' : 'en'
 }
 
-const STRINGS = {
+/** Exported (only) so the locale-parity/drift guard tests (src/saas/i18n.test.tsx)
+ * can walk all three dicts directly — `dictFor` deliberately can't reach 'fr-eg'
+ * (see its own doc comment), so this is the only way to get at STRINGS['fr-eg']. */
+export const STRINGS = {
   en: {
     nav: { product: 'Product', pricing: 'Pricing', login: 'Log in', start: 'Start free', dashboard: 'Dashboard' },
     common: {
