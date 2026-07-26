@@ -1,6 +1,7 @@
 import { getSql } from '../../_lib/db'
 import { methodNotAllowed, queryParam, sendJson, type VercelApiRequest, type VercelApiResponse } from '../../_lib/http'
 import { toSafeInt } from '../../_lib/money'
+import { readRawBody } from '../../_lib/rawBody'
 import { getAdapter, getGatewayInfo } from '../../_lib/payments/registry'
 import { canTransition } from '../../_lib/payments/status'
 import type { PaymentStatus } from '../../_lib/payments/types'
@@ -60,23 +61,6 @@ import type { PaymentStatus } from '../../_lib/payments/types'
  * hostile sender can't force us to buffer an unbounded stream into memory.
  */
 
-const MAX_BODY_BYTES = 256 * 1024 // no real gateway webhook payload is anywhere near this
-
-async function readRawBody(req: VercelApiRequest): Promise<string> {
-  if (typeof req.body === 'string') {
-    if (Buffer.byteLength(req.body, 'utf8') > MAX_BODY_BYTES) throw new Error('payload too large')
-    return req.body
-  }
-  const chunks: Buffer[] = []
-  let total = 0
-  for await (const chunk of req as unknown as AsyncIterable<Buffer | string>) {
-    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
-    total += buf.length
-    if (total > MAX_BODY_BYTES) throw new Error('payload too large')
-    chunks.push(buf)
-  }
-  return Buffer.concat(chunks).toString('utf8')
-}
 
 interface PaymentRow {
   id: string

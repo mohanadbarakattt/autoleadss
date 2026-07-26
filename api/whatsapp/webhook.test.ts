@@ -134,3 +134,48 @@ describe('POST inbound handling', () => {
     expect((r.body as any).stored).toBe(0)
   })
 })
+
+/**
+ * PRODUCTION SHAPE. Every other test in this file assigns `req.body` a string,
+ * which is exactly why the raw-body bug survived: with `bodyParser: false` the
+ * real runtime never sets `req.body`, so the handler used to hash the literal
+ * string "{}" and reject every genuine message with a non-retryable 403.
+ * These tests hand the handler a STREAM, like Vercel does.
+ */
+describe('raw body from a stream (the shape production actually sends)', () => {
+  function streamReq(body: string, headers: Record<string, string>) {
+    return {
+      method: 'POST',
+      headers,
+      // No `body` property at all — same as the real runtime with bodyParser off.
+      async *[Symbol.asyncIterator]() {
+        // Split across chunks: a single-chunk stream would hide a concat bug.
+        yield Buffer.from(body.slice(0, 10))
+        yield Buffer.from(body.slice(10))
+      },
+    } as any
+  }
+
+  it('verifies a correctly-signed streamed body and stores the message', async () => {
+    const body = inbound('stream-1')
+    state.rows = [[{ id: 'conn1', clerk_user_id: 'user_1' }], [], []]
+    const r = res()
+    await handler(streamReq(body, { 'x-hub-signature-256': sign(body) }), r)
+    expect(r.statusCode).toBe(200)
+  })
+
+  it('rejects a streamed body whose signature does not match', async () => {
+    const body = inbound('stream-2')
+    const r = res()
+    await handler(streamReq(body, { 'x-hub-signature-256': sign('a different payload') }), r)
+    expect(r.statusCode).toBe(403)
+  })
+
+  it('does not hash "{}" when the body is a stream (the actual shipped bug)', async () => {
+    const body = inbound('stream-3')
+    const r = res()
+    // Signing the literal "{}" is what the old implementation effectively hashed.
+    await handler(streamReq(body, { 'x-hub-signature-256': sign('{}') }), r)
+    expect(r.statusCode).toBe(403)
+  })
+})

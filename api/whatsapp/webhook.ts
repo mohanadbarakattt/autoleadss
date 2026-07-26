@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { getSql } from '../_lib/db'
 import { sendJson, methodNotAllowed, type VercelApiRequest, type VercelApiResponse } from '../_lib/http'
 import { opensNewConversation } from '../_lib/whatsapp'
+import { readRawBody } from '../_lib/rawBody'
 
 /**
  * WhatsApp Business webhook.
@@ -64,16 +65,35 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   const appSecret = process.env.WHATSAPP_APP_SECRET
   if (!appSecret) return sendJson(res, 503, { error: 'WHATSAPP_APP_SECRET not configured' })
 
-  const raw = typeof req.body === 'string' ? req.body : JSON.stringify(req.body ?? {})
+  // RAW BYTES ONLY. This used to be `JSON.stringify(req.body ?? {})`, which is
+  // wrong twice over: re-serializing reorders keys so the HMAC can't match, and
+  // with bodyParser disabled (see the config export below) `req.body` is
+  // undefined in the real runtime — so it hashed the literal string "{}" and
+  // EVERY inbound message failed verification, was answered 403, and Meta
+  // stopped redelivering it. Silent, total, permanent inbound message loss.
+  // Tests hid it by assigning req.body a string.
+  let raw: string
+  try {
+    raw = await readRawBody(req)
+  } catch {
+    return sendJson(res, 413, { error: 'payload too large' })
+  }
+
   const sig = req.headers?.['x-hub-signature-256'] as string | undefined
   if (!verifySignature(raw, sig, appSecret)) {
-    // 403 not 500: a bad signature is not transient and must never be retried.
+    // 403 (non-retryable) is right for a genuine forgery, and Meta must not
+    // retry one. It is the wrong answer when OUR verification is broken — but
+    // the handler cannot tell those apart, and answering 500 to a real forgery
+    // would invite endless redelivery of an attacker's payload. Keeping 403 and
+    // logging loudly instead: a sudden burst of these means our secret or our
+    // raw-body handling regressed, not that Meta started forging requests.
+    console.error('[whatsapp][SIGNATURE-REJECTED]', { bytes: raw.length, hasHeader: !!sig })
     return sendJson(res, 403, { error: 'bad signature' })
   }
 
   let payload: Record<string, unknown>
   try {
-    payload = typeof req.body === 'string' ? JSON.parse(req.body) : ((req.body ?? {}) as Record<string, unknown>)
+    payload = JSON.parse(raw) as Record<string, unknown>
   } catch {
     return sendJson(res, 400, { error: 'invalid JSON' })
   }
