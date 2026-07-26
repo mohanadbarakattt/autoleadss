@@ -6,18 +6,14 @@ import Footer from '../components/Footer'
 import { useLocale } from '../i18n/LocaleProvider'
 import type { LegalDoc } from '../content/legal'
 
-const HTML_LANG: Record<'en' | 'ar' | 'fr-eg', string> = { en: 'en', ar: 'ar', 'fr-eg': 'ar-Latn' }
-
-const DRAFT_NOTICE: Record<'en' | 'ar' | 'fr-eg', string> = {
+const DRAFT_NOTICE: Record<'en' | 'ar', string> = {
   en: 'Draft for legal review. This is a solid starting point written from how AutoLeadss actually works today, not a substitute for a qualified lawyer in your jurisdiction before you rely on it.',
   ar: 'مسودة قيد المراجعة القانونية. هذا نص أولي جيد مبني على طريقة عمل AutoLeadss الفعلية حالياً، وليس بديلاً عن محامٍ مختص في بلدك قبل الاعتماد عليه.',
-  'fr-eg': 'Draft lessa mesh legally reviewed. Kwayes ka starting point, bas msh badeel 3an mo7amy mokhtas 2abl ma te3tamed 3aleeh.',
 }
 
-const OTHER_LINK: Record<'en' | 'ar' | 'fr-eg', { privacy: string; terms: string }> = {
+const OTHER_LINK: Record<'en' | 'ar', { privacy: string; terms: string }> = {
   en: { privacy: 'Privacy Policy', terms: 'Terms of Service' },
   ar: { privacy: 'سياسة الخصوصية', terms: 'شروط الخدمة' },
-  'fr-eg': { privacy: 'Privacy Policy', terms: 'Terms of Service' },
 }
 
 export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy' | 'terms' }) {
@@ -27,7 +23,7 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet defer={false}>
-        <html lang={HTML_LANG[locale]} dir={isRTL ? 'rtl' : 'ltr'} />
+        <html lang={locale} dir={isRTL ? 'rtl' : 'ltr'} />
         <title>{doc.title} — AutoLeadss</title>
         <meta name="description" content={doc.intro} />
         <link rel="canonical" href={`https://autoleadss.com${localePath(`/${kind}`)}`} />

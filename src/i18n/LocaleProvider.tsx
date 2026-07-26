@@ -14,17 +14,13 @@ type Ctx = {
 
 const LocaleContext = createContext<Ctx | null>(null)
 
-/** BCP-47 `lang` values per locale. Franco is Egyptian Arabic content in Latin
- * script — "ar-Latn" is the correct BCP-47 tag for that (not "fr-eg", which would
- * misleadingly read as French). */
-const HTML_LANG: Record<Locale, string> = { en: 'en', ar: 'ar', 'fr-eg': 'ar-Latn' }
-const LOCALE_ROUTE_RE = /^\/(en|ar|fr-eg)/
+const LOCALE_ROUTE_RE = /^\/(en|ar)/
 
 /**
  * `persist` bridges this choice into the SaaS app (`src/saas/i18n.tsx` reads the
  * same `LOCALE_KEY`), so a language picked on the marketing site carries into
  * /signup and /app instead of silently resetting to English. Defaults to true for
- * the explicit `/en`, `/ar`, `/fr-eg` routes and `switchLocale`; the bare `/`
+ * the explicit `/en`, `/ar` routes and `switchLocale`; the bare `/`
  * fallback route passes `persist={false}` so it never clobbers an already-stored
  * preference with its hardcoded "en" default.
  */
@@ -36,7 +32,7 @@ export function LocaleProvider({ locale, persist = true, children }: { locale: L
 
   useEffect(() => {
     const html = document.documentElement
-    html.setAttribute('lang', HTML_LANG[locale])
+    html.setAttribute('lang', locale)
     html.setAttribute('dir', dir)
   }, [locale, dir])
 

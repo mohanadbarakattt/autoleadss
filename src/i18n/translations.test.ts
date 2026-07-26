@@ -5,23 +5,15 @@ import { isSuspectedDrift, leafEntries, leafPaths } from '../test/localeDictHelp
 const LRI = '⁦' // LEFT-TO-RIGHT ISOLATE
 const PDI = '⁩' // POP DIRECTIONAL ISOLATE
 
-describe('locale key parity (en / ar / fr-eg)', () => {
+describe('locale key parity (en / ar)', () => {
   const enPaths = new Set(leafPaths(translations.en))
   const arPaths = new Set(leafPaths(translations.ar))
-  const frPaths = new Set(leafPaths(translations['fr-eg']))
 
   it('ar has exactly the keys en has (nothing missing, nothing extra)', () => {
     const missing = [...enPaths].filter((p) => !arPaths.has(p))
     const extra = [...arPaths].filter((p) => !enPaths.has(p))
     expect(missing, `ar is missing keys en has: ${missing.join(', ')}`).toEqual([])
     expect(extra, `ar has keys en doesn't: ${extra.join(', ')}`).toEqual([])
-  })
-
-  it('fr-eg has exactly the keys en has (nothing missing, nothing extra)', () => {
-    const missing = [...enPaths].filter((p) => !frPaths.has(p))
-    const extra = [...frPaths].filter((p) => !enPaths.has(p))
-    expect(missing, `fr-eg is missing keys en has: ${missing.join(', ')}`).toEqual([])
-    expect(extra, `fr-eg has keys en doesn't: ${extra.join(', ')}`).toEqual([])
   })
 })
 
@@ -51,7 +43,7 @@ describe('leafPaths parity check — proof it actually catches a regression', ()
 const AR_DRIFT_ALLOWLIST = new Set<string>([
   'langSwitch.en', // "EN" — language-toggle code, not prose
   'langSwitch.ar', // "AR" — language-toggle code, not prose
-  'hero.marquee[5]', // "SEO & GEO" — technical acronym pair with no Arabic equivalent in use; en/fr-eg keep it identical
+  'hero.marquee[5]', // "SEO & GEO" — technical acronym pair with no Arabic equivalent in use; en keeps it identical
   'services.also[1]', // "SEO" — same acronym, same reasoning
   'footer.Services[5].label', // "SEO & GEO" — same acronym, same reasoning
   'comparison.columns.us', // "AutoLeadss" — the product's own name, never translated in any locale

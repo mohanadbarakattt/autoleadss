@@ -188,60 +188,6 @@ export const privacyContent: Record<Locale, LegalDoc> = {
       },
     ],
   },
-  'fr-eg': {
-    title: 'Privacy Policy (Franco)',
-    updated: 'Akher update: Youlyo 2026',
-    intro:
-      'Note: el nos2ha el rasmeya w el mo3tamada 2anoniyan hya el 3arabeya (shoof el link fo2). El nos2ha di bel Franco 3ashan tefham el fikra be so2ola bas — msh legal document rasmy. Di ezay AutoLeadss betgama3 el ma3lomat w bet2adamha w bet7meeha lama tzoor el mo23 aw testakhdem el funnel builder.',
-    sections: [
-      {
-        heading: 'Meen e7na',
-        body: [
-          'AutoLeadss 3andaha 7agtein: wakala betebni w tshaghal el funnels/ads/content/chatbot le 3omalaeha, w self-serve product (AI funnel builder) elly bykhalli el business ye3mel landing pages w ads w chatbot w social content lewa7do.',
-        ],
-      },
-      {
-        heading: 'El ma3lomat elly bngama3ha',
-        body: [
-          'Contact form: esm, esm el nashat, telefon, email, balad, sector, mizaneya, w ay resala, w law wafa2t 3ala WhatsApp.',
-          'Account: esm, email, w el region (Masr aw El Khaleeg).',
-          'Funnels w leads: el content elly enta 3amaltoh w ay leads (esm, telefon, resala) gat men el published page beta3ak.',
-          'Rasa2el: law raslt WhatsApp beta3na aw beta3 funnel le 3amel 3andena, benwasal 7na (aw el messaging provider) el resala w ra2m telefonak.',
-        ],
-      },
-      {
-        heading: 'Ezay bnestakhdem el ma3lomat',
-        body: [
-          '3ashan naradd 3ala as2elat w nehgez calls.',
-          '3ashan naddi el khadama elly talabtaha.',
-          '3ashan nshaghal el account beta3ak w nwareek el leads w el zeyarat.',
-          '3ashan nraslak WhatsApp — bas law wafa2t.',
-        ],
-      },
-      {
-        heading: 'Demo mode',
-        body: [
-          'Fi demo mode, el account w el funnels w el leads beta3ak bytkhazano bas fel browser beta3ak — mesh betrouho le server. Law fi real auth w database, el data betetkhazen bel amaan 3ala el server w mafeesh 7ad yeshoofha ghair enta (w el team beta3ak law fatta7t da).',
-        ],
-      },
-      {
-        heading: 'Cookies w local storage',
-        body: ['Benestakhdem local storage 3ashan tefdal logged in w 3ashan nekhazen el funnels beta3ak fi demo mode. Mafeesh third-party ad-tracking cookies delwa2ty.'],
-      },
-      {
-        heading: 'Sharing el ma3lomat',
-        body: ['Mabnbee3sh el data beta3ak. Bnesharekha bas ma3 service providers (hosting, database, auth, messaging), law el 2anoon yetlob keda, aw be mowafaqtak.'],
-      },
-      {
-        heading: 'Ho2ou2ak',
-        body: ['Momken yeb2a leek el ha2 en tshoof, tesa77a7, tesaddar, aw tomsah el data beta3ak, w tsa7ab el mowafa2a emta 3ayez. Kallemna 3al details ta7t.'],
-      },
-      {
-        heading: 'Kallemna',
-        body: ['As2ela? info@autoleadss.com aw WhatsApp +20 110 005 4278.'],
-      },
-    ],
-  },
 }
 
 export const termsContent: Record<Locale, LegalDoc> = {
@@ -402,46 +348,6 @@ export const termsContent: Record<Locale, LegalDoc> = {
       {
         heading: 'تواصل معنا',
         body: ['أسئلة حول هذه الشروط؟ راسلنا على info@autoleadss.com أو على واتساب ⁦+20 110 005 4278⁩.'],
-      },
-    ],
-  },
-  'fr-eg': {
-    title: 'Terms of Service (Franco)',
-    updated: 'Akher update: Youlyo 2026',
-    intro:
-      'Note: el nos2ha el rasmeya hya el 3arabeya (shoof el link fo2). Di summary bel Franco 3ashan tefham el shorout be so2ola. Be estekhdamak lel mo23 aw el product, enta mwafe2 3ala el shorout di.',
-    sections: [
-      {
-        heading: 'El khadamat beta3etna',
-        body: ['Wakala done-for-you (scope w se3r 7asab el project ba3d call), w self-serve funnel builder be as3ar manshora 3ala /pricing.'],
-      },
-      {
-        heading: 'El accounts',
-        body: ['Lazem tedeeni ma3lomat sa7ee7a. Enta mas2ool 3an ay 7aga te7sal ta7t el account beta3ak. Fi demo mode mafeesh ta7a2o2 ho2ee2y — matetmedsh 3aleeh le data 3omala2 7a2ee2ya aw madfoo3at.'],
-      },
-      {
-        heading: 'El content w el data beta3ak',
-        body: ['Enta malek el pages w el ad accounts w el content w el leads. Te2dar teskhrog el data beta3ak aw te2fel el account emta 3ayez.'],
-      },
-      {
-        heading: 'Estekhdam ma2boul',
-        body: ['Ma testakhdemsh el khadama fi 7aga mesh 2anoneya, spam, scraping, aw resale bidoon plan wakala/white-label.'],
-      },
-      {
-        heading: 'El fawater',
-        body: ['El self-serve plans betefwater 7asab el se3r 3ala /pricing wa2t el eshterak. El done-for-you 7asab el 3a2d el mowa22a3.'],
-      },
-      {
-        heading: 'Termination',
-        body: ['Te2dar te2fel el account emta 3ayez. Momken ne3allek el account law fi abuse aw non-payment — hansa77alak teskhrog el data awalan law momken.'],
-      },
-      {
-        heading: 'Disclaimers',
-        body: ['El khadama betetadem "as is". El case studies 3al mo23 7a2ee2ya bas mesh damana lel nata2eg le kol business.'],
-      },
-      {
-        heading: 'Kallemna',
-        body: ['As2ela? info@autoleadss.com aw WhatsApp +20 110 005 4278.'],
       },
     ],
   },
