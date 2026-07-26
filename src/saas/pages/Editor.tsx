@@ -10,7 +10,7 @@ import ChatSimulator from '../components/ChatSimulator'
 import FunnelAnalytics from '../components/FunnelAnalytics'
 import BrowserFrame from '../components/BrowserFrame'
 import { useI18n, toContentLocale } from '../i18n'
-import { useFunnel, useOrders, updateSpec, updateFunnel, publishFunnel, setLeadStatus, hasSampleData } from '../store'
+import { useFunnel, useOrders, updateSpec, updateFunnel, publishFunnel, setLeadStatus, hasSampleData, getDb } from '../store'
 import { generateFromTemplate } from '../ai/generate'
 import { useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
@@ -128,7 +128,17 @@ export function EditorContent() {
           </Link>
           <div>
             <h1 className="font-luxe text-2xl font-semibold text-suite-text" style={{ letterSpacing: '-0.02em' }}>{funnel.name}</h1>
-            <p className="text-xs text-suite-muted">{funnel.status === 'published' ? `${t.editor.publishedAt} ${funnel.slug}.autoleadss.site` : t.common.draft}</p>
+            {/* Only claim a live URL when there is a backend that could actually
+                serve it. In keyless demo mode nothing was written anywhere and
+                {slug}.autoleadss.site serves nothing — saying "Live at ..." there
+                was the one place demo mode pretended a remote write succeeded. */}
+            <p className="text-xs text-suite-muted">
+              {funnel.status !== 'published'
+                ? t.common.draft
+                : getDb()
+                  ? `${t.editor.publishedAt} ${funnel.slug}.autoleadss.site`
+                  : t.editor.publishedDemo}
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">

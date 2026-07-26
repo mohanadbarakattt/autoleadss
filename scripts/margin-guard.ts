@@ -35,15 +35,24 @@ import {
 // remitted and was never ours — ignoring that overstated every margin here
 // by ~12 percentage points.
 import { computeMargin, egpToPiastres, piastresToEgp, usdToEgpRate } from "../src/saas/lib/money/index.js";
-import { convertUsdToCurrency, CURRENCY_PEGS } from "../src/saas/currency";
+import { convertUsdToCurrency, CURRENCY_PEGS, SUPPORTED_CURRENCIES } from "../src/saas/currency";
 import type { Currency } from "../src/saas/types";
 
 export const HARD_FLOOR = 0.55;
 export const WARN_TARGET = 0.6;
 
-/** Every currency the pricing page can display (src/saas/currency.ts's
- * SUPPORTED_CURRENCIES) — this is the set the guard must cover. */
-export const DISPLAYED_CURRENCIES: readonly Currency[] = ["EGP", "USD", "AED", "SAR"];
+/**
+ * Every currency the pricing page can display — DERIVED from the app's own
+ * SUPPORTED_CURRENCIES, not hand-copied.
+ *
+ * It was a literal, with a comment asking whoever edits it to remember to keep
+ * the two in sync. That is not a guarantee, it is a wish: adding a currency to
+ * the app would have shipped a displayed price this guard never checked, while
+ * the guard still reported green. A margin guard that silently skips a live
+ * price is worse than no guard, because it is trusted. Importing means adding a
+ * currency can only ever ADD a row here.
+ */
+export const DISPLAYED_CURRENCIES: readonly Currency[] = SUPPORTED_CURRENCIES;
 
 function parseEgp(s: string): number {
   const n = Number(s.replace(/[^0-9.]/g, ""));
