@@ -34,11 +34,15 @@ const db = {
   queries: [] as string[],
   callCount: 0,
   failAtCall: null as number | null,
+  /** Set to a status to simulate a concurrent delivery winning the row between
+   * the read-only phase and the write. Fires once. */
+  raceOnce: null as string | null,
   reset(seed: FakePayment[] = []) {
     this.payments = new Map(seed.map((p) => [p.id, { ...p }]))
     this.events = new Set()
     this.queries = []
     this.callCount = 0
+    this.raceOnce = null
     this.failAtCall = null
   },
 }
@@ -62,35 +66,42 @@ async function fakeSql(strings: TemplateStringsArray, ...vals: unknown[]) {
     return p ? [{ id: p.id, status: p.status, amount_minor: String(p.amount_minor), currency: p.currency }] : []
   }
 
-  // Write phase: the combined ledger-insert + status-flip CTE statement.
-  // Positions (see the route's template literal): 0 gateway, 1 eventId,
-  // 2 payment.id (ins select), 3 payment.id (ins where), 4 payment.status
-  // (ins where), 5 event.amountMinor (ins where), 6 event.currency (ins
-  // where), 7 event.status (upd set), 8 payment.id (upd where), 9
-  // payment.status (upd where), 10 event.amountMinor (upd where), 11
-  // event.currency (upd where). 2/3/8 are the same value, as are 4/9, 5/10,
-  // 6/11 — the route interpolates each literal twice, once per CTE.
-  if (text.includes('with ins as')) {
-    const gateway = vals[0] as string
-    const eventId = vals[1] as string
-    const paymentId = vals[2] as string
-    const expectedStatus = vals[4] as string
-    const expectedAmount = vals[5] as number
-    const expectedCurrency = vals[6] as string
-    const newStatus = vals[7] as string
+  // Write phase: the combined status-flip + ledger-insert CTE statement.
+  // `upd` comes FIRST and `ins` is gated on it (see the route's comment for why
+  // the reverse silently dropped events). Param positions, in template order:
+  //   0 event.status (upd set), 1 payment.id, 2 payment.status, 3 amountMinor,
+  //   4 currency (upd where), 5 gateway, 6 eventId, 7 payment.id (ins select).
+  if (text.includes('with upd as')) {
+    const newStatus = vals[0] as string
+    const paymentId = vals[1] as string
+    const expectedStatus = vals[2] as string
+    const expectedAmount = vals[3] as number
+    const expectedCurrency = vals[4] as string
+    const gateway = vals[5] as string
+    const eventId = vals[6] as string
 
-    const key = `${gateway}:${eventId}`
+    // Simulates a CONCURRENT delivery winning the row between our read-only
+    // phase and this write — the interleaving that made `upd` re-evaluate under
+    // READ COMMITTED and match zero rows. Fires once, then clears.
+    if (db.raceOnce) {
+      const victim = db.payments.get(paymentId)
+      if (victim) victim.status = db.raceOnce
+      db.raceOnce = null
+    }
+
     const p = db.payments.get(paymentId)
     const stateMatches = !!p && p.status === expectedStatus && p.amount_minor === expectedAmount && p.currency === expectedCurrency
 
     let inserted = 0
     let updated = 0
-    if (stateMatches && !db.events.has(key)) {
-      db.events.add(key)
-      inserted = 1
-      if (p) {
-        p.status = newStatus
-        updated = 1
+    if (stateMatches && p) {
+      p.status = newStatus
+      updated = 1
+      // ins is gated on upd: the ledger row lands only because upd matched.
+      const key = `${gateway}:${eventId}`
+      if (!db.events.has(key)) {
+        db.events.add(key)
+        inserted = 1
       }
     }
     return [{ inserted: String(inserted), updated: String(updated) }]
@@ -162,18 +173,35 @@ describe('replay', () => {
     expect((r2.body as any).noop).toBe(true)
   })
 
-  it('a concurrent-delivery race for an event id already claimed is deduped even though canTransition would allow it', async () => {
-    // Simulates a second, near-simultaneous delivery of the same event_id
-    // whose ledger row an in-flight request already inserted, before the
-    // payment status itself has moved off 'pending'. This is the scenario
-    // the ledger's PK actually exists for — the replay test above is instead
-    // caught earlier, by canTransition, once the status has already flipped.
+  it('a stray ledger row does NOT block the effect — the state machine governs, not the ledger', async () => {
+    // Under the OLD gating (ins guarded by a read, upd gated on ins) this case
+    // returned 200 deduped and left the payment 'pending' — i.e. the money moved
+    // at the gateway and we never recorded it. A ledger row can no longer exist
+    // without its effect having landed (ins is gated on upd), so a stray row
+    // like this is unreachable in new data; if legacy data has one, applying is
+    // the correct answer because the payment genuinely has not been paid yet.
     db.events.add('fake:evt_1')
     const r = res()
     await handler(req('fake', { eventId: 'evt_1', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r)
     expect(r.statusCode).toBe(200)
-    expect((r.body as any).deduped).toBe(true)
-    expect(db.payments.get('pay_1')?.status).toBe('pending') // this call did not apply it
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
+  })
+
+  it('a racer that loses writes NOTHING — no stray ledger row, no false success', async () => {
+    // The structural property the inverted gating buys. Under the old order the
+    // loser committed a ledger row with no effect; that row was harmless ONLY
+    // because no transition is legal both before and after another (pinned in
+    // status.test.ts). Now the loser writes nothing, so the safety no longer
+    // depends on that table staying shaped the way it happens to be today.
+    db.raceOnce = 'paid' // a concurrent 'paid' commits between our read and write
+    const r = res()
+    await handler(req('fake', { eventId: 'evt_B', gatewayRef: 'ref_1', status: 'paid', amountMinor: 5000, currency: 'AED' }), r)
+
+    // Re-reads, finds paid -> paid illegal, no-ops. Never a false success.
+    expect(r.statusCode).toBe(200)
+    expect((r.body as any).noop).toBe(true)
+    expect(db.payments.get('pay_1')?.status).toBe('paid')
+    expect(db.events.has('fake:evt_B')).toBe(false)
   })
 })
 

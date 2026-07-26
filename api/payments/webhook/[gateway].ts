@@ -62,6 +62,11 @@ import type { PaymentStatus } from '../../_lib/payments/types'
  */
 
 
+/** Bounded in-request retries for the decide→apply race. A losing racer writes
+ * nothing, so re-deciding is safe; 3 is plenty for a momentary row-lock contest
+ * and stops a pathological loop. */
+const MAX_APPLY_ATTEMPTS = 3
+
 interface PaymentRow {
   id: string
   status: PaymentStatus
@@ -106,6 +111,12 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   }
 
   try {
+    // Decide-then-apply, retried a bounded number of times. A retry happens ONLY
+    // when a concurrent delivery won the row between our read and our write —
+    // in which case nothing of ours was written, so re-reading and deciding
+    // again from current state is safe and is what settles the race in-process
+    // rather than bouncing it back to the gateway.
+    for (let attempt = 1; attempt <= MAX_APPLY_ATTEMPTS; attempt++) {
     // ---- Read-only phase. No write happens below until every check passes. ----
     const rows = (await sql`
       select id, status, amount_minor, currency from autoleadss.payments
@@ -124,75 +135,69 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     }
 
     // ---- Write phase: one statement, all-or-nothing. ----
-    // `ins` inserts the ledger row only if the payment STILL matches the
-    // exact status/amount/currency we just read (the WHERE EXISTS guards the
-    // INSERT ... SELECT source, so a non-match means zero rows are proposed
-    // for insertion — not a conflict, a genuine no-attempt). `upd` flips the
-    // status only if `ins` actually inserted. Because both live in one
-    // Postgres statement, a mid-write failure commits neither — the ledger
-    // can never end up poisoned without its effect landing, which is the
-    // exact scenario (crash after the ledger write, before the status flip)
-    // that used to swallow a payment forever on retry.
+    // ORDER MATTERS, AND IT IS THE OPPOSITE OF THE OBVIOUS ONE. `upd` runs
+    // first and `ins` is gated on it — the ledger row is written IF AND ONLY IF
+    // the status actually moved.
+    //
+    // It used to be the other way round (ins guarded by a read, upd gated on
+    // ins), with a comment claiming the `updated === 0` branch was unreachable
+    // because "both check the identical predicate against the same snapshot".
+    // That reasoning is false: `ins`'s guard is a plain snapshot READ, while
+    // `upd` is an UPDATE that blocks on the row lock and RE-EVALUATES its WHERE
+    // against the newly committed row (EvalPlanQual). So a concurrent delivery
+    // that won the lock left ins matching and upd not — committing a ledger row
+    // with NO effect. A later redelivery of that event then hit `on conflict do
+    // nothing` and short-circuited as "already handled".
+    //
+    // Whether that DROPPED anything depended on a property nobody had written
+    // down: it is only harmful if the loser's transition is still legal after
+    // the winner's. With today's table it never is — `pending` allows
+    // {paid,failed,expired} and `paid` allows only {refunded}, which do not
+    // intersect — so the stray ledger row was harmless in practice. That safety
+    // was accidental, unstated, and one added transition away from becoming a
+    // silent money-loss bug (see status.test.ts, which now pins the invariant).
+    //
+    // Inverting the gating removes the dependency entirely: a losing racer
+    // writes nothing at all, so it is always fully reprocessable regardless of
+    // what the transition table later allows. Genuine replays of an applied
+    // event are still caught earlier by canTransition() in the read-only phase.
+    // The ledger stays as the audit record.
     const applied = (await sql`
-      with ins as (
-        insert into autoleadss.payment_events (gateway, event_id, payment_id)
-        select ${gateway}, ${event.eventId}, ${payment.id}
-        where exists (
-          select 1 from autoleadss.payments
-          where id = ${payment.id} and status = ${payment.status}
-            and amount_minor = ${event.amountMinor} and currency = ${event.currency}
-        )
-        on conflict (gateway, event_id) do nothing
-        returning gateway
-      ),
-      upd as (
+      with upd as (
         update autoleadss.payments
         set status = ${event.status}, updated_at = now()
         where id = ${payment.id} and status = ${payment.status}
           and amount_minor = ${event.amountMinor} and currency = ${event.currency}
-          and exists (select 1 from ins)
         returning id
+      ),
+      ins as (
+        insert into autoleadss.payment_events (gateway, event_id, payment_id)
+        select ${gateway}, ${event.eventId}, ${payment.id}
+        where exists (select 1 from upd)
+        on conflict (gateway, event_id) do nothing
+        returning gateway
       )
       select (select count(*) from ins) as inserted, (select count(*) from upd) as updated
     `) as unknown as ApplyRow[]
 
     const outcome = applied[0]
-    const inserted = outcome ? toSafeInt(outcome.inserted, 'inserted') : 0
     const updated = outcome ? toSafeInt(outcome.updated, 'updated') : 0
 
-    if (inserted === 0) return sendJson(res, 200, { ok: true, deduped: true })
-    if (updated === 0) {
-      // REACHABLE, and the old comment here was wrong twice over. It claimed
-      // `ins`'s WHERE EXISTS and `upd`'s WHERE "check the identical predicate
-      // against the same snapshot, so if one matched the other must too", and
-      // that a trip meant "the event id was NOT consumed". Neither holds:
-      //
-      //   - `ins`'s guard is a plain READ against the statement snapshot.
-      //     `upd` is an UPDATE, so under READ COMMITTED it blocks on the row
-      //     lock and RE-EVALUATES its WHERE against the newly committed row
-      //     (EvalPlanQual). A concurrent delivery that wins the lock therefore
-      //     leaves ins matching and upd not matching.
-      //   - When that happens `inserted === 1`: the ledger row IS committed
-      //     (the whole statement commits), so the event id HAS been consumed.
-      //
-      // KNOWN HOLE (not live today — every real gateway is implemented:false,
-      // so nothing reaches here outside tests; it goes live with Phase 3b):
-      // if the losing event's transition would still be legal after the winner
-      // applied (e.g. a 'refunded' event racing a 'paid' one), its retry passes
-      // the read-only phase, then hits `on conflict do nothing` → inserted === 0
-      // → the 200-deduped branch above, and the refund is silently dropped.
-      // That is the dedup-before-effect class this route was restructured to
-      // kill, resurfacing on the concurrent path only.
-      //
-      // FIX (deliberately not done inside a cleanup pass — it is a money-path
-      // change and wants its own tests): invert the gating so `ins` depends on
-      // `upd` rather than the reverse. A losing racer then writes no ledger row
-      // and its retry reprocesses cleanly, while replays of an already-applied
-      // event still short-circuit earlier via canTransition() in the read-only
-      // phase.
-      return sendJson(res, 409, { error: 'concurrent update' })
+    // The effect landing is what "handled" means. `inserted` can only be 0 here
+    // if a ledger row for this event id already existed, which the forward-only
+    // machine makes unreachable — and even then the status DID move, so
+    // reporting success is correct and re-running would be the wrong answer.
+    if (updated > 0) return sendJson(res, 200, { ok: true })
+
+    // Lost the race. Nothing of ours was written (ins is gated on upd), so the
+    // loop re-reads and decides again from current state — which may still be a
+    // legal transition (the refunded-after-paid case) and must not be dropped.
+    if (attempt === MAX_APPLY_ATTEMPTS) {
+      console.error('[payments][webhook] contention exhausted', { gateway, eventId: event.eventId })
+      // 503, not 409: this is transient and the gateway SHOULD redeliver.
+      return sendJson(res, 503, { error: 'contended, retry' })
     }
-    return sendJson(res, 200, { ok: true })
+    }
   } catch (err) {
     // FAIL CLOSED — a 200 here would tell the gateway "handled" while the
     // status flip never landed. 500 so it retries, same discipline as

@@ -60,3 +60,39 @@ describe('canTransition — named invariants', () => {
     expect(canTransition('paid', 'paid')).toBe(false)
   })
 })
+
+/**
+ * An invariant the webhook's OLD write ordering silently depended on, and which
+ * nobody had written down.
+ *
+ * Under that ordering a concurrent delivery that lost the row lock still
+ * committed its idempotency-ledger row while applying no effect; its later
+ * redelivery then short-circuited on `on conflict do nothing` as "already
+ * handled". That only loses money if the loser's transition would STILL be
+ * legal after the winner's — and with this table it never is, because the
+ * statuses reachable from `pending` ({paid,failed,expired}) and those reachable
+ * from `paid` ({refunded}) do not intersect.
+ *
+ * The webhook no longer relies on this (a loser now writes nothing at all), but
+ * the property is worth pinning: if someone later adds, say, `failed -> paid`
+ * for a retry flow, this test explains what else has to hold and why it mattered.
+ */
+describe('no transition is legal both before AND after another transition', () => {
+  it('holds for every from/winner/loser triple', () => {
+    const statuses: PaymentStatus[] = ['pending', 'paid', 'failed', 'expired', 'refunded']
+    const offenders: string[] = []
+    for (const from of statuses) {
+      for (const winner of statuses) {
+        if (!canTransition(from, winner)) continue
+        for (const loser of statuses) {
+          // The loser passed the read-only phase (legal from `from`) — is it
+          // still legal once the winner has moved the row to `winner`?
+          if (canTransition(from, loser) && canTransition(winner, loser)) {
+            offenders.push(`${from} -> winner ${winner}, loser ${loser} still legal`)
+          }
+        }
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+})
