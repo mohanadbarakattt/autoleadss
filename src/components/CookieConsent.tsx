@@ -22,7 +22,14 @@ export function hasAnalyticsConsent(): boolean {
 }
 
 function save(analytics: boolean) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  // Storage can throw (Chrome/Firefox "block all site data", sandboxed iframe).
+  // An uncaught SecurityError here left the banner undismissable forever —
+  // the consent decision is still honoured for this page view either way.
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  } catch {
+    /* not persisted — the banner will ask again next visit */
+  }
 }
 
 export default function CookieConsent() {

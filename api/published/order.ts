@@ -110,6 +110,18 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
     quantities.set(raw.productId, (quantities.get(raw.productId) ?? 0) + raw.quantity)
   }
 
+  // Re-check AFTER merging duplicates. The per-line check above is not enough:
+  // the same productId can be sent on many lines, each individually under the
+  // cap, and only the merged total is what actually gets ordered — so the cap
+  // was bypassable by repetition. (Stock and the safe-integer subtotal check
+  // downstream would usually catch the result, but a stated invariant that
+  // holds only because something else happens to catch it is not an invariant.)
+  for (const [productId, quantity] of quantities) {
+    if (quantity > MAX_QUANTITY) {
+      return sendJson(res, 400, { error: `quantity for ${productId} must be a positive integer.` })
+    }
+  }
+
   // ---- 3. Load every referenced product from the DB, scoped to this owner. ----
   const products: { id: string; name: string; priceMinor: number; currency: string; stock: number }[] = []
   for (const productId of quantities.keys()) {

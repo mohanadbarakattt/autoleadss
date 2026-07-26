@@ -24,7 +24,14 @@ export function hasFunnelAnalyticsConsent(slug: string): boolean {
 }
 
 function save(slug: string, analytics: boolean) {
-  window.localStorage.setItem(keyFor(slug), JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  // Storage can throw (Chrome/Firefox "block all site data", sandboxed iframe).
+  // An uncaught SecurityError here left the banner undismissable forever —
+  // the consent decision is still honoured for this page view either way.
+  try {
+    window.localStorage.setItem(keyFor(slug), JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  } catch {
+    /* not persisted — the banner will ask again next visit */
+  }
 }
 
 // Bilingual copy mirrors the main marketing banner (src/components/CookieConsent.tsx).

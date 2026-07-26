@@ -319,6 +319,7 @@ describe('stock', () => {
 describe('quantity validation', () => {
   it.each([0, -1, 1.5, 20000])('rejects quantity %s, writing nothing', async (quantity) => {
     process.env.PAYMENTS_FAKE_ADAPTER = '1'
+    process.env.PAYMENTS_FAKE_ADAPTER = '1'
     seedSellSite()
     seedFakeGatewayConnected()
     seedProduct()
@@ -375,5 +376,35 @@ describe('buyer validation', () => {
     const r = res()
     await handler(req('POST', { slug: 'noor', items: [], buyer: BUYER }), r)
     expect(r.statusCode).toBe(400)
+  })
+
+})
+
+describe('quantity cap', () => {
+  it('caps quantity on the MERGED total, not per line (duplicate-item bypass)', async () => {
+    // Each line is individually under MAX_QUANTITY (10_000) but they are all the
+    // same product, so the real order is 30_000. The cap was applied before
+    // duplicates were merged and never re-checked afterwards.
+    process.env.PAYMENTS_FAKE_ADAPTER = '1'
+    seedSellSite()
+    seedFakeGatewayConnected()
+    seedProduct({ stock: 100_000 }) // stock must not be what rejects this
+    const before = totalRowCount()
+    const r = res()
+    await handler(
+      req('POST', {
+        slug: 'noor',
+        items: [
+          { productId: 'prod_1', quantity: 9_000 },
+          { productId: 'prod_1', quantity: 9_000 },
+          { productId: 'prod_1', quantity: 9_000 },
+          { productId: 'prod_1', quantity: 3_000 },
+        ],
+        buyer: BUYER,
+      }),
+      r,
+    )
+    expect(r.statusCode).toBe(400)
+    expect(totalRowCount()).toBe(before)
   })
 })
