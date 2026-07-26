@@ -43,7 +43,20 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   if (req.method === 'POST') {
     const body = (req.body ?? {}) as { gateway?: string; credentials?: string; credentialsHint?: string }
     if (!body.gateway || !body.credentials) return sendJson(res, 400, { error: 'gateway and credentials are required.' })
-    if (!getGatewayInfo(body.gateway)) return sendJson(res, 400, { error: `Unknown gateway: ${body.gateway}` })
+    const info = getGatewayInfo(body.gateway)
+    if (!info) return sendJson(res, 400, { error: `Unknown gateway: ${body.gateway}` })
+    // Refuse to "connect" a gateway with no adapter. It used to return 201 with
+    // status 'connected', while checkout still refused with
+    // `payments_not_connected` (api/_lib/payments/gate.ts requires
+    // `implemented`) — so the merchant saw a connected gateway that could never
+    // take a payment, and we stored live gateway credentials to no purpose.
+    // A secret held for a capability that does not exist is pure liability.
+    if (!info.implemented) {
+      return sendJson(res, 400, {
+        error: 'gateway_not_available',
+        message: `The ${info.label} integration isn't available yet, so connecting it now would not enable checkout. Your credentials were not stored.`,
+      })
+    }
 
     const encrypted = encryptCredentials(body.credentials)
     const id = `pc_${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`

@@ -129,3 +129,23 @@ describe('validateHostname — reserved hostnames (platform hijack prevention)',
     expect(validateHostname('  app.autoleadss.com  ').ok).toBe(false)
   })
 })
+
+describe('punycode / IDN homograph bypass', () => {
+  it('rejects the punycode encoding of a platform-domain homograph', () => {
+    // `аutoleadss.com` (Cyrillic а) is rejected as non-ASCII, but its punycode
+    // encoding is pure ASCII and used to pass — and a browser renders it back
+    // as `аutoleadss.com`, i.e. visually the platform's own domain.
+    expect(validateHostname('xn--utoleadss-zyh.com').ok).toBe(false)
+    expect(validateHostname('XN--UTOLEADSS-ZYH.COM').ok).toBe(false)
+  })
+
+  it('rejects punycode anywhere in the hostname, not just the first label', () => {
+    expect(validateHostname('sub.xn--80ak6aa92e.com').ok).toBe(false)
+    expect(validateHostname('xn--80ak6aa92e.example.com').ok).toBe(false)
+  })
+
+  it('still accepts ordinary ASCII hostnames', () => {
+    expect(validateHostname('example.com').ok).toBe(true)
+    expect(validateHostname('shop.my-brand.co.uk').ok).toBe(true)
+  })
+})

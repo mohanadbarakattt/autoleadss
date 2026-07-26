@@ -25,10 +25,26 @@ const RESERVED_EXACT = new Set([PLATFORM_APEX, `www.${PLATFORM_APEX}`, FUNNEL_RO
 const RESERVED_SUFFIXES = [`.${FUNNEL_ROOT}`, '.vercel.app', `.${PLATFORM_APEX}`]
 
 /** DNS label: 1-63 chars, letters/digits/hyphens, no leading/trailing hyphen.
- * ASCII-only — an IDN homograph (e.g. Cyrillic а look­alike) simply isn't in
- * this charset and is rejected as an invalid hostname, same as any other
- * non-ASCII input. */
+ * ASCII-only, which rejects a raw IDN homograph (Cyrillic а lookalike) as
+ * invalid characters — but NOT its punycode encoding, which is pure ASCII.
+ * See `PUNYCODE_PREFIX` below; ASCII-only is necessary, not sufficient. */
 const LABEL_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/
+
+/**
+ * An `xn--` label is punycode: a pure-ASCII encoding of a Unicode label, which
+ * the LABEL_RE above therefore accepts. That was a real bypass of this file's
+ * own homograph protection — `аutoleadss.com` (Cyrillic а) is rejected, while
+ * its identical-meaning encoding `xn--utoleadss-zyh.com` was accepted, and a
+ * browser renders that back as `аutoleadss.com`. A merchant could claim a
+ * domain visually indistinguishable from the platform's.
+ *
+ * Rather than decode and re-run the lookalike check (which would need a
+ * confusables table we do not have and cannot fake), custom domains simply do
+ * not support IDNs: they are rejected outright, with a truthful reason. If IDN
+ * support is ever wanted, it needs a real confusable-detection pass, not a
+ * decode-and-compare.
+ */
+const PUNYCODE_PREFIX = 'xn--'
 const IPV4_RE = /^\d{1,3}(\.\d{1,3}){3}$/
 
 export type HostnameValidation = { ok: true; hostname: string } | { ok: false; error: string }
@@ -58,6 +74,9 @@ export function validateHostname(input: unknown): HostnameValidation {
   if (labels.length < 2) return { ok: false, error: 'Enter a full hostname, e.g. shop.yourbrand.com.' }
   if (hostname.length > 253) return { ok: false, error: 'Hostname is too long.' }
   if (!labels.every((l) => LABEL_RE.test(l))) return { ok: false, error: 'Hostname contains invalid characters.' }
+  if (labels.some((l) => l.startsWith(PUNYCODE_PREFIX))) {
+    return { ok: false, error: 'Internationalised (punycode) domains are not supported as custom domains.' }
+  }
 
   if (RESERVED_EXACT.has(hostname) || RESERVED_SUFFIXES.some((suffix) => hostname.endsWith(suffix))) {
     return { ok: false, error: 'This hostname is reserved and cannot be used as a custom domain.' }
