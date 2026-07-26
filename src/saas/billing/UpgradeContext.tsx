@@ -19,21 +19,17 @@ const COPY: Record<Feature | 'maxFunnels', { en: [string, string]; ar: [string, 
   whiteLabel: { en: ['White-label is an Agency plan', 'Resell AutoLeadss as your own with sub-accounts and your branding.'], ar: ['وايت ليبل من باقة الوكالات', 'أعد بيع AutoLeadss باسمك مع حسابات فرعية وهويتك.'] },
 }
 
-/** Cap-hit copy gets genuine text in all three UI locales (unlike `COPY` above,
- * which falls back Franco→English via `toContentLocale` like the rest of this
- * file's "formal Record<Locale,...>" lookups) — these are the two newest,
- * highest-traffic upsell prompts (PRICING-SPEC-DRAFT.md §2.2's hard caps), so they
- * warrant the same full-Franco treatment as `i18n.tsx`'s STRINGS dict. */
+/** Cap-hit copy, keyed directly by UI locale rather than routed through
+ * `toContentLocale` like `COPY` above — these are the two newest,
+ * highest-traffic upsell prompts (PRICING-SPEC-DRAFT.md §2.2's hard caps). */
 const CAP_COPY: Record<CapFeature, Record<UILocale, [string, string]>> = {
   whatsappCap: {
     en: ['You’ve hit your WhatsApp-AI limit', 'Growth includes 300 AI-answered conversations a month — upgrade to Pro for 800, or buy a top-up pack below.'],
     ar: ['وصلت إلى حدّ محادثات واتساب الذكي', 'باقة Growth تشمل 300 محادثة يردّ عليها الذكاء الاصطناعي شهرياً — رقِّ إلى Pro لتصل إلى 800، أو اشترِ باقة إضافية.'],
-    'fr-eg': ['Wasalt le limit bta3et WhatsApp AI', 'Plan Growth beyeddeek 300 mokalma be AI kol shahr — ra22i le Pro 3ashan tewsal le 800, aw eshtery top-up pack.'],
   },
   aiActionCap: {
     en: ['You’ve hit your AI-generation limit', 'Growth includes 2,000 ad/social/page-copy generations a month — upgrade to Pro for 10,000, or buy a top-up pack below.'],
     ar: ['وصلت إلى حدّ توليد الذكاء الاصطناعي', 'باقة Growth تشمل 2,000 توليد إعلانات وسوشيال وصفحات شهرياً — رقِّ إلى Pro لتصل إلى 10,000، أو اشترِ باقة إضافية.'],
-    'fr-eg': ['Wasalt le limit bta3et AI generation', 'Plan Growth beyeddeek 2,000 generation (ads/social/page copy) kol shahr — ra22i le Pro 3ashan tewsal le 10,000, aw eshtery top-up pack.'],
   },
 }
 

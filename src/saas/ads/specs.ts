@@ -28,8 +28,7 @@ export interface PlatformInfo {
   name: string
   chips: SpecChip[]
   /** Static, per-platform "where to paste this" checklist for the review step —
-   * en/ar only (deeper lookup; Franco falls back to English via toContentLocale,
-   * same convention as industries.ts). */
+   * en/ar only, same convention as industries.ts. */
   checklist: { en: string[]; ar: string[] }
 }
 

@@ -26,7 +26,7 @@ export interface FollowUpInput {
  * key). Kept in sync with `buildGenerationPrompt`'s style in `./generate.ts`.
  */
 export function buildFollowUpPrompt(input: FollowUpInput): { system: string; user: string } {
-  const system = `You are AutoLeadss's instant lead-reply writer. Given a business and a lead who just submitted an inquiry, write ONE short WhatsApp message the business owner can send right away. Write in warm, natural Egyptian colloquial Arabic (the "Franco" register — casual spoken Egyptian Arabic, not formal MSA), even if the business's own funnel language is English. Greet the lead by name, reference what they asked about, and invite them to continue the conversation — no hard sales pitch, no emojis overload (at most one), no markdown. Output ONLY the message text, nothing else.`
+  const system = `You are AutoLeadss's instant lead-reply writer. Given a business and a lead who just submitted an inquiry, write ONE short WhatsApp message the business owner can send right away. Write in warm, natural Egyptian colloquial Arabic (casual spoken Egyptian Arabic, not formal MSA), even if the business's own funnel language is English. Greet the lead by name, reference what they asked about, and invite them to continue the conversation — no hard sales pitch, no emojis overload (at most one), no markdown. Output ONLY the message text, nothing else.`
   const user = `Business: ${input.businessName} (${input.industry})
 What the business offers: ${input.offer}
 Lead's name: ${input.leadName}

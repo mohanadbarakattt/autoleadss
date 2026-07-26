@@ -72,14 +72,11 @@ export default function Pricing() {
     navigate('/app/pages')
   }
 
-  const isFranco = locale === 'fr-eg'
-  const title = isRTL ? 'الأسعار — AutoLeadss' : isFranco ? 'El As3ar — AutoLeadss' : 'Pricing — AutoLeadss'
+  const title = isRTL ? 'الأسعار — AutoLeadss' : 'Pricing — AutoLeadss'
   const description = isRTL
     ? 'أسعار AutoLeadss لمنشئ القمع بالذكاء الاصطناعي — باقات لمصر والخليج، من التجربة المجانية إلى وضع الوكالة.'
-    : isFranco
-      ? 'As3ar AutoLeadss lel funnel builder bel AI — plans le Masr w El Khaleeg, men ebda2 majjany le agency white-label.'
-      : 'AutoLeadss pricing for the self-serve AI funnel builder — plans for Egypt and the Gulf, from a free start to white-label agency.'
-  const htmlLang = isRTL ? 'ar' : isFranco ? 'ar-Latn' : 'en'
+    : 'AutoLeadss pricing for the self-serve AI funnel builder — plans for Egypt and the Gulf, from a free start to white-label agency.'
+  const htmlLang = locale
 
   // Only the tiers with a fixed, published price (not "contact us" tiers) go into
   // structured data — no fabricated/estimated prices for the done-with-you or
@@ -192,7 +189,7 @@ export default function Pricing() {
               <div className="text-center">
                 <p className="font-display text-xl font-bold">{isRTL ? 'باقات إضافية' : 'Top-up packs'}</p>
                 <p className="mx-auto mt-1 max-w-md text-sm text-muted-fg">
-                  {isRTL ? 'وصلت لحدّك الشهري؟ اشترِ محادثات واتساب وتوليدات إضافية تُستخدم خلال 90 يوماً.' : isFranco ? 'Wasalt le limit el shahr? Eshtery mokalmat WhatsApp w generations extra, sale7a le 90 youm.' : 'Hit your monthly cap? Buy extra WhatsApp-AI conversations and AI generations, valid for 90 days.'}
+                  {isRTL ? 'وصلت لحدّك الشهري؟ اشترِ محادثات واتساب وتوليدات إضافية تُستخدم خلال 90 يوماً.' : 'Hit your monthly cap? Buy extra WhatsApp-AI conversations and AI generations, valid for 90 days.'}
                 </p>
               </div>
               <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -215,7 +212,7 @@ export default function Pricing() {
           )}
 
           <div className="mt-12 text-center">
-            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">{isRTL ? '→' : '←'} {isRTL ? 'العودة إلى AutoLeadss' : isFranco ? 'Erga3 le AutoLeadss' : 'Back to AutoLeadss'}</Link>
+            <Link to="/" className="text-sm text-muted-fg hover:text-foreground">{isRTL ? '→' : '←'} {isRTL ? 'العودة إلى AutoLeadss' : 'Back to AutoLeadss'}</Link>
           </div>
         </div>
       </section>

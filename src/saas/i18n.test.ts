@@ -5,23 +5,15 @@ import { isSuspectedDrift, leafEntries, leafPaths } from '../test/localeDictHelp
 const LRI = '⁦' // LEFT-TO-RIGHT ISOLATE
 const PDI = '⁩' // POP DIRECTIONAL ISOLATE
 
-describe('suite locale key parity (en / ar / fr-eg)', () => {
+describe('suite locale key parity (en / ar)', () => {
   const enPaths = new Set(leafPaths(STRINGS.en))
   const arPaths = new Set(leafPaths(STRINGS.ar))
-  const frPaths = new Set(leafPaths(STRINGS['fr-eg']))
 
   it('ar has exactly the keys en has (nothing missing, nothing extra)', () => {
     const missing = [...enPaths].filter((p) => !arPaths.has(p))
     const extra = [...arPaths].filter((p) => !enPaths.has(p))
     expect(missing, `ar is missing keys en has: ${missing.join(', ')}`).toEqual([])
     expect(extra, `ar has keys en doesn't: ${extra.join(', ')}`).toEqual([])
-  })
-
-  it('fr-eg has exactly the keys en has (nothing missing, nothing extra)', () => {
-    const missing = [...enPaths].filter((p) => !frPaths.has(p))
-    const extra = [...frPaths].filter((p) => !enPaths.has(p))
-    expect(missing, `fr-eg is missing keys en has: ${missing.join(', ')}`).toEqual([])
-    expect(extra, `fr-eg has keys en doesn't: ${extra.join(', ')}`).toEqual([])
   })
 })
 

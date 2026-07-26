@@ -12,7 +12,6 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   const { t, isRTL, locale, setLocale } = useI18n()
-  const isFranco = locale === 'fr-eg'
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -38,9 +37,9 @@ export default function AuthForm({ mode }: { mode: 'signup' | 'login' }) {
   }
 
   const title = isSignup
-    ? (isRTL ? 'إنشاء حساب — AutoLeadss' : isFranco ? 'Emel account — AutoLeadss' : 'Sign up — AutoLeadss')
-    : (isRTL ? 'تسجيل الدخول — AutoLeadss' : isFranco ? 'Log in — AutoLeadss' : 'Log in — AutoLeadss')
-  const htmlLang = isRTL ? 'ar' : isFranco ? 'ar-Latn' : 'en'
+    ? (isRTL ? 'إنشاء حساب — AutoLeadss' : 'Sign up — AutoLeadss')
+    : (isRTL ? 'تسجيل الدخول — AutoLeadss' : 'Log in — AutoLeadss')
+  const htmlLang = locale
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="grid min-h-screen lg:grid-cols-2">

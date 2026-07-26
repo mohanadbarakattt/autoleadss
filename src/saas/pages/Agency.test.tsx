@@ -85,13 +85,14 @@ describe('Agency — locale', () => {
     expect(screen.getByText('حسابات العملاء')).toBeInTheDocument()
   })
 
-  it('renders Franco strings in fr-eg locale', () => {
+  it('resolves a stale persisted fr-eg to Arabic (the Franco locale was removed)', () => {
     window.localStorage.setItem(LOCALE_KEY, 'fr-eg')
     signUp('Demo', 'demo@example.com', 'gulf')
     setPlan('whitelabel')
     renderAgency()
-    expect(screen.getByText('Agency Mode')).toBeInTheDocument()
-    expect(screen.getByText('El Branding (White-label)')).toBeInTheDocument()
+    expect(screen.getByText('وضع الوكالة')).toBeInTheDocument()
+    expect(screen.getByText('الهوية (وايت ليبل)')).toBeInTheDocument()
+    expect(screen.getByText('حسابات العملاء')).toBeInTheDocument()
   })
 })
 

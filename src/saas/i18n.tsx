@@ -3,28 +3,26 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Locale } from './types'
 
 /**
- * The SaaS chrome's own locale — a superset of the funnel-content `Locale` (which
- * stays 'en'|'ar' since generated funnel copy isn't produced in Franco; see
- * `toContentLocale` below). Franco gets full translations for this file's UI
- * strings (nav, buttons, wizard/dashboard/editor labels); a handful of deeper,
- * formal Record<Locale,...> lookups elsewhere (plan names, industry labels, lead
- * statuses) fall back through `toContentLocale` to keep everything on-screen in
- * one script rather than mixing Latin Franco with Arabic-script fragments.
+ * The SaaS chrome's own locale. Kept as a distinct named type from the
+ * funnel-content `Locale` (src/saas/types.ts) even though both are now exactly
+ * 'en' | 'ar' — this one answers "what language is the AutoLeadss chrome
+ * itself in", that one answers "what language did the merchant choose for
+ * THEIR funnel's content", and those can differ (an Arabic-speaking merchant
+ * browsing the dashboard in English can still publish an Arabic funnel).
+ * `toContentLocale` below bridges the two.
  */
-export type UILocale = 'en' | 'ar' | 'fr-eg'
+export type UILocale = 'en' | 'ar'
 
-/** Maps the UI locale to the nearest funnel-content locale for Record<Locale,...>
- * lookups that don't have Franco copy. English (not Arabic) is the fallback for
- * Franco so the screen stays in one script — Franco readers code-switch to English
- * constantly, but a sudden Arabic-script fragment in an otherwise Latin-script UI
- * reads as a script-mixing bug, not a feature. */
+/** UILocale and Locale carry the same two values today, so this is the
+ * identity function — kept as a named bridge (rather than inlined at each call
+ * site) because it documents that a UI-locale value is being read as a content
+ * locale, and because the two types are free to diverge again later. */
 export function toContentLocale(l: UILocale): Locale {
-  return l === 'ar' ? 'ar' : 'en'
+  return l
 }
 
-/** Exported (only) so the locale-parity/drift guard tests (src/saas/i18n.test.tsx)
- * can walk all three dicts directly — `dictFor` deliberately can't reach 'fr-eg'
- * (see its own doc comment), so this is the only way to get at STRINGS['fr-eg']. */
+/** Exported so the locale-parity/drift guard tests (src/saas/i18n.test.ts)
+ * can walk both dicts directly. */
 export const STRINGS = {
   en: {
     nav: { product: 'Product', pricing: 'Pricing', login: 'Log in', start: 'Start free', dashboard: 'Dashboard' },
@@ -856,421 +854,6 @@ export const STRINGS = {
       },
     },
   },
-  'fr-eg': {
-    nav: { product: 'El Product', pricing: 'El As3ar', login: 'Login', start: 'Ebda2 Majjany', dashboard: 'Dashboard' },
-    common: {
-      getStarted: 'Ebda2 majjany',
-      book: 'Ehgez demo',
-      new: 'Funnel gedid',
-      generate: 'Wallad el funnel bta3y',
-      save: 'Save',
-      publish: 'Publish',
-      published: 'Published',
-      draft: 'Draft',
-      preview: 'Preview',
-      edit: 'Edit',
-      back: 'Rega3',
-      next: 'Next',
-      cancel: 'Cancel',
-      delete: 'Delete',
-      copy: 'Copy',
-      copied: 'Et-copy',
-      open: 'Efta7',
-      leads: 'Leads',
-      visits: 'Zeyarat',
-      convRate: 'Conv. rate',
-    },
-    auth: {
-      signupTitle: 'Emel account 3ala AutoLeadss',
-      signupSub: 'Ebni awel funnel beta3ak bel AI fi da2a2e2. Bidoon card.',
-      loginTitle: 'Ahlan beek tany',
-      loginSub: 'Log in le workspace beta3ak 3ala AutoLeadss.',
-      name: 'El esm el kamel',
-      email: 'Email el shoghl',
-      region: 'Beteb3 fen?',
-      egypt: 'Masr',
-      gulf: 'El Khaleeg / El Emarat',
-      createAccount: 'E3mel el account',
-      login: 'Log in',
-      haveAccount: '3andak account already?',
-      noAccount: 'Mesh 3andak account?',
-      demoNote: 'Shaghal fi demo mode — el data beta3ak fi el browser da bas.',
-      nameRequired: 'Ektib esmak min fadlak.',
-      emailRequired: 'Ektib el email beta3ak min fadlak.',
-      emailInvalid: 'Ektib email sa7i7 min fadlak.',
-    },
-    wizard: {
-      title: 'Yalla nebni el funnel beta3ak',
-      step: 'Khatwa',
-      of: 'men',
-      industryQ: 'Nashat eh da?',
-      nameQ: 'Esm el nashat eh?',
-      namePh: 'Mesalan: Marina Heights Realty',
-      langQ: 'El funnel yeb2a be anhy logha?',
-      regionQ: 'El 3omala2 beta3ak fen?',
-      goalQ: 'Eh el hadaf el awal men el funnel da?',
-      toneQ: 'Ekhtar el tone w el lawn',
-      audiencePh: '3omala2ak meen? (ekhteyari)',
-      generating: 'Bnebni el funnel beta3ak…',
-      generatingSub: 'Benaktob el page, el ads, bot el WhatsApp, w el social — fi sawany.',
-      ready: 'El funnel beta3ak gahez 🎉',
-      readySub: 'Landing page, ad copy, WhatsApp bot, w social posts — kolohom gahzeen.',
-      openEditor: 'Efta7 fel editor',
-    },
-    goals: {
-      leads: 'Zawed el leads',
-      bookings: 'Zawed el bookings / mawa3eed',
-      sales: 'Zawed el online sales',
-      calls: 'Zawed mokalmat WhatsApp',
-    },
-    tones: { bold: 'Bold', friendly: 'Friendly', luxury: 'Luxury', professional: 'Professional' },
-    dash: {
-      title: 'El funnels beta3ak',
-      empty: 'Mafeesh funnels lessa',
-      emptySub: 'Wallad awel sales funnel beta3ak bel AI fi a2al men da2i2a.',
-      overview: 'Overview',
-      totalFunnels: 'Funnels',
-      totalLeads: 'Total leads',
-      totalVisits: 'Total visits',
-      live: 'Live',
-    },
-    editor: {
-      tabs: { page: 'Landing page', ads: 'Ads', chatbot: 'WhatsApp bot', social: 'Social', leads: 'Leads', storefront: 'Storefront', products: 'Products', orders: 'Orders' },
-      regenerate: 'Regenerate',
-      livePreview: 'Live preview',
-      publishedAt: 'Live 3ala',
-      copyLink: 'Copy el link',
-      simulator: 'Garrab el bot',
-      typeMessage: 'Ektib resala…',
-      storefrontPanel: {
-        heroTitle: 'El Hero',
-        headline: 'El 3onwan',
-        subhead: 'El Wasf',
-        cta: 'Zorar el CTA',
-        bandTitle: 'Band section',
-        bandLabel: 'El Label',
-        bandHeadline: 'El 3onwan',
-        bandCta: 'El Zorar',
-      },
-      productsPanel: {
-        title: 'El Products',
-        body: 'Edarat el catalogue beta3ak — products, as3ar, sowar, w stock — men Products page.',
-        cta: 'Edarat el products',
-      },
-      ordersPanel: {
-        empty: 'Mafeesh orders lessa.',
-        buyer: 'El Mshtary',
-        items: 'El Items',
-        total: 'El Total',
-        status: 'El Status',
-        date: 'El Tareekh',
-        statuses: { pending: 'Pending', paid: 'Paid', cancelled: 'Cancelled', refunded: 'Refunded' },
-      },
-    },
-    pricing: {
-      title: 'As3ar betekbar ma3ak',
-      sub: 'Ebda2 majjany. Ra22i lama el leads tebda2 tegy. As3ar mazbota le so2ak.',
-      egypt: 'Masr',
-      gulf: 'El Khaleeg / El Emarat',
-      monthly: 'Shahry',
-      annual: 'Sanawy −20%',
-      mo: '/shahr',
-      popular: 'El aktar talab',
-      choose: 'Ekhtar el plan',
-      current: 'El plan el 7aly',
-      contact: 'Kallem el sales',
-    },
-    lang: { switch: 'العربية', label: 'FRN' },
-    adSuite: {
-      navLabel: 'Ad Suite',
-      rail: { platforms: 'El Platforms', details: 'El Tafaseel', generate: 'Wallad', review: 'Morag3a' },
-      platformsTitle: 'Al platforms elly 3ayez te3len 3aleiha eh?',
-      platformsSub: 'Ekhtar wa7da aw aktar — hanwallad copy makhsoos le kol platform.',
-      detailsTitle: 'Beta3len 3an eh?',
-      detailsPlaceholder: 'Mesalan: gym boutique fi El Sheikh Zayed beye2addem personal training w khetat taghzeya…',
-      useFunnel: 'Emla2 el bayanat men funnel mawgood',
-      useFunnelNone: 'Ebda2 men el sefr',
-      businessName: 'Esm el nashat',
-      industryLabel: 'Nashat',
-      toneLabel: 'El Tone',
-      adLanguage: 'Logha el e3lanat',
-      generateCta: 'Wallad el campaigns bta3ty',
-      generatingTitle: 'Benaktob el campaigns beta3tak…',
-      generatingSub: 'Talab makhsoos le kol platform — copy, audience, w el budget.',
-      readyTitle: 'El campaigns beta3tak gahzeen',
-      readySub: 'Copy, eqtera7at targeting, w checklist le kol platform.',
-      regenerate: 'Wallad Tany',
-      exportAll: 'Export el kol (.md)',
-      sample: 'Sample',
-      checklistLabel: 'Checklist el tashghil',
-      audienceLabel: 'El Audience el mo2tara7',
-      interests: 'El Ehtemamat',
-      jobTitles: 'El Mosammayat el wazifeya',
-      ageBands: 'El Sen',
-      budgetLabel: 'El Budget w Estratigeyet el Mazayada',
-      perDay: 'EGP/yom',
-      headlines: 'El 3anaween',
-      descriptions: 'El Awsaf',
-      variants: 'Nosoos el e3lan',
-      videoScript: 'Script video 15 sania',
-      intro: 'El Nas el mo2addema',
-      headline: 'El 3onwan',
-      startOver: 'Ebda2 Ad Suite gedid',
-      capNote: 'Wasalt le limit el AI generation el shahr da — 3ard sample mabni 3ala elly katabto badalan men keda.',
-    },
-    hub: {
-      nav: { home: 'El Home', tools: 'El Tools', clients: 'El Clients', pricing: 'El As3ar' },
-      region: { label: 'El market region', gulf: 'El Khaleeg', global: 'El 3alam' },
-      head: { title: 'El growth suite beta3ak', subtitle: 'Kol 7aga 3ashan tetla2 w tebi3 w tekbar — men El Khaleeg lel 3alam. Ekhtar tool.' },
-      flagship: {
-        tag: 'El Flagship',
-        title: 'Storefront',
-        body: 'Online store fakhma — designed, hosted, w gahza tebi3. Premium templates, brand beta3ak, so2ak.',
-        cta: 'Coming soon',
-      },
-      toolsLabel: 'El tools beta3ak',
-      status: { live: 'Live', soon: 'Soon' },
-      tools: {
-        storefront: { name: 'Storefront', desc: 'Bi3 online, be class' },
-        ads: { name: 'Ads', desc: 'AI ads, localized' },
-        whatsapp: { name: 'WhatsApp', desc: 'Bot, broadcasts, inbox' },
-        pages: { name: 'Landing pages', desc: 'Zawed leads w bookings' },
-        leads: { name: 'Leads & CRM', desc: 'Kol lead fi makan wa7ed' },
-        social: { name: 'Social', desc: 'Content w scheduling' },
-        insights: { name: 'Insights', desc: 'Eh elly shaghal, live' },
-        reviews: { name: 'Reviews', desc: 'Egma3ha w e3redha' },
-        bookings: { name: 'Bookings', desc: 'Mawa3eed w calendar' },
-      },
-    },
-    onboarding: {
-      kicker: 'Gahez fi da2i2a wahda',
-      title: 'Yalla nebni el growth beta3ak',
-      subtitle: 'Ekhtar nashat eh — hangahez el tools w wasa2el el daf3 el monaseba.',
-      step1: '1 · Nashat eh?',
-      step2: '2 · El toolkit beta3ak',
-      types: {
-        retail: 'Retail w E-commerce',
-        restaurant: 'Restaurant w Cafe',
-        beauty: 'Beauty w Salon',
-        clinic: 'Clinic w Se7a',
-        realEstate: 'Real Estate',
-        coaching: 'Coaching w Estesharat',
-        services: 'Services w Agency',
-        hospitality: 'Hospitality w Eqama',
-      },
-      tools: {
-        storefront: 'Bi3 online bel checkout',
-        ads: 'Gib el mshatareen',
-        whatsapp: 'Chat, orders w support',
-        pages: '7awel el zowar le leads',
-        leads: 'Kol lead fi makan wa7ed',
-        social: 'Content, gahez w majdwel',
-        insights: 'Shoof eh elly shaghal',
-        reviews: 'Ebni el se2a',
-        bookings: 'Mawa3eed men gher ta3qeed',
-      },
-      paymentsLabel: 'Wasa2el el daf3 le so2ak — gayya ma3 el checkout',
-      soonTag: 'Soon',
-      cta: 'Ebni el toolkit beta3y →',
-      note: 'Zawed aw shil tools fi ay wa2t.',
-      editToolkit: '3addel el toolkit',
-    },
-    products: {
-      title: 'El Products',
-      subtitle: 'Eli beteb3o — gahez lel storefront lama el checkout yeb2a live.',
-      newProduct: 'Product gedid',
-      empty: { title: 'Mafeesh products lessa', body: 'Zawed awel product beta3ak — esm, se3r, w link soora — w yeb2a gahez lel bay3.' },
-      status: { draft: 'Draft', active: 'Active', archived: 'Archived' },
-      stockLabel: 'stock',
-      form: {
-        titleNew: 'Product gedid',
-        titleEdit: 'Edit el product',
-        name: 'El Esm',
-        namePh: 'Mesalan: Oud Leather Tote',
-        description: 'El Wasf',
-        imageUrl: 'Image URL',
-        imageHint: 'Hot link le soora mostadafa — mafeesh upload lessa.',
-        price: 'El Se3r',
-        currency: 'El 3omla',
-        stock: 'El Stock',
-        status: 'El Status',
-        nameError: 'El esm matloob.',
-        priceError: 'Ektib se3r zay 240.50 — ra2m positive, max 2 decimals.',
-      },
-      deleteConfirm: 'Delete el product da?',
-      archivedNotice: 'El product da fi orders adima, fa et3amel archive badal ma yet2ela3.',
-      deletedNotice: 'Et2ala3 el product.',
-      storefront: {
-        createTitle: 'Mafeesh storefront lessa',
-        createBody: 'E3mel storefront beta3ak 3ashan te3ras el products dool lel 3ala2.',
-        createCta: 'E3mel el storefront',
-        liveTitle: 'El storefront beta3ak live',
-        liveBody: 'El products fo2 gahzeen lel 3ard — el checkout yeb2a live lama gateway el daf3 yet-connect.',
-        viewStore: 'Shoof el store',
-      },
-    },
-    leads: {
-      title: 'Leads & CRM',
-      subtitle: 'Kol lead men kol site — fi makan wa7ed.',
-      searchPh: 'Search bel esm, mobile, aw email…',
-      filters: { allStatuses: 'Kol el statuses', allSites: 'Kol el sites' },
-      status: { new: 'New', qualified: 'Qualified', won: 'Won', lost: 'Lost' },
-      source: { page: 'Page', whatsapp: 'WhatsApp' },
-      table: { name: 'El Esm', phone: 'El Mobile', email: 'Email', site: 'El Site', source: 'El Source', status: 'El Status', created: 'Etsagel', followUp: 'Instant reply' },
-      sampleBadge: 'Sample',
-      export: 'Export CSV',
-      empty: { title: 'Mafeesh leads lessa', body: 'El leads elly hayet-captured men ay site beta3ak hayzharu hena.' },
-      noResults: 'Mafeesh leads matching el filters dool.',
-      followUp: {
-        toggle: 'Instant reply',
-        drafting: 'Bektib…',
-        send: 'Eb3at via WhatsApp',
-        regenerate: 'Wallad Tany',
-      },
-    },
-    insights: {
-      title: 'El Insights',
-      subtitle: 'Eh elly shaghal fi kol site — sawa, 3ala kol el suite beta3ak.',
-      kpis: { visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
-      utcNote: 'El ayam mawgoda bel UTC — "el naharda" bel Khaleeg (UTC+4) momken teb2a mo2sama 3ala 3amodein 2orayeb nos el lail.',
-      charts: { visitsTitle: 'Visits · akher 14 youm', leadsTitle: 'Leads · akher 14 youm' },
-      funnel: { title: 'Rehlet el customer', visits: 'Visits', leads: 'Leads', whatsapp: 'WhatsApp', won: 'Won' },
-      sites: {
-        title: 'Hasab el site',
-        table: { site: 'El Site', visits: 'Visits', leads: 'Leads', conversion: 'Conversion', won: 'Won' },
-      },
-      orders: {
-        title: 'El Orders',
-        pending: 'Pending',
-        pendingNote: 'Value lessa mesh matgama3a — mafeesh payment gateway connected lessa, fa mafeesh 7aga hena revenue.',
-        empty: 'Mafeesh pending orders lessa.',
-      },
-      empty: { title: 'Mafeesh data lessa', body: 'Lama el sites beta3tak yeb2a 3andaha visits w leads, el insights beta3tak hatzhar hena.' },
-    },
-    agency: {
-      title: 'Agency Mode',
-      subtitle: 'El branding beta3ak w el client sub-accounts.',
-      locked: {
-        title: 'Agency Mode (White-label)',
-        body: 'Resell AutoLeadss be esmak — client sub-accounts w el branding beta3ak kamel. Available 3ala plan el Agency.',
-        cta: 'Ra22i le Agency',
-      },
-      brand: {
-        title: 'El Branding (White-label)',
-        name: 'Esm el Brand',
-        namePh: 'Esm el Agency beta3tak',
-        accent: 'El Loon',
-        logoUrl: 'Rabet el Logo',
-        logoUrlPh: 'https://your-cdn.com/logo.png',
-        logoUrlHint: 'Ela2 rabet soora hosted bel https:// — mafeesh upload lessa.',
-        hideBadge: 'Ekhfy el badge "Made with AutoLeadss" men el pages el manshora',
-        save: 'Save el Branding',
-        saved: 'Et-saved',
-        nameError: 'Esm el brand lazem yeb2a 1-80 harf.',
-        logoUrlError: 'Rabet el logo lazem yeb2a link https:// sa7.',
-      },
-      sub: {
-        title: 'Client Sub-accounts',
-        subtitle: 'Efsel funnels kol client. El funnels el gedeed hate-assign lel account el active.',
-        namePh: 'Esm el Client',
-        emailPh: 'Email (optional)',
-        add: 'Zawed',
-        allAccounts: 'Kol el Accounts',
-        active: 'Active',
-        funnelOne: 'funnel',
-        funnelOther: 'funnels',
-        buildingFor: 'Betebni delwa2ty le',
-        buildCta: 'Site gedeed lel client da',
-        delete: 'Delete',
-        deleteConfirm: 'Delete el client da? El sites beta3to hate-reassign le "Kol el Accounts" — mesh hatetla3.',
-        confirmDelete: 'Delete el Client',
-        cancel: 'Cancel',
-      },
-    },
-    whatsapp: {
-      title: 'WhatsApp',
-      subtitle: 'Kol mokalma ma3 el 3omala2 beta3ak, fi inbox wa7ed moshtarak.',
-      funnelLabel: 'El Ra2m',
-      list: { title: 'El Mokalmat' },
-      locked: {
-        title: 'Bot el WhatsApp men mazaya Growth',
-        body: 'Ra22i el plan beta3ak 3ashan te-connect ra2m WhatsApp ha2i2y w tred 3ala el 3omala2 men inbox moshtarak.',
-        cta: 'Ra22i Dilwa2ti',
-      },
-      notConnected: {
-        title: 'Lessa mesh connected',
-        body: 'Connect ra2m WhatsApp lel site da 3ashan tebda2 tred 3ala el 3omala2 men hena.',
-        cta: 'Connect WhatsApp',
-      },
-      empty: {
-        title: 'Mafeesh mokalmat lessa',
-        body: 'El mokalmat hatzhar hena lama ay 3ameel yeb3atlak resala 3ala el ra2m da.',
-      },
-      selectThread: 'Ekhtar mokalma 3ashan teshoofha.',
-      reply: {
-        placeholder: 'Ektib rad…',
-        send: 'Eb3at',
-        sending: 'Bab3at…',
-        windowClosed: 'El window bta3et el rad (24 sa3a) le el 3ameel da 2afla — mesh mumkin teb3at resala 7orra men gher template mo3tamad.',
-        error: 'Ma2dernash neb3at — try tany.',
-      },
-    },
-    storefront: {
-      cart: 'El Cart',
-      close: 'E2fel',
-      curated: 'Mokhtar 3ashanak',
-      newArrivals: 'Gedid',
-      shopTheStore: 'Etsawa2 mel store',
-      fullCollection: 'Kol el collection',
-      shopNow: 'Etsawa2 dilwa2ti',
-      shop: 'El Shop',
-      addToCart: 'Zawedha lel cart',
-      outOfStock: 'Khelset',
-      empty: 'El cart beta3ak far3gh.',
-      emptyCatalogue: { title: 'Mafeesh products lessa', body: 'El store lessa beyet-gahez — erga3 3an 2orayeb.' },
-      decrease: 'Ne2es el kammeya',
-      increase: 'Zawed el kammeya',
-      remove: 'Shel',
-      subtotal: 'El Ma7sool',
-      checkout: 'Etmam el shera2',
-      continueShopping: 'Kammel tetsawa2',
-      buyerName: 'El Esm',
-      buyerEmail: 'Email (ekhtyari)',
-      buyerPhone: 'Ra2m el mobile',
-      placeOrder: 'Eb3at el order',
-      placingOrder: 'Bab3at el order…',
-      gated: { title: 'El store da lessa mesh bya2bal madfoo3at', body: 'Sa7eb el store lessa ma-connectsh wasilet daf3 — erga3 3an 2orayeb.' },
-      orderError: 'Ma2dernash neb3at el order beta3ak. Try tany.',
-      tryAgain: 'Try tany',
-      orderSuccess: { title: 'El order wasal', body: 'Shokran — el store hayekallemak le-ta2keed el order.' },
-    },
-    domains: {
-      freeSubdomainTitle: 'El subdomain el majjany',
-      freeSubdomainBody: 'El funnel el manshoor beta3ak live hena 3ala tool.',
-      visit: 'Zoor ↗',
-      publishFirst: 'Publish awalan',
-      customTitle: 'Custom domain',
-      comingSoon: 'Custom domains lessa mesh mawgoodeen fel version da — coming soon.',
-      signInRequired: 'Custom domains me7tageen connected account — Log in 3ashan tezawed domain.',
-      placeholder: 'shop.yourbrand.com',
-      add: 'Zawed',
-      recordIntro: 'E3mel el TXT record da, ba3dein verify:',
-      recordName: 'El Esm',
-      recordValue: 'El Value',
-      verify: 'Verify',
-      verifying: 'Bne-verify…',
-      verified: 'Live',
-      pending: 'Pending DNS',
-      remove: 'Shel el domain',
-      cnameNote: 'Zawed kaman CNAME record le cname.vercel-dns.com 3ashan yeshtaghal, w zawed el domain fi hosting project beta3ak 3ashan yesdar SSL certificate.',
-      reasons: {
-        nxdomain: 'Mafeesh DNS le el domain da lessa — et2aked men el esm w try tany lama yeshtaghal.',
-        no_record: 'Mafeesh TXT record lessa — zawed el record fo2 w verify tany.',
-        mismatch: "La2ena TXT record, bas el value mesh matching — et2aked ennak copy-etaha zabt.",
-        lookup_failed: 'DNS lookup fashal — try tany ba3d shwaya.',
-      },
-    },
-  },
 }
 
 export type Dict = (typeof STRINGS)['en']
@@ -1298,12 +881,8 @@ export const LOCALE_KEY = 'autoleadss:locale'
  * we migrate it into LOCALE_KEY on first load so returning users keep their choice. */
 const LEGACY_LOCALE_KEY = 'virlo:locale'
 
-/** BCP-47 lang per UI locale — Franco is Egyptian Arabic in Latin script, so
- * "ar-Latn" (not "fr-eg", which would misleadingly read as French). */
-const HTML_LANG: Record<UILocale, string> = { en: 'en', ar: 'ar', 'fr-eg': 'ar-Latn' }
-
 function isUILocale(v: string | null): v is UILocale {
-  return v === 'ar' || v === 'en' || v === 'fr-eg'
+  return v === 'ar' || v === 'en'
 }
 
 function readStoredLocale(): UILocale | null {
@@ -1311,13 +890,17 @@ function readStoredLocale(): UILocale | null {
   const saved = window.localStorage.getItem(LOCALE_KEY)
   if (isUILocale(saved)) return saved
   const legacy = window.localStorage.getItem(LEGACY_LOCALE_KEY)
-  if (isUILocale(legacy)) {
+  // A visitor from before the Franco locale was dropped may still have
+  // 'fr-eg' persisted (LOCALE_KEY or the legacy key) — resolve it to 'ar',
+  // the closer register for a Franco reader, instead of silently reverting
+  // to the 'en' default; persist the resolution below so it sticks.
+  const resolved = saved === 'fr-eg' || legacy === 'fr-eg' ? 'ar' : isUILocale(legacy) ? legacy : null
+  if (resolved) {
     try {
-      window.localStorage.setItem(LOCALE_KEY, legacy)
+      window.localStorage.setItem(LOCALE_KEY, resolved)
     } catch {}
-    return legacy
   }
-  return null
+  return resolved
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
@@ -1330,7 +913,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const dir = locale === 'ar' ? 'rtl' : 'ltr'
-    document.documentElement.setAttribute('lang', HTML_LANG[locale])
+    document.documentElement.setAttribute('lang', locale)
     document.documentElement.setAttribute('dir', dir)
   }, [locale])
 

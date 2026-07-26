@@ -1,10 +1,10 @@
 import type { UILocale } from '../i18n'
 
-const LABEL: Record<UILocale, string> = { en: 'EN', ar: 'AR', 'fr-eg': 'FRN' }
-const LOCALES: UILocale[] = ['en', 'ar', 'fr-eg']
+const LABEL: Record<UILocale, string> = { en: 'EN', ar: 'AR' }
+const LOCALES: UILocale[] = ['en', 'ar']
 
-/** Compact 3-way EN / AR / Franco pill switcher for the SaaS app — mirrors the
- * marketing site's Navigation switcher. `variant="dark"` for dark headers/panels
+/** Compact EN / AR pill switcher for the SaaS app — mirrors the marketing
+ * site's Navigation switcher. `variant="dark"` for dark headers/panels
  * (Pricing hero, AuthForm's dark side panel), `variant="light"` for the app shell,
  * `variant="suite"` for SuiteShell's dark-luxe bar (gold-toned, matches RegionSwitch
  * beside it rather than the plain white/dark chip). */
