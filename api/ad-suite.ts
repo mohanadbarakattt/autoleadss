@@ -63,9 +63,12 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   if (sql) {
     const plan: PlanId = KNOWN_PLANS.includes(body.plan as PlanId) ? (body.plan as PlanId) : 'growth'
     const cap = entitlementFor(plan).aiActionCap
+    // Always meter, cap only where a limit exists — see the same note in
+    // api/ai-generate.ts. Plans with a null cap were recording nothing, so
+    // their AI spend was invisible rather than just uncapped.
+    const usage = await incrementUsageCounter(sql, userId, 'aiAction')
+    usageRecorded = true
     if (cap) {
-      const usage = await incrementUsageCounter(sql, userId, 'aiAction')
-      usageRecorded = true
       if (cap.type === 'hard' && usage.aiAction > cap.limit) {
         return sendJson(res, 429, {
           error: 'ai_action_cap_exceeded',

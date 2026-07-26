@@ -84,9 +84,14 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
   if (sql) {
     const plan: PlanId = KNOWN_PLANS.includes(body.plan as PlanId) ? (body.plan as PlanId) : 'growth'
     const cap = entitlementFor(plan).aiActionCap
+    // METERING AND CAPPING ARE DIFFERENT CONCERNS. The increment used to sit
+    // inside `if (cap)`, so the three plans with a null cap (starter, dwy,
+    // whitelabel) recorded NOTHING — their AI spend wasn't merely uncapped, it
+    // was invisible, so nobody could see it growing. Always record; enforce
+    // only where a limit exists.
+    const usage = await incrementUsageCounter(sql, userId, 'aiAction')
+    usageRecorded = true
     if (cap) {
-      const usage = await incrementUsageCounter(sql, userId, 'aiAction')
-      usageRecorded = true
       if (cap.type === 'hard' && usage.aiAction > cap.limit) {
         return sendJson(res, 429, {
           error: 'ai_action_cap_exceeded',
