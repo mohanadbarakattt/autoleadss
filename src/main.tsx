@@ -1,11 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import ErrorBoundary from './components/ErrorBoundary'
 import DefaultSeo from './components/DefaultSeo'
 import App from './App'
+import { frEgToAr } from './legacyFrEgRedirect'
 import { LocaleProvider } from './i18n/LocaleProvider'
 import { LocaleProvider as SaasLocaleProvider } from './saas/i18n'
 import AuthProvider from './saas/auth/AuthProvider'
@@ -31,6 +32,13 @@ import Pricing from './saas/pages/Pricing'
 import NotFound from './pages/NotFound'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
+
+// Any bookmarked/shared /fr-eg/... URL from before the Franco locale was
+// removed — see legacyFrEgRedirect.ts for why /ar and not a 404.
+function FrEgRedirect() {
+  const location = useLocation()
+  return <Navigate to={frEgToAr(location.pathname, location.search, location.hash)} replace />
+}
 
 // Every SaaS route: optional Clerk provider → locale → Clerk↔store bridge → page.
 const withSaas = (el: React.ReactNode) => (
@@ -67,15 +75,13 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<LocaleProvider locale="en" persist={false}><App /></LocaleProvider>} />
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
-          <Route path="/fr-eg/*" element={<LocaleProvider locale="fr-eg"><App /></LocaleProvider>} />
+          <Route path="/fr-eg/*" element={<FrEgRedirect />} />
 
           {/* Legal pages — one per locale, take priority over the /:locale/* wildcard above */}
           <Route path="/en/privacy" element={<LocaleProvider locale="en"><Privacy /></LocaleProvider>} />
           <Route path="/en/terms" element={<LocaleProvider locale="en"><Terms /></LocaleProvider>} />
           <Route path="/ar/privacy" element={<LocaleProvider locale="ar"><Privacy /></LocaleProvider>} />
           <Route path="/ar/terms" element={<LocaleProvider locale="ar"><Terms /></LocaleProvider>} />
-          <Route path="/fr-eg/privacy" element={<LocaleProvider locale="fr-eg"><Privacy /></LocaleProvider>} />
-          <Route path="/fr-eg/terms" element={<LocaleProvider locale="fr-eg"><Terms /></LocaleProvider>} />
 
           {/* Self-serve platform (the AI funnel builder) */}
           <Route path="/pricing" element={withSaas(<Pricing />)} />

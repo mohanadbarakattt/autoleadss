@@ -195,7 +195,7 @@ export default function Hero() {
                     </span>
                     <div>
                       <p className="text-white text-xs font-medium">WhatsApp</p>
-                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : locale === 'fr-eg' ? 'Radd otomatiky · 12s' : 'Auto-reply · 12s'}</p>
+                      <p className="text-white/60 text-[10px]">{isAr ? 'ردّ تلقائي · 12 ث' : 'Auto-reply · 12s'}</p>
                     </div>
                   </div>
                 </div>

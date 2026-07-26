@@ -14,7 +14,6 @@ const socials = [
 const LEGAL_LABEL = {
   en: { privacy: 'Privacy Policy', terms: 'Terms of Service' },
   ar: { privacy: 'سياسة الخصوصية', terms: 'شروط الخدمة' },
-  'fr-eg': { privacy: 'Privacy Policy', terms: 'Terms of Service' },
 } as const
 
 export default function Footer() {

@@ -10,7 +10,7 @@ import SectionHeading from '../SectionHeading'
  * deep link, so a visitor can go straight into a real conversation about the
  * thing they actually want instead of filling out a form and waiting.
  *
- * Reuses `services.demos` (already fully translated EN/AR/Franco) as the listed
+ * Reuses `services.demos` (already fully translated EN/AR) as the listed
  * offers rather than inventing new marketplace copy.
  *
  * needsUser: WhatsApp number is the one already used site-wide (Footer, CTABanner,

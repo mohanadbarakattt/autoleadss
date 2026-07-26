@@ -12,10 +12,10 @@ function ReplyVisual() {
   )
 }
 
-/** Card 2 — three language chips that take turns pulsing, standing in for native
- * EN/AR/Franco output (no words claimed to "translate", just alternating emphasis). */
+/** Card 2 — two language chips that take turns pulsing, standing in for native
+ * EN/AR output (no words claimed to "translate", just alternating emphasis). */
 function LanguageVisual() {
-  const chips = ['EN', 'AR', 'FR']
+  const chips = ['EN', 'AR']
   return (
     <div aria-hidden className="flex h-16 items-center justify-center gap-2.5">
       {chips.map((c, i) => (

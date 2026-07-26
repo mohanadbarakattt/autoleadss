@@ -7,10 +7,10 @@ import Logo from './Logo'
 import { SHOW_WORK } from './sections/Work'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
-const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR', 'fr-eg': 'FRN' }
-const LOCALES: Locale[] = ['en', 'ar', 'fr-eg']
+const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR' }
+const LOCALES: Locale[] = ['en', 'ar']
 
-/** Compact 3-way EN / AR / Franco pill switcher — replaces the old binary toggle. */
+/** Compact EN / AR pill switcher. */
 function LocaleSwitcher({ locale, switchLocale, size = 'md' }: { locale: Locale; switchLocale: (l: Locale) => void; size?: 'md' | 'sm' }) {
   return (
     <div className={`flex items-center gap-0.5 rounded-full border border-white/20 ${size === 'sm' ? 'p-0.5' : 'p-1'}`}>
@@ -103,13 +103,13 @@ export default function Navigation() {
               href="/login"
               className="text-sm font-medium text-white/80 transition-colors hover:text-white"
             >
-              {locale === 'ar' ? 'دخول' : locale === 'fr-eg' ? 'Login' : 'Log in'}
+              {locale === 'ar' ? 'دخول' : 'Log in'}
             </a>
             <a
               href="/signup"
               className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:shadow-[0_10px_28px_-8px_rgba(255,92,42,0.7)] hover:-translate-y-0.5"
             >
-              {locale === 'ar' ? 'جرّب المنشئ' : locale === 'fr-eg' ? 'Jarrab el builder' : 'Try the builder'}
+              {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
             </a>
           </div>
 
@@ -164,7 +164,7 @@ export default function Navigation() {
                 href="/signup"
                 className="rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-white"
               >
-                {locale === 'ar' ? 'جرّب المنشئ' : locale === 'fr-eg' ? 'Jarrab el builder' : 'Try the builder'}
+                {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
               </a>
               <a
                 href={CAL_URL}
