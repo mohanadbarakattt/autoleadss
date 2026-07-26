@@ -162,11 +162,34 @@ export default async function handler(req: VercelApiRequest, res: VercelApiRespo
 
     if (inserted === 0) return sendJson(res, 200, { ok: true, deduped: true })
     if (updated === 0) {
-      // Defense in depth, not expected to be reachable: `ins`'s WHERE EXISTS
-      // and `upd`'s WHERE check the identical predicate against the same
-      // statement-level snapshot, so if one matched the other must too. If it
-      // ever does trip, the event id was NOT consumed (ins's guard means
-      // nothing landed), so a retry re-reads current state and decides fresh.
+      // REACHABLE, and the old comment here was wrong twice over. It claimed
+      // `ins`'s WHERE EXISTS and `upd`'s WHERE "check the identical predicate
+      // against the same snapshot, so if one matched the other must too", and
+      // that a trip meant "the event id was NOT consumed". Neither holds:
+      //
+      //   - `ins`'s guard is a plain READ against the statement snapshot.
+      //     `upd` is an UPDATE, so under READ COMMITTED it blocks on the row
+      //     lock and RE-EVALUATES its WHERE against the newly committed row
+      //     (EvalPlanQual). A concurrent delivery that wins the lock therefore
+      //     leaves ins matching and upd not matching.
+      //   - When that happens `inserted === 1`: the ledger row IS committed
+      //     (the whole statement commits), so the event id HAS been consumed.
+      //
+      // KNOWN HOLE (not live today — every real gateway is implemented:false,
+      // so nothing reaches here outside tests; it goes live with Phase 3b):
+      // if the losing event's transition would still be legal after the winner
+      // applied (e.g. a 'refunded' event racing a 'paid' one), its retry passes
+      // the read-only phase, then hits `on conflict do nothing` → inserted === 0
+      // → the 200-deduped branch above, and the refund is silently dropped.
+      // That is the dedup-before-effect class this route was restructured to
+      // kill, resurfacing on the concurrent path only.
+      //
+      // FIX (deliberately not done inside a cleanup pass — it is a money-path
+      // change and wants its own tests): invert the gating so `ins` depends on
+      // `upd` rather than the reverse. A losing racer then writes no ledger row
+      // and its retry reprocesses cleanly, while replays of an already-applied
+      // event still short-circuit earlier via canTransition() in the read-only
+      // phase.
       return sendJson(res, 409, { error: 'concurrent update' })
     }
     return sendJson(res, 200, { ok: true })
