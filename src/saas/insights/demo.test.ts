@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeDemoInsights } from './demo'
+import { computeDemoInsights, realCountsFor } from './demo'
 import type { Funnel } from '../types'
 
 function baseFunnel(overrides: Partial<Funnel>): Funnel {
@@ -73,5 +73,41 @@ describe('computeDemoInsights', () => {
     expect(summary.totals.visits).toBe(30)
     expect(summary.totals.leads).toBe(2)
     expect(summary.sites).toHaveLength(2)
+  })
+})
+
+/**
+ * The Dashboard's KPI tiles and Insights must report the SAME numbers for the
+ * same workspace. They used to disagree: the Dashboard summed `f.visits` and
+ * `f.leads.length` raw, so it counted seeded demo data as real business
+ * activity while Insights excluded it — and the Dashboard is the more
+ * prominent surface. Both now call `realCountsFor`; this pins that they agree.
+ */
+describe('realCountsFor — the shared "real activity" rule', () => {
+  const seeded = baseFunnel({
+    visits: 72,
+    seedVisits: 40,
+    leads: [
+      { id: 'l1', name: 'Real Buyer', phone: '+971500000001', source: 'page', status: 'new', createdAt: Date.now() },
+      { id: 'l2', name: 'Sample', phone: '+971500000002', source: 'page', status: 'new', createdAt: Date.now(), sample: true },
+    ] as Funnel['leads'],
+  })
+
+  it('excludes seeded visits and sample leads', () => {
+    const real = realCountsFor(seeded)
+    expect(real.visits).toBe(32) // 72 stored − 40 seeded
+    expect(real.leads).toHaveLength(1)
+    expect(real.leads[0].name).toBe('Real Buyer')
+  })
+
+  it('never returns a negative visit count if seedVisits exceeds visits', () => {
+    expect(realCountsFor(baseFunnel({ visits: 5, seedVisits: 40 })).visits).toBe(0)
+  })
+
+  it('agrees with the totals computeDemoInsights reports', () => {
+    const summary = computeDemoInsights([seeded])
+    const real = realCountsFor(seeded)
+    expect(summary.totals.visits).toBe(real.visits)
+    expect(summary.totals.leads).toBe(real.leads.length)
   })
 })

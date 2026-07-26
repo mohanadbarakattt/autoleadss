@@ -6,6 +6,7 @@ import SuiteShell from '../suite/SuiteShell'
 import { GoldButton, Panel } from '../suite/ui'
 import { useI18n, toContentLocale } from '../i18n'
 import { useFunnels, useAgency, hasSampleData, clearSampleData } from '../store'
+import { realCountsFor } from '../insights/demo'
 import { INDUSTRIES, industryLabel } from '../industries'
 import { useEntitlements, useUpgrade } from '../billing/UpgradeContext'
 import { useCapGate, isCapHit } from '../billing/usage'
@@ -42,8 +43,11 @@ export function DashboardContent() {
     else navigate('/app/new')
   }
 
-  const totalLeads = funnels.reduce((a, f) => a + f.leads.length, 0)
-  const totalVisits = funnels.reduce((a, f) => a + f.visits, 0)
+  // Same "real activity" rule Insights uses — seeded sample leads and fake
+  // visits are excluded. These tiles used to sum raw, so the Dashboard showed
+  // inflated numbers while Insights showed true ones for the same workspace.
+  const totalLeads = funnels.reduce((a, f) => a + realCountsFor(f).leads.length, 0)
+  const totalVisits = funnels.reduce((a, f) => a + realCountsFor(f).visits, 0)
   const stats = [
     { label: t.dash.totalFunnels, value: funnels.length, icon: TrendingUp },
     { label: t.dash.totalLeads, value: totalLeads, icon: Users },
@@ -125,7 +129,10 @@ export function DashboardContent() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {funnels.map((f, i) => {
             const ind = INDUSTRIES.find((x) => x.id === f.industry)
-            const conv = f.visits ? Math.round((f.leads.length / f.visits) * 100) : 0
+            // Real activity only, same rule as the tiles above and Insights —
+            // otherwise a card would contradict the totals it rolls up into.
+            const real = realCountsFor(f)
+            const conv = real.visits ? Math.round((real.leads.length / real.visits) * 100) : 0
             return (
               <motion.div key={f.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: i * 0.05 }} className="group overflow-hidden rounded-2xl border border-suite-line bg-suite-panel transition-colors hover:border-[#3a3d49]">
                 <div className="relative h-28 overflow-hidden px-5 py-4" style={{ background: '#0A0A0B' }}>
@@ -143,8 +150,8 @@ export function DashboardContent() {
 
                 <div className="p-5">
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <Metric value={f.visits} label={t.common.visits} />
-                    <Metric value={f.leads.length} label={t.common.leads} />
+                    <Metric value={real.visits} label={t.common.visits} />
+                    <Metric value={real.leads.length} label={t.common.leads} />
                     <Metric value={`${conv}%`} label={t.common.convRate} />
                   </div>
                   {hasSampleData(f) && (

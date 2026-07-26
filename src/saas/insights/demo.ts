@@ -1,4 +1,4 @@
-import type { Funnel, InsightsSummary, LeadSourceCounts, LeadStatusCounts, SiteInsights } from '../types'
+import type { Funnel, Lead, InsightsSummary, LeadSourceCounts, LeadStatusCounts, SiteInsights } from '../types'
 import { denseUtcDays } from './series'
 
 const DEFAULT_WINDOW_DAYS = 14
@@ -25,9 +25,26 @@ const EMPTY_SOURCE: LeadSourceCounts = { page: 0, whatsapp: 0 }
  * count); the trend chart for an affected site is covered by the same
  * SampleDataBanner disclosure instead of a numeric split.
  */
+/**
+ * The single definition of "real" activity for one site: sample leads and the
+ * fake visit count `seedDemoLeads` injects are excluded.
+ *
+ * Exported because the Dashboard's KPI tiles need the SAME rule. They used to
+ * sum `f.visits` and `f.leads.length` raw, so the Dashboard reported seeded
+ * demo data as real while Insights excluded it — two surfaces showing different
+ * totals for the same workspace, with the more prominent one inflated. Both now
+ * call this; agreeing by coincidence is not agreeing.
+ */
+export function realCountsFor(f: Funnel): { visits: number; leads: Lead[] } {
+  return {
+    visits: Math.max(0, f.visits - (f.seedVisits ?? 0)),
+    leads: f.leads.filter((l) => !l.sample),
+  }
+}
+
 export function computeDemoInsights(funnels: Funnel[], windowDays = DEFAULT_WINDOW_DAYS): InsightsSummary {
   const sites: SiteInsights[] = funnels.map((f) => {
-    const realLeads = f.leads.filter((l) => !l.sample)
+    const realLeads = realCountsFor(f).leads
     const leadsByStatus: LeadStatusCounts = { new: 0, qualified: 0, won: 0, lost: 0 }
     const leadsBySource: LeadSourceCounts = { page: 0, whatsapp: 0 }
     for (const l of realLeads) {
@@ -37,7 +54,7 @@ export function computeDemoInsights(funnels: Funnel[], windowDays = DEFAULT_WIND
     return {
       id: f.id,
       name: f.name,
-      visits: Math.max(0, f.visits - (f.seedVisits ?? 0)),
+      visits: realCountsFor(f).visits,
       leads: realLeads.length,
       leadsByStatus,
       leadsBySource,
