@@ -17,7 +17,7 @@ const en = {
     ctaBook: 'Book a free strategy call',
     ctaWork: 'See our work',
     serving: 'Serving businesses in Dubai · Abu Dhabi · Cairo · Alexandria',
-    respBadge: '⚡ Average lead response time: 12 seconds',
+    respBadge: '⚡ Automated lead response, 24/7',
     newLead: 'New lead',
     secondsAgo: '12 seconds ago',
     thisWeek: 'This week',
@@ -51,7 +51,7 @@ const en = {
         tag: 'Landing Pages',
         title: 'Pages built to convert.',
         body: 'Fast, bilingual pages designed around one job: turning a click into a booked customer.',
-        points: ['2–5× more conversions', 'Arabic + English', 'Live in days, not months'],
+        points: ['Built to convert, not just to look good', 'Arabic + English', 'Live in days, not months'],
       },
       {
         tag: 'Google & Paid Ads',
@@ -77,7 +77,7 @@ const en = {
       { title: 'Discovery call', body: "Tell us about your business in 15 minutes. We'll tell you exactly what we can do for you. Zero pressure." },
       { title: 'Blueprint & onboarding', body: 'We map your funnel, audiences, and messaging. A short form and a brand handoff is all we need from you.' },
       { title: 'We build & launch', body: 'You go back to running your business. We engineer your pages, ads, content, and chatbot — then take it live.' },
-      { title: 'Leads start flowing', body: 'Most clients see qualified leads within the first two weeks. We report on everything, then keep optimizing.' },
+      { title: 'Leads start flowing', body: 'Qualified leads land in one place as they come in. We report on everything, then keep optimizing.' },
     ],
   },
   work: {
@@ -107,12 +107,11 @@ const en = {
   results: {
     eyebrow: 'The Numbers',
     title: 'Built for speed, accountability, and growth.',
-    stats: [
-      { suffix: ' sec', label: 'Average lead response time, 24/7' },
-      { staticVal: '2–5×', label: 'Better conversion vs. a standard homepage' },
-      { suffix: ' days', label: 'From onboarding to first live lead' },
-      { staticVal: '100%', label: 'Transparent reporting — no black boxes' },
-    ],
+    // [NEEDS-OWNER: real measured figures] — emptied for the same reason
+    // work.cases is (see Work.tsx). Every entry here read as a measured result
+    // and none was. Refill only with sourced numbers; Results.tsx also gates on
+    // SHOW_RESULTS, so both must be satisfied deliberately.
+    stats: [] as { suffix?: string; staticVal?: string; label: string }[],
   },
   testimonials: {
     eyebrow: 'What Clients Say',
@@ -223,7 +222,7 @@ const en = {
       services: 'We run your entire sales operation — sales funnels, landing pages, Google and social ads, content, AI chatbots, and SEO/GEO. Everything works together as one system so you get consistent leads without managing five different tools.',
       pricing: 'Every business is different, so we scope each engagement individually after a free strategy call. On the call we audit your setup and give you a clear, tailored proposal — no obligation. Want me to help you book one?',
       start: "Easy — book a free strategy call and we'll tell you exactly what we'd do for your business. No commitment.",
-      landing: "We build high-converting landing pages in Arabic and English. They're fast, mobile-first, and connected to your CRM and chatbot from day one. Most clients see 2-5× better conversion vs. a regular homepage.",
+      landing: "We build high-converting landing pages in Arabic and English. They're fast, mobile-first, and connected to your CRM and chatbot from day one. They're built to convert, not just to look good.",
       chatbot: 'We set up an AI chatbot on WhatsApp and your website that responds to leads in under 60 seconds — 24/7. It qualifies leads, books appointments, and only hands off to your team when the lead is hot.',
       ads: 'We manage your Google, Meta, and TikTok ads end-to-end. Campaign setup, daily optimization, conversion tracking — you see exactly where every dollar, dirham, or pound goes.',
       social: 'We handle content creation, scheduling, and posting across your platforms. Arabic and English. Your brand stays visible and consistent without you touching it.',
@@ -265,7 +264,7 @@ const ar: Dict = {
     ctaBook: 'احجز مكالمة استراتيجية مجانية',
     ctaWork: 'شاهد أعمالنا',
     serving: 'نخدم الشركات في دبي · أبوظبي · القاهرة · الإسكندرية',
-    respBadge: '⚡ متوسّط وقت الردّ على العملاء: 12 ثانية',
+    respBadge: '⚡ ردّ آلي على العملاء، 24/7',
     newLead: 'عميل جديد',
     secondsAgo: 'منذ 12 ثانية',
     thisWeek: 'هذا الأسبوع',
@@ -299,7 +298,7 @@ const ar: Dict = {
         tag: 'صفحات الهبوط',
         title: 'صفحات مبنيّة للتحويل.',
         body: 'صفحات سريعة ثنائيّة اللغة مصمّمة لمهمّة واحدة: تحويل النقرة إلى عميل يحجز.',
-        points: ['تحويل أعلى بـ 2–5×', 'عربي + إنجليزي', 'جاهزة خلال أيام لا شهور'],
+        points: ['مصمَّمة للتحويل لا للشكل فقط', 'عربي + إنجليزي', 'جاهزة خلال أيام لا شهور'],
       },
       {
         tag: 'إعلانات جوجل والمدفوعة',
@@ -325,7 +324,7 @@ const ar: Dict = {
       { title: 'مكالمة تعارف', body: 'أخبرنا عن عملك في 15 دقيقة. وسنخبرك بالضبط ما يمكننا تقديمه لك. بدون أي ضغط.' },
       { title: 'الخطّة والتجهيز', body: 'نرسم القمع والجمهور والرسائل. نموذج قصير وتسليم للهويّة — هذا كل ما نحتاجه منك.' },
       { title: 'نبني ونطلق', body: 'عُد إلى إدارة عملك. نحن نبني صفحاتك وإعلاناتك ومحتواك وشات البوت — ثم نطلقها.' },
-      { title: 'العملاء يبدؤون بالتدفّق', body: 'معظم عملائنا يرون عملاء مؤهّلين خلال أوّل أسبوعين. نقدّم تقارير عن كل شيء، ونواصل التحسين.' },
+      { title: 'العملاء يبدؤون بالتدفّق', body: 'العملاء المؤهّلون يصلون في مكان واحد فور ورودهم. نقدّم تقارير عن كل شيء، ونواصل التحسين.' },
     ],
   },
   work: {
@@ -353,12 +352,7 @@ const ar: Dict = {
   results: {
     eyebrow: 'الأرقام',
     title: 'مبني للسرعة والمساءلة والنمو.',
-    stats: [
-      { suffix: ' ثانية', label: 'متوسط وقت الردّ على العملاء، 24/7' },
-      { staticVal: '×2–5', label: 'تحويل أفضل مقارنة بصفحة رئيسية عاديّة' },
-      { suffix: ' يوماً', label: 'من التجهيز إلى أوّل عميل' },
-      { staticVal: '100%', label: 'تقارير شفّافة — بلا صناديق سوداء' },
-    ],
+    stats: [] as { suffix?: string; staticVal?: string; label: string }[],
   },
   testimonials: {
     eyebrow: 'ماذا يقول عملاؤنا',
@@ -466,7 +460,7 @@ const ar: Dict = {
       services: 'نُدير عمليّة مبيعاتك بالكامل — قمع مبيعات، صفحات هبوط، إعلانات جوجل وسوشيال، محتوى، شات بوت ذكي، وSEO/GEO. كل شيء يعمل معاً كنظام واحد لتحصل على عملاء بانتظام.',
       pricing: 'كل عمل مختلف، لذلك نحدّد نطاق كل مشروع بعد مكالمة استراتيجيّة مجانيّة. في المكالمة نراجع وضعك ونقدّم لك عرضاً واضحاً مخصّصاً — بلا أي التزام. أساعدك في حجز مكالمة؟',
       start: 'سهل — احجز مكالمة استراتيجيّة مجانيّة وسنخبرك بالضبط ما سنفعله لعملك. بلا أي التزام.',
-      landing: 'نبني صفحات هبوط عالية التحويل بالعربيّة والإنجليزيّة. سريعة، متوافقة مع الجوّال، ومتّصلة بنظام CRM والشات بوت من اليوم الأوّل. معظم عملائنا يرون تحويلاً أفضل بـ 2-5×.',
+      landing: 'نبني صفحات هبوط عالية التحويل بالعربيّة والإنجليزيّة. سريعة، متوافقة مع الجوّال، ومتّصلة بنظام CRM والشات بوت من اليوم الأوّل. مبنيّة للتحويل لا للشكل فقط.',
       chatbot: 'نُعدّ شات بوت ذكي على واتساب وموقعك يردّ على العملاء في أقل من 60 ثانية — 24/7. يؤهّل العملاء، يحجز المواعيد، ولا يحوّل إلى فريقك إلا عندما يكون العميل جاهزاً.',
       ads: 'نُدير إعلاناتك على جوجل وميتا وتيك توك من البداية للنهاية. إعداد الحملة، التحسين اليومي، تتبّع التحويل — ترى بالضبط أين يذهب كل جنيه أو درهم تنفقه.',
       social: 'نتولّى إنشاء المحتوى والجدولة والنشر على منصّاتك. عربي وإنجليزي. علامتك تبقى ظاهرة ومتّسقة دون أن تلمس شيئاً.',

@@ -4,6 +4,21 @@ import { useT } from '../../i18n/LocaleProvider'
 import SectionHeading from '../SectionHeading'
 import { useCountUp } from '../../hooks/useCountUp'
 
+// [NEEDS-OWNER: real measured figures] — gated off for the same reason the Work
+// section is (see Work.tsx's SHOW_WORK). This section is headed "The Numbers"
+// and animates counters, so every figure in it reads as a MEASURED result:
+// "12 sec average lead response time" and "15 days from onboarding to first
+// live lead" both imply data across real engagements, and "2–5× better
+// conversion" is a performance claim outright. None of it is measured — the
+// agency's case studies were withdrawn for being invented, so there is no
+// dataset these could have come from.
+//
+// Flip this on only when the numbers are real and sourced. Do NOT soften the
+// wording and leave the figures — a hedged fabricated number is still a
+// fabricated number. Commitment-style copy ("we reply within X") would be
+// honest, but inventing a promise on the owner's behalf is not mine to do.
+export const SHOW_RESULTS = false
+
 const COUNT_TARGETS = [12, 0, 15, 0] // stats with suffix animate to these values
 
 function Stat({ stat, index }: { stat: { suffix?: string; staticVal?: string; label: string }; index: number }) {
@@ -40,6 +55,7 @@ function Stat({ stat, index }: { stat: { suffix?: string; staticVal?: string; la
 
 export default function Results() {
   const t = useT()
+  if (!SHOW_RESULTS) return null
 
   return (
     <section className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
