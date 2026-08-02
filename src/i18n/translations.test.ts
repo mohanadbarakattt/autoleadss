@@ -47,6 +47,10 @@ const AR_DRIFT_ALLOWLIST = new Set<string>([
   'services.also[1]', // "SEO" — same acronym, same reasoning
   'footer.Services[5].label', // "SEO & GEO" — same acronym, same reasoning
   'comparison.columns.us', // "AutoLeadss" — the product's own name, never translated in any locale
+  // A CLIENT's registered brand name. Transliterating a real company's name is
+  // worse than leaving it Latin — it is not ours to rename. Any future client
+  // name lands here for the same reason, and only for the `role` field.
+  'work.cases[0].role', // "Lash Cartel Cosmetics"
 ])
 
 describe('untranslated-string drift (ar block)', () => {

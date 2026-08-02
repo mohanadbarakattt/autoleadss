@@ -53,14 +53,31 @@ describe('marketing copy asserts no unevidenced business results', () => {
     })
   }
 
-  it('keeps the unverifiable sections gated until real figures exist', () => {
-    // Both flags are the deliberate opt-in. If someone flips one, the arrays
-    // they render are empty, so the section still shows nothing — two locks.
+  it('keeps Results gated — it has no measured figures to show', () => {
+    // Results is the "The Numbers" section: every entry in it reads as a
+    // measured outcome and none is measured. Two locks — the flag AND the data.
     expect(SHOW_RESULTS).toBe(false)
-    expect(SHOW_WORK).toBe(false)
     for (const locale of Object.keys(translations) as (keyof typeof translations)[]) {
       expect(translations[locale].results.stats).toEqual([])
-      expect(translations[locale].work.cases).toEqual([])
+    }
+  })
+
+  it('Work is live, and every case is free of invented result-style claims', () => {
+    // SHOW_WORK is now true: work.cases carries a real engagement. The gate is
+    // no longer "is it empty" but "is what is in it clean" — which is the check
+    // that keeps meaning something as more cases are added.
+    expect(SHOW_WORK).toBe(true)
+    for (const locale of Object.keys(translations) as (keyof typeof translations)[]) {
+      const cases = translations[locale].work.cases
+      expect(cases.length).toBeGreaterThan(0)
+      for (const c of cases) {
+        const serialized = JSON.stringify(c)
+        const offenders = RESULT_CLAIM_PATTERNS.filter(([re]) => re.test(serialized)).map(([, label]) => label)
+        expect(offenders).toEqual([])
+        // A case may carry a measured figure, but only as an explicit pair —
+        // never a bare badge with nothing behind it.
+        if (c.big) expect(c.label).toBeTruthy()
+      }
     }
   })
 })

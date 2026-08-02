@@ -1,18 +1,20 @@
 import { motion } from 'framer-motion'
-import { Star, TrendingUp } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
-import imgLanding from '../../assets/landing-pages.jpg'
-import imgSocial from '../../assets/social-content.jpg'
-import imgAds from '../../assets/ads-management.jpg'
+import imgLashCartel from '../../assets/work/lashcartel-ad.png'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
-const IMAGES = [imgLanding, imgSocial, imgAds]
+/** One image per case, same order as t.work.cases. Real client deliverables —
+ * this is produced work, not stock or a generated mockup. */
+const IMAGES = [imgLashCartel]
 
-// [NEEDS-OWNER: real case studies] — `work.cases` in src/i18n/translations.ts is
-// intentionally empty; the previous entries used invented client names, quotes, and
-// metrics. Flip this on only once real, verifiable case studies are supplied —
-// never fill it with invented ones. Nav/Hero/Footer #work links key off this flag.
-export const SHOW_WORK = false
+// Live: `work.cases` now carries a real client engagement (Lash Cartel
+// Cosmetics) — real deliverables, a real quote published with the owner's
+// permission, and NO invented metrics (the result badge is omitted; see the
+// cases array). The flag stays as the gate: anything added here must be real
+// and permitted, or this goes back to false. Nav/Hero/Footer #work links key
+// off it.
+export const SHOW_WORK = true
 
 export default function Work() {
   const t = useT()
@@ -67,11 +69,16 @@ export default function Work() {
                   <span className="absolute left-5 top-5 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur">
                     {c.platform}
                   </span>
-                  {/* result badge */}
-                  <div className="absolute bottom-5 left-5 flex items-center gap-3">
-                    <span className="font-display text-5xl font-bold leading-none text-gradient-accent" style={{ letterSpacing: '-0.03em' }}>{c.big}</span>
-                    <span className="max-w-[130px] text-[12px] leading-tight text-white/80">{c.label}</span>
-                  </div>
+                  {/* Result badge — ONLY when a measured figure exists. This used to
+                      be unconditional, so every case study had a giant number
+                      slot demanding to be filled; an empty slot is what turns
+                      into an invented one. No number, no badge. */}
+                  {c.big && (
+                    <div className="absolute bottom-5 left-5 flex items-center gap-3">
+                      <span className="font-display text-5xl font-bold leading-none text-gradient-accent" style={{ letterSpacing: '-0.03em' }}>{c.big}</span>
+                      <span className="max-w-[130px] text-[12px] leading-tight text-white/80">{c.label}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* testimonial + metrics */}
@@ -79,11 +86,6 @@ export default function Work() {
                   <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[11px] font-semibold text-accent">
                     {c.industry}
                   </span>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <Star key={s} size={15} className="fill-accent text-accent" />
-                    ))}
-                  </div>
                   <p className="text-[17px] font-medium leading-relaxed text-foreground">“{c.quote}”</p>
                   <div className="flex items-center gap-3">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full font-display text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #FF7A4D, #FF5C2A)' }}>
@@ -95,9 +97,9 @@ export default function Work() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 border-t border-border pt-5">
-                    {c.metrics.map((m, j) => (
+                    {c.deliverables.map((m, j) => (
                       <span key={j} className="inline-flex items-center gap-1.5 rounded-lg bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
-                        <TrendingUp size={12} className="text-accent" />
+                        <Check size={12} className="text-accent" />
                         {m}
                       </span>
                     ))}

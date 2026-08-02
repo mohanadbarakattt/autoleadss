@@ -83,14 +83,41 @@ const en = {
   },
   work: {
     eyebrow: 'Our Work',
-    title: 'Real systems. Real numbers.',
-    confidentiality: 'Selected engagements. Client names withheld under NDA.',
+    title: 'Real clients. Real work.',
+    // Was "Real numbers." and "names withheld under NDA" — both became untrue the
+    // moment a named client with no published metrics went live here. Copy has to
+    // track the content, not the other way round.
+    confidentiality: 'Selected engagements, shown with the client\u2019s permission.',
     ctaText: 'Want results like these for your business?',
     ctaBtn: 'Book a free strategy call',
-    // [NEEDS-OWNER: real case studies] — intentionally empty; Work.tsx is
-    // feature-flagged off until real, verifiable client results are supplied. Do not
-    // fill this with invented names, quotes, or metrics.
-    cases: [] as { industry: string; platform: string; big: string; label: string; imgAlt: string; quote: string; name: string; role: string; metrics: string[] }[],
+    // Real client work. `big`/`label` (the large result badge) are OPTIONAL and
+    // deliberately omitted here: no measured before/after figures exist for this
+    // engagement, and Work.tsx renders the badge only when one is supplied.
+    // `deliverables` says what was BUILT — never what it achieved.
+    cases: [
+      {
+        industry: 'Beauty · DTC e-commerce',
+        platform: 'Brand · Website · Ads · Content',
+        imgAlt: 'Lash Cartel Cosmetics campaign creative — product photography with brand typography',
+        quote: 'They did outstanding work. The strategy and identity they created improved the brand substantially.',
+        name: 'Owner',
+        role: 'Lash Cartel Cosmetics',
+        deliverables: ['Brand strategy & identity', 'Website', 'Ad creative & campaign', 'Social content system'],
+      },
+    ] as {
+      industry: string
+      platform: string
+      imgAlt: string
+      quote: string
+      name: string
+      role: string
+      deliverables: string[]
+      /** The large result badge. OPTIONAL by design — a case with no measured
+       * figure is valid, and Work.tsx omits the badge entirely rather than
+       * leaving an empty slot that invites an invented number. */
+      big?: string
+      label?: string
+    }[],
   },
   regions: {
     eyebrow: 'Where we work',
@@ -345,12 +372,21 @@ const ar: Dict = {
   },
   work: {
     eyebrow: 'أعمالنا',
-    title: 'أنظمة حقيقيّة. أرقام حقيقيّة.',
-    confidentiality: 'مشاريع مختارة. أسماء العملاء محجوبة بموجب اتفاقية سريّة.',
+    title: 'عملاء حقيقيّون. عمل حقيقي.',
+    confidentiality: 'مشاريع مختارة، معروضة بإذن من العميل.',
     ctaText: 'تريد نتائج كهذه لعملك؟',
     ctaBtn: 'احجز مكالمة استراتيجية مجانية',
-    // [NEEDS-OWNER: real case studies] — intentionally empty, same as the en block.
-    cases: [],
+    cases: [
+      {
+        industry: 'تجميل · تجارة إلكترونيّة مباشرة',
+        platform: 'هويّة · موقع · إعلانات · محتوى',
+        imgAlt: 'تصميم حملة Lash Cartel Cosmetics — تصوير المنتج مع هويّة الخط',
+        quote: 'قدّموا عملاً متميّزاً. الاستراتيجيّة والهويّة التي صمّموها ارتقت بالعلامة بشكل ملحوظ.',
+        name: 'المالكة',
+        role: 'Lash Cartel Cosmetics',
+        deliverables: ['استراتيجيّة وهويّة العلامة', 'الموقع الإلكتروني', 'تصميم وحملة إعلانيّة', 'منظومة محتوى السوشيال'],
+      },
+    ] as typeof translations.en.work.cases,
   },
   regions: {
     eyebrow: 'حيث نعمل',
