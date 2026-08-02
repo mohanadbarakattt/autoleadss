@@ -206,6 +206,10 @@ export default function Hero() {
               <div className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-white/80 text-xs">
                 {t.hero.respBadge}
               </div>
+              {/* The panel above is a product mockup with sample values ("New
+                  lead · 12 seconds ago"). Unlabelled, a visitor can read it as a
+                  real client account with real numbers — say so plainly. */}
+              <p className="mt-3 text-center text-[10px] leading-relaxed text-white/40">{t.hero.mockupNote}</p>
             </div>
           </motion.div>
         </div>

@@ -1,13 +1,30 @@
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { useT } from '../../i18n/LocaleProvider'
+import { useT, useLocale } from '../../i18n/LocaleProvider'
+import { retainerPrice } from '../../agency/offer'
+import { resolveCurrency } from '../../saas/currency'
 
-/** Blue-ocean comparison — AutoLeadss has no direct product competitor, so this
- * compares against the two ways businesses actually try to solve this today.
- * Agency/DIY cells are hedged general industry ranges (see t.comparison.footnote),
- * never a specific competitor's claim. */
+/**
+ * How this compares to the usual way of assembling the same work.
+ *
+ * It used to compare against "Hiring an Agency" — which stopped making sense
+ * the moment AutoLeadss became one, and it still quoted the retired $59
+ * self-serve price. The comparison is now against piecing the work together
+ * across several people, which is the real alternative a client is weighing.
+ *
+ * The first two columns describe a COMMON arrangement, never a named
+ * competitor's terms (see t.comparison.footnote). The AutoLeadss column states
+ * deliverables only — no outcome claims (src/i18n/claims.test.ts guards that).
+ *
+ * `{from}` and `{adSpend}` are substituted from src/agency/offer.ts rather than
+ * written into the copy, so this table can never quote a price the pricing
+ * section has moved on from — which is exactly how the dead $59 survived here.
+ */
 export default function Comparison() {
   const t = useT()
+  const { isRTL } = useLocale()
+  const price = retainerPrice(resolveCurrency(), isRTL ? 'ar' : 'en')
+  const fill = (v: string) => v.replace('{from}', price.amount).replace('{adSpend}', price.adSpend)
 
   return (
     <section className="relative overflow-hidden bg-background py-24">
@@ -51,12 +68,12 @@ export default function Comparison() {
               {t.comparison.rows.map((row, i) => (
                 <tr key={i} className={i < t.comparison.rows.length - 1 ? 'border-b border-border' : ''}>
                   <td className="p-5 align-top font-display text-sm font-semibold text-foreground">{row.dimension}</td>
-                  <td className="p-5 align-top text-muted-fg">{row.agency}</td>
-                  <td className="p-5 align-top text-muted-fg">{row.diy}</td>
+                  <td className="p-5 align-top text-muted-fg">{fill(row.agency)}</td>
+                  <td className="p-5 align-top text-muted-fg">{fill(row.diy)}</td>
                   <td className="bg-accent/[0.06] p-5 align-top font-medium text-foreground">
                     <span className="flex items-start gap-2">
                       <Check size={16} className="mt-0.5 shrink-0 text-accent" />
-                      {row.us}
+                      {fill(row.us)}
                     </span>
                   </td>
                 </tr>
