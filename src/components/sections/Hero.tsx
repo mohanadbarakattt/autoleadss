@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion, type Variants } from 'framer-motion'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { SHOW_WORK } from './Work'
+import heroAtmosphere from '../../assets/brand/hero-atmosphere.webp'
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
@@ -45,6 +46,16 @@ export default function Hero() {
     <section className="relative overflow-hidden" style={{ background: '#0A0A0B' }}>
       {/* ambient background */}
       <div aria-hidden className="absolute inset-0">
+        {/* Generated brand atmosphere (docs/brand/VISUAL-SCRIPTS.md, script 01).
+            Sits UNDER the hand-tuned grid and glow layers below so their
+            lighting still reads; scripted with the left third kept clear so it
+            never fights the headline. Purely decorative -> aria-hidden. */}
+        <img
+          src={heroAtmosphere}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
+        />
         <div
           className="absolute inset-0 opacity-[0.07]"
           style={{

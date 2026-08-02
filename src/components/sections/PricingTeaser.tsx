@@ -5,12 +5,23 @@ import { useT, useLocale } from '../../i18n/LocaleProvider'
 import { retainerPrice } from '../../agency/offer'
 import { resolveCurrency, setStoredCurrency, SUPPORTED_CURRENCIES } from '../../saas/currency'
 import type { Currency } from '../../saas/types'
+import imgContent from '../../assets/brand/content-cadence.webp'
+import imgAds from '../../assets/brand/ads-variants.webp'
+import imgWebsite from '../../assets/brand/website-layers.webp'
+import imgChatbot from '../../assets/brand/chatbot-nightlight.webp'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 
 /** Flag/globe glyphs for the currency switcher — a display convenience, kept
  * out of currency.ts (which stays UI-agnostic). */
 const CURRENCY_FLAG: Record<Currency, string> = { USD: '🌍', AED: '🇦🇪', SAR: '🇸🇦', EGP: '🇪🇬' }
+
+/** One image per retainer deliverable, in the same order as
+ * t.pricingTeaser.includes. Deliberately abstract: a generated "dashboard"
+ * would state a result the site cannot source, which is the same lie
+ * src/i18n/claims.test.ts guards the copy against — see
+ * docs/brand/VISUAL-SCRIPTS.md. */
+const DELIVERABLE_IMAGES = [imgContent, imgAds, imgWebsite, imgChatbot]
 
 /**
  * The agency retainer, on the marketing homepage.
@@ -102,13 +113,22 @@ export default function PricingTeaser() {
 
           <div className="px-8 py-8 sm:px-12">
             <p className="mb-5 text-sm font-semibold text-foreground">{t.pricingTeaser.includesTitle}</p>
-            <ul className="flex flex-col gap-3.5">
-              {t.pricingTeaser.includes.map((line) => (
-                <li key={line} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10">
-                    <Check size={12} className="text-accent" />
-                  </span>
-                  <span className="text-sm leading-relaxed text-muted-fg">{line}</span>
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {t.pricingTeaser.includes.map((line, i) => (
+                <li key={line} className="overflow-hidden rounded-2xl border border-border bg-background">
+                  <img
+                    src={DELIVERABLE_IMAGES[i]}
+                    alt=""
+                    aria-hidden
+                    loading="lazy"
+                    className="h-24 w-full object-cover"
+                  />
+                  <div className="flex items-start gap-2.5 p-4">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                      <Check size={12} className="text-accent" />
+                    </span>
+                    <span className="text-sm leading-relaxed text-muted-fg">{line}</span>
+                  </div>
                 </li>
               ))}
             </ul>
