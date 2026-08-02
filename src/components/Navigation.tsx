@@ -92,7 +92,7 @@ export default function Navigation() {
                 )}
               </a>
             ))}
-            <a href="/pricing" className="text-sm font-medium text-white/70 transition-colors duration-200 hover:text-white">
+            <a href="#pricing" className="text-sm font-medium text-white/70 transition-colors duration-200 hover:text-white">
               {t.nav.pricing}
             </a>
           </nav>
@@ -100,16 +100,12 @@ export default function Navigation() {
           <div className="hidden lg:flex items-center gap-3">
             <LocaleSwitcher locale={locale} switchLocale={switchLocale} />
             <a
-              href="/login"
-              className="text-sm font-medium text-white/80 transition-colors hover:text-white"
-            >
-              {locale === 'ar' ? 'دخول' : 'Log in'}
-            </a>
-            <a
-              href="/signup"
+              href={CAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:shadow-[0_10px_28px_-8px_rgba(255,92,42,0.7)] hover:-translate-y-0.5"
             >
-              {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
+              {t.nav.bookCall}
             </a>
           </div>
 
@@ -152,7 +148,7 @@ export default function Navigation() {
                 </a>
               ))}
               <a
-                href="/pricing"
+                href="#pricing"
                 onClick={() => setMenuOpen(false)}
                 className="font-display text-xl font-semibold text-white transition-colors hover:text-accent"
               >
@@ -161,16 +157,10 @@ export default function Navigation() {
             </nav>
             <div className="mt-auto flex flex-col gap-3">
               <a
-                href="/signup"
-                className="rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-white"
-              >
-                {locale === 'ar' ? 'جرّب المنشئ' : 'Try the builder'}
-              </a>
-              <a
                 href={CAL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-white/20 px-5 py-3 text-center text-sm font-medium text-white/90"
+                className="rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-white"
               >
                 {t.nav.bookCall}
               </a>
