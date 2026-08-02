@@ -4,14 +4,60 @@
     {
       "name": "autoleadss-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 5173
     },
     {
       "name": "autoleadss-demo",
       "runtimeExecutable": "env",
-      "runtimeArgs": ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=", "npm", "run", "dev"],
+      "runtimeArgs": [
+        "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=",
+        "npm",
+        "run",
+        "dev"
+      ],
       "port": 5173
+    },
+    {
+      "name": "clients",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4300",
+        "--directory",
+        "clients"
+      ],
+      "port": 4300
+    },
+    {
+      "name": "drm",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../drm-prototype",
+        "run",
+        "dev"
+      ],
+      "port": 4173
+    },
+    {
+      "name": "drm-live",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../drm-prototype",
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4180",
+        "--strictPort"
+      ],
+      "port": 4180
     }
   ]
 }

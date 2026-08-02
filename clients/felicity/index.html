@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Felicity Properties — Dubai Creek Harbour allocations before the portals</title>
+<meta name="description" content="Felicity Properties, RERA ORN 33951. Off-plan allocations at Dubai Creek Harbour and across Dubai's growth corridors — reached before they list on the portals." />
+
+<!-- ============================================================
+     BUILD NOTES  (delete before handover)
+
+     Positioning change vs the old Durable site:
+       Old: 8 generic services + 4 projects + "Dubai real estate".
+       New: ONE promise - early allocation access - and ONE capture
+            mechanism - the WhatsApp brief. Everything else supports it.
+
+     Everything factual here was taken from felicitypro.com on 2026-08-02:
+     name, RERA ORN, developer partners, the four projects, the WhatsApp
+     number, the office address, the three testimonials, and the
+     "100+ investors" line (their own claim - ASK MUHANNAD TO CONFIRM
+     before this goes live).
+
+     NOT invented anywhere: no deal counts, no AED volumes, no ROI
+     figures, no review scores. If a number appears on this page later,
+     it must come from him with a source.
+
+     Project imagery: <div class="render-slot"> marks where the REAL
+     developer render goes. Do not fill these with generated art - these
+     are real buildings people buy for AED 1M+.
+     ============================================================ -->
+
+<style>
+:root{
+  --navy:#0B1220;
+  --navy-2:#111B2E;
+  --navy-3:#16243D;
+  --gold:#C9A227;
+  --gold-lt:#E3C260;
+  --paper:#F7F5F1;
+  --ink:#0B1220;
+  --muted:rgba(247,245,241,.62);
+  --muted-dk:rgba(11,18,32,.60);
+  --line:rgba(247,245,241,.14);
+  --maxw:1180px;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--navy);color:var(--paper);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  font-size:17px;line-height:1.65;letter-spacing:-.005em;
+  overflow-x:hidden;
+}
+h1,h2,h3,.display{
+  font-family:"Georgia","Times New Roman",serif;
+  font-weight:400;letter-spacing:-.025em;line-height:1.08;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+.eyebrow{
+  font-family:"Inter",sans-serif;font-size:11.5px;font-weight:600;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--gold);
+}
+.lede{font-size:19px;color:var(--muted);max-width:60ch}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:15px 28px;border-radius:100px;font-size:15px;font-weight:600;
+  font-family:"Inter",sans-serif;letter-spacing:-.01em;
+  transition:transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s,background .25s;
+  border:1px solid transparent;cursor:pointer;white-space:nowrap;
+}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 34px -12px rgba(201,162,39,.7)}
+.btn-ghost{border-color:var(--line);color:var(--paper)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-lt);transform:translateY(-2px)}
+
+/* ---------- nav ---------- */
+header{
+  position:fixed;inset:0 0 auto 0;z-index:60;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(11,18,32,0);border-bottom:1px solid transparent;
+  transition:background .35s,border-color .35s;
+}
+header.stuck{background:rgba(11,18,32,.86);border-bottom-color:var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px}
+.brand{display:flex;align-items:baseline;gap:11px;font-family:Georgia,serif;font-size:21px;letter-spacing:-.02em}
+.brand span{font-family:Inter,sans-serif;font-size:9.5px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;font-weight:600}
+.nav-links{display:flex;gap:34px;font-size:14.5px;color:var(--muted);font-weight:500}
+.nav-links a{transition:color .2s;position:relative}
+.nav-links a:hover{color:var(--paper)}
+.nav-cta{display:flex;align-items:center;gap:14px}
+@media(max-width:900px){.nav-links{display:none}}
+@media(max-width:560px){.nav-cta .btn-ghost{display:none}}
+
+/* ================= HERO — motion is CSS/SVG, no video ================= */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:120px 0 90px}
+.hero-photo{
+  position:absolute;inset:0;object-fit:cover;width:100%;height:100%;
+  opacity:.5;filter:saturate(.85);
+}
+.hero::after{ /* vignette + left-side legibility ramp */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(100deg,var(--navy) 6%,rgba(11,18,32,.86) 38%,rgba(11,18,32,.30) 72%,rgba(11,18,32,.72) 100%),
+    radial-gradient(120% 80% at 50% 120%,transparent 40%,var(--navy) 100%);
+}
+/* --- motion layer 1: slow golden light sweep --- */
+.sweep{
+  position:absolute;top:-40%;left:-30%;width:80%;height:180%;
+  background:linear-gradient(75deg,transparent 30%,rgba(201,162,39,.16) 50%,transparent 70%);
+  filter:blur(46px);animation:sweep 15s ease-in-out infinite;pointer-events:none;
+}
+@keyframes sweep{
+  0%,100%{transform:translateX(-10%) rotate(-6deg);opacity:.45}
+  50%    {transform:translateX(120%) rotate(-6deg);opacity:.95}
+}
+/* --- motion layer 2: drifting horizon bands --- */
+.bands{position:absolute;inset:auto 0 0 0;height:52%;pointer-events:none;opacity:.5}
+.bands i{
+  position:absolute;left:-20%;width:140%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,.55),transparent);
+  animation:drift 11s linear infinite;
+}
+.bands i:nth-child(1){bottom:14%;animation-duration:13s}
+.bands i:nth-child(2){bottom:26%;animation-duration:17s;animation-delay:-4s;opacity:.6}
+.bands i:nth-child(3){bottom:38%;animation-duration:21s;animation-delay:-9s;opacity:.35}
+@keyframes drift{0%{transform:translateX(-14%)}100%{transform:translateX(14%)}}
+/* --- motion layer 3: slow rising motes --- */
+.motes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.motes i{
+  position:absolute;bottom:-10px;width:2px;height:2px;border-radius:50%;
+  background:var(--gold);opacity:0;animation:rise linear infinite;
+}
+@keyframes rise{
+  0%{transform:translateY(0) scale(.6);opacity:0}
+  12%{opacity:.75}
+  85%{opacity:.4}
+  100%{transform:translateY(-92vh) scale(1.15);opacity:0}
+}
+.hero-inner{position:relative;z-index:5;width:100%}
+.hero h1{font-size:clamp(2.7rem,6.4vw,5.1rem);max-width:15ch;margin:22px 0 24px}
+.hero h1 em{font-style:normal;color:var(--gold);display:block}
+.hero .lede{font-size:clamp(1.02rem,1.6vw,1.22rem);max-width:52ch}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:38px}
+.hero-meta{
+  display:flex;gap:30px;flex-wrap:wrap;margin-top:52px;padding-top:26px;
+  border-top:1px solid var(--line);font-size:13px;color:var(--muted);
+}
+.hero-meta b{display:block;color:var(--paper);font-weight:600;font-size:14.5px;margin-bottom:3px;font-family:Inter,sans-serif}
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.8,.3,1),transform .8s cubic-bezier(.2,.8,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .sweep,.bands i,.motes i{animation:none}
+  .rv{opacity:1;transform:none;transition:none}
+}
+
+/* ---------- generic section ---------- */
+section{position:relative}
+.sec{padding:112px 0}
+.sec-head{max-width:66ch;margin-bottom:56px}
+.sec-head h2{font-size:clamp(2rem,3.8vw,3.05rem);margin:16px 0 20px}
+
+/* ---------- the differentiator ---------- */
+.edge{background:var(--navy-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.edge-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+@media(max-width:940px){.edge-grid{grid-template-columns:1fr;gap:40px}}
+.edge-img{border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.edge-list{list-style:none;margin-top:34px;display:grid;gap:2px}
+.edge-list li{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--line);align-items:flex-start}
+.edge-list li:last-child{border-bottom:1px solid var(--line)}
+.edge-list .n{font-family:Georgia,serif;color:var(--gold);font-size:15px;min-width:26px;padding-top:1px}
+.edge-list p{font-size:15.5px;color:var(--muted);margin-top:4px}
+.edge-list strong{font-weight:600;font-size:16.5px;color:var(--paper);font-family:Inter,sans-serif}
+
+/* ---------- projects ---------- */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.proj{
+  background:var(--navy-2);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:transform .35s cubic-bezier(.2,.8,.3,1),border-color .35s;
+}
+.proj:hover{transform:translateY(-6px);border-color:rgba(201,162,39,.45)}
+/* REAL developer render goes here. Never generated art. */
+.render-slot{
+  aspect-ratio:4/3;background:
+    repeating-linear-gradient(45deg,var(--navy-3) 0 12px,var(--navy-2) 12px 24px);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  border-bottom:1px solid var(--line);padding:20px;
+}
+.render-slot span{
+  font-family:Inter,sans-serif;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(247,245,241,.42);line-height:1.7;
+}
+.proj-body{padding:26px;flex:1;display:flex;flex-direction:column}
+.proj-loc{font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.proj h3{font-size:1.5rem;margin:10px 0 12px}
+.proj p{font-size:14.5px;color:var(--muted);flex:1}
+.proj-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.proj-foot a{color:var(--gold);font-weight:600;font-family:Inter,sans-serif}
+.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- WhatsApp brief ---------- */
+.brief{position:relative;overflow:hidden;background:var(--navy-2);border-top:1px solid var(--line)}
+.brief-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4}
+.brief::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--navy-2) 18%,rgba(17,27,46,.55) 60%,rgba(17,27,46,.9))}
+.brief-inner{position:relative;z-index:3;max-width:60ch}
+.brief h2{font-size:clamp(1.9rem,3.4vw,2.75rem);margin:16px 0 18px}
+.brief form{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.brief input{
+  flex:1;min-width:230px;padding:15px 20px;border-radius:100px;
+  background:rgba(247,245,241,.06);border:1px solid var(--line);
+  color:var(--paper);font-size:15px;font-family:Inter,sans-serif;
+}
+.brief input::placeholder{color:rgba(247,245,241,.4)}
+.brief input:focus{outline:none;border-color:var(--gold)}
+.brief small{display:block;margin-top:16px;font-size:12.5px;color:var(--muted)}
+
+/* ---------- founder ---------- */
+.founder{background:var(--paper);color:var(--ink)}
+.founder .eyebrow{color:#8A6F14}
+.founder-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;align-items:center}
+@media(max-width:940px){.founder-grid{grid-template-columns:1fr}}
+.portrait-slot{
+  aspect-ratio:4/5;border-radius:var(--r);border:1px solid rgba(11,18,32,.14);
+  background:repeating-linear-gradient(45deg,#EDE9E1 0 12px,#F3F0EA 12px 24px);
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;
+}
+.portrait-slot span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted-dk);line-height:1.7;font-family:Inter,sans-serif}
+.founder h2{font-size:clamp(1.9rem,3.4vw,2.7rem);margin:14px 0 20px}
+.founder p{color:var(--muted-dk);font-size:16.5px;margin-bottom:16px;max-width:58ch}
+.founder .btn-gold{margin-top:14px}
+.partners{margin-top:34px;padding-top:26px;border-top:1px solid rgba(11,18,32,.12)}
+.partners .eyebrow{color:var(--muted-dk);margin-bottom:14px;display:block}
+.partner-row{display:flex;gap:26px;flex-wrap:wrap;font-family:Georgia,serif;font-size:19px;color:rgba(11,18,32,.55)}
+
+/* ---------- testimonials ---------- */
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:24px}
+.quote{background:var(--navy-2);border:1px solid var(--line);border-radius:var(--r);padding:30px}
+.quote p{font-family:Georgia,serif;font-size:17.5px;line-height:1.55;margin-bottom:20px}
+.quote cite{font-style:normal;font-size:13px;color:var(--gold);font-weight:600;letter-spacing:.04em;font-family:Inter,sans-serif}
+
+/* ---------- placeholder rails (posts + ads: owner supplies) ---------- */
+.rail{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.ph{
+  border:1px dashed rgba(247,245,241,.24);border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:26px 18px;color:rgba(247,245,241,.4);
+  font-size:11px;letter-spacing:.13em;text-transform:uppercase;line-height:1.8;
+  font-family:Inter,sans-serif;
+}
+.ph.sq{aspect-ratio:1}
+.ph.st{aspect-ratio:9/16}
+
+/* ---------- footer ---------- */
+footer{background:#070C15;border-top:1px solid var(--line);padding:64px 0 40px;font-size:14px;color:var(--muted)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;margin-bottom:44px}
+@media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:30px}}
+.foot-grid h4{font-family:Inter,sans-serif;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper);margin-bottom:16px;font-weight:600}
+.foot-grid a{display:block;margin-bottom:9px;transition:color .2s}
+.foot-grid a:hover{color:var(--gold)}
+.legal{padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12.5px}
+
+/* ---------- chatbot ---------- */
+.bot{position:fixed;right:22px;bottom:22px;z-index:70}
+.bot-btn{
+  width:58px;height:58px;border-radius:50%;background:var(--gold);color:var(--navy);
+  display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;
+  box-shadow:0 12px 34px -8px rgba(201,162,39,.6);transition:transform .25s;
+}
+.bot-btn:hover{transform:scale(1.07)}
+.bot-panel{
+  position:absolute;right:0;bottom:72px;width:min(340px,calc(100vw - 44px));
+  background:var(--navy-2);border:1px solid var(--line);border-radius:18px;
+  padding:22px;box-shadow:0 30px 70px -20px rgba(0,0,0,.7);
+  opacity:0;transform:translateY(10px) scale(.97);pointer-events:none;transition:.28s cubic-bezier(.2,.8,.3,1);
+}
+.bot-panel.open{opacity:1;transform:none;pointer-events:auto}
+.bot-panel h4{font-family:Inter,sans-serif;font-size:15px;margin-bottom:6px;font-weight:600}
+.bot-panel p{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+.bot-q{display:block;width:100%;text-align:left;padding:12px 15px;margin-bottom:8px;border-radius:10px;
+  background:rgba(247,245,241,.05);border:1px solid var(--line);color:var(--paper);
+  font-size:13.5px;font-family:Inter,sans-serif;cursor:pointer;transition:.2s}
+.bot-q:hover{border-color:var(--gold);background:rgba(201,162,39,.09)}
+.bot-note{font-size:11px;color:rgba(247,245,241,.38);margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a href="#" class="brand">Felicity <span>Properties</span></a>
+    <nav class="nav-links">
+      <a href="#edge">The edge</a>
+      <a href="#projects">Projects</a>
+      <a href="#brief">Market brief</a>
+      <a href="#founder">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="#founder">Talk to Muhannad</a>
+      <a class="btn btn-gold" href="#brief">Get the brief</a>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <img class="hero-photo" src="assets/hero.jpg" alt="" aria-hidden="true" />
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="bands" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="motes" id="motes" aria-hidden="true"></div>
+
+  <div class="wrap hero-inner">
+    <p class="eyebrow rv">Dubai Creek Harbour · Off-plan</p>
+    <h1 class="rv">The allocation, <em>before the portal.</em></h1>
+    <p class="lede rv">
+      By the time a unit reaches Bayut or Property Finder, the good lines are gone.
+      Felicity works the release itself — allocations at Dubai Creek Harbour and across
+      Dubai's growth corridors, reached while they are still allocations.
+    </p>
+    <div class="hero-cta rv">
+      <a class="btn btn-gold" href="#brief">Join the weekly brief</a>
+      <a class="btn btn-ghost" href="#projects">See current releases</a>
+    </div>
+    <div class="hero-meta rv">
+      <div><b>RERA ORN 33951</b>Licensed Dubai brokerage</div>
+      <div><b>20+ developers</b>Emaar · DAMAC · Sobha · Aldar</div>
+      <div><b>Business Bay</b>Bay Square, Dubai</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== THE EDGE ==================== -->
+<section class="sec edge" id="edge">
+  <div class="wrap edge-grid">
+    <div>
+      <p class="eyebrow rv">Why Felicity</p>
+      <h2 class="rv" style="font-size:clamp(2rem,3.8vw,3.05rem);margin:16px 0 20px">
+        Everyone has the listings.<br />Almost nobody has the release.
+      </h2>
+      <p class="lede rv">
+        Listings are a commodity — the same units, on the same portals, at the same price.
+        What is not a commodity is being in the room when a developer sets an allocation.
+      </p>
+      <ul class="edge-list">
+        <li class="rv"><span class="n">01</span><div>
+          <strong>Direct developer allocations</strong>
+          <p>Partnered with 20+ developers including Emaar, DAMAC, Sobha and Aldar — units are worked at release, not after listing.</p>
+        </div></li>
+        <li class="rv"><span class="n">02</span><div>
+          <strong>Creek Harbour depth</strong>
+          <p>Altan, Albero and Silva are all Dubai Creek Harbour. One district, understood properly, beats a directory of everywhere.</p>
+        </div></li>
+        <li class="rv"><span class="n">03</span><div>
+          <strong>Data-first, not hype-first</strong>
+          <p>Market analysis and honest guidance — including when the answer is that a unit is not worth taking.</p>
+        </div></li>
+      </ul>
+    </div>
+    <div class="edge-img rv"><img src="assets/edge.jpg" alt="" loading="lazy" /></div>
+  </div>
+</section>
+
+<!-- ==================== PROJECTS ==================== -->
+<section class="sec" id="projects">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow rv">Current releases</p>
+      <h2 class="rv">Four live allocations.</h2>
+      <p class="lede rv">Payment plans, handover dates and entry pricing are confirmed per unit on request — they move, so they are not printed here.</p>
+    </div>
+    <div class="proj-grid">
+
+      <article class="proj rv">
+        <div class="render-slot"><span>Developer render<br />Emaar — Albero</span></div>
+        <div class="proj-body">
+          <p class="proj-loc">Dubai Creek Harbour</p>
+          <h3>Albero</h3>
+          <p>Apartments and townhouses in the Green Gate District. Floor-to-ceiling windows, Creek and skyline balconies. Infinity pool, spa, yoga deck, children's play areas.</p>
+          <div class="proj-foot"><span class="tag">Emaar</span><a href="#brief">Request allocation →</a></div>
+        </div>
+      </article>
+
+      <article class="proj rv">
+        <div class="render-slot"><span>Developer render<br />Emaar — Silva</span></div>
+        <div class="proj-body">
+          <p class="proj-loc">Dubai Creek Harbour</p>
+          <h3>Silva</h3>
+          <p>1–3 bedroom apartments and townhouses in a green waterfront setting. Infinity pool, gym, yoga decks, outdoor cinema. 1, 2 &amp; 3 bedrooms available.</p>
+          <div class="proj-foot"><span class="tag">Emaar</span><a href="#brief">Request allocation →</a></div>
+        </div>
+      </article>
+
+      <article class="proj rv">
+        <div class="render-slot"><span>Developer render<br />Emaar — Altan</span></div>
+        <div class="proj-body">
+          <p class="proj-loc">Dubai Creek Harbour</p>
+          <h3>Altan</h3>
+          <p>Modern apartments on the waterfront. Rooftop pool, gym, green spaces and yoga zones, with access to Downtown, Marina and DXB airport.</p>
+          <div class="proj-foot"><span class="tag">Emaar</span><a href="#brief">Request allocation →</a></div>
+        </div>
+      </article>
+
+      <article class="proj rv">
+        <div class="render-slot"><span>Developer render<br />DAMAC — Islands 2</span></div>
+        <div class="proj-body">
+          <p class="proj-loc">Dubailand</p>
+          <h3>DAMAC Islands 2</h3>
+          <p>Waterfront community across 20 million sq ft. 544 units — 4–6 bedroom villas, twin villas and townhouses inspired by eight global islands. Lagoon pools, wellness zones, clubhouse.</p>
+          <div class="proj-foot"><span class="tag">DAMAC</span><a href="#brief">Request allocation →</a></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== WHATSAPP BRIEF ==================== -->
+<section class="sec brief" id="brief">
+  <img class="brief-img" src="assets/brief.jpg" alt="" aria-hidden="true" loading="lazy" />
+  <div class="wrap brief-inner">
+    <p class="eyebrow rv">The weekly brief</p>
+    <h2 class="rv">What actually moved in Dubai this week — on WhatsApp, once.</h2>
+    <p class="lede rv">
+      New releases, payment plans worth reading, handovers landing, and the units
+      Muhannad would not touch. One message a week. No broadcast spam.
+    </p>
+    <form class="rv" onsubmit="event.preventDefault();this.querySelector('button').textContent='Wired to your CRM →';">
+      <input type="tel" placeholder="WhatsApp number, with country code" required />
+      <button class="btn btn-gold" type="submit">Join the brief</button>
+    </form>
+    <!-- "100+ investors" is Felicity's own claim from felicitypro.com.
+         CONFIRM WITH MUHANNAD before launch, or cut the line. -->
+    <small class="rv">Already read by 100+ investors. Leave any time — one word does it.</small>
+  </div>
+</section>
+
+<!-- ==================== FOUNDER ==================== -->
+<section class="sec founder" id="founder">
+  <div class="wrap founder-grid">
+    <div class="portrait-slot rv"><span>Portrait of Muhannad<br />— to be photographed</span></div>
+    <div>
+      <p class="eyebrow rv">Founder &amp; CEO</p>
+      <h2 class="rv">Muhannad Nwilati</h2>
+      <p class="rv">
+        Felicity Properties (RERA ORN 33951) is a Dubai brokerage built from the ground up.
+        Muhannad specialises in off-plan investment across Dubai's growth corridors, from
+        Dubai Creek Harbour to Dubai South, serving buyers in over a dozen countries.
+      </p>
+      <p class="rv">
+        The approach is data-first: market analysis, honest guidance, and access to
+        allocations before they reach the portals.
+      </p>
+      <a class="btn btn-gold rv" href="https://wa.me/971563520611" target="_blank" rel="noopener">
+        WhatsApp Muhannad directly
+      </a>
+      <div class="partners rv">
+        <span class="eyebrow">Developer partners include</span>
+        <div class="partner-row"><span>Emaar</span><span>DAMAC</span><span>Sobha</span><span>Aldar</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TESTIMONIALS ==================== -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><p class="eyebrow rv">In their words</p><h2 class="rv">Buyers who closed.</h2></div>
+    <div class="quotes">
+      <blockquote class="quote rv">
+        <p>“An incredible experience with the purchase of our new home. Excellent customer service, and their understanding of the market was very impressive.”</p>
+        <cite>Dr. Ali &amp; Ahlam</cite>
+      </blockquote>
+      <blockquote class="quote rv">
+        <p>“Exceeded all my expectations. Highly recommend them for anyone looking to buy or rent property in Dubai.”</p>
+        <cite>Abdullah</cite>
+      </blockquote>
+      <blockquote class="quote rv">
+        <p>“Their knowledge of the real estate market and attention to detail made the process smooth and enjoyable.”</p>
+        <cite>Kishore</cite>
+      </blockquote>
+    </div>
+    <!-- Old site repeated these same 3 nine times. Three real ones, shown once. -->
+  </div>
+</section>
+
+<!-- ==================== CONTENT + ADS PLACEHOLDERS ==================== -->
+<section class="sec" style="background:var(--navy-2);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow rv">Content</p>
+      <h2 class="rv">This week from Muhannad</h2>
+      <p class="lede rv">Slots wired and styled — drop the real posts and ad creative straight in.</p>
+    </div>
+    <div class="rail" style="margin-bottom:20px">
+      <div class="ph sq rv">Post 1<br />1:1</div>
+      <div class="ph sq rv">Post 2<br />1:1</div>
+      <div class="ph sq rv">Post 3<br />1:1</div>
+      <div class="ph sq rv">Post 4<br />1:1</div>
+    </div>
+    <div class="rail">
+      <div class="ph st rv">Reel / story<br />9:16</div>
+      <div class="ph st rv">Ad creative A<br />9:16</div>
+      <div class="ph st rv">Ad creative B<br />9:16</div>
+      <div class="ph st rv">Ad creative C<br />9:16</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="brand" style="margin-bottom:14px">Felicity <span>Properties</span></a>
+        <p style="max-width:34ch">Off-plan allocations across Dubai's growth corridors. RERA ORN 33951.</p>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <a href="#edge">The edge</a><a href="#projects">Projects</a>
+        <a href="#brief">Market brief</a><a href="#founder">About</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="https://wa.me/971563520611">+971 56 352 0611</a>
+        <a href="#">Office 705, Building 12</a>
+        <a href="#">Bay Square, Business Bay, Dubai</a>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2026 Felicity Properties. RERA ORN 33951.</span>
+      <span>Rebuilt by AutoLeadss</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== CHATBOT ==================== -->
+<!-- Qualifies on the 4 things that decide an off-plan lead:
+     budget · cash vs plan · investor vs end-user · country.
+     Hot -> Muhannad's WhatsApp. Everyone else -> the brief list.
+     He sells into 12+ countries, so this is the timezone cover. -->
+<div class="bot">
+  <div class="bot-panel" id="botPanel">
+    <h4>Before you speak to Muhannad</h4>
+    <p>Four questions, twenty seconds — so the first reply is useful rather than “hi, how can I help”.</p>
+    <button class="bot-q">I'm investing — what's the best yield right now?</button>
+    <button class="bot-q">I want to live in it — what suits my budget?</button>
+    <button class="bot-q">Explain off-plan payment plans</button>
+    <button class="bot-q">I'm outside the UAE — can I still buy?</button>
+    <p class="bot-note">Demo shell. Connect to the AutoLeadss chatbot backend to make live.</p>
+  </div>
+  <button class="bot-btn" id="botBtn" aria-label="Chat">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  </button>
+</div>
+
+<script>
+// sticky header
+const hdr=document.getElementById('hdr');
+addEventListener('scroll',()=>hdr.classList.toggle('stuck',scrollY>40),{passive:true});
+
+// scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.rv').forEach((el,i)=>{
+  el.style.transitionDelay=(i%6*60)+'ms';io.observe(el);
+});
+
+// hero motes — generated, not hand-written, so density is tunable
+const motes=document.getElementById('motes');
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  for(let i=0;i<26;i++){
+    const m=document.createElement('i');
+    m.style.left=Math.random()*100+'%';
+    m.style.animationDuration=(13+Math.random()*16)+'s';
+    m.style.animationDelay=(-Math.random()*24)+'s';
+    m.style.opacity=.3+Math.random()*.4;
+    motes.appendChild(m);
+  }
+}
+
+// chatbot shell
+const bb=document.getElementById('botBtn'),bp=document.getElementById('botPanel');
+bb.addEventListener('click',()=>bp.classList.toggle('open'));
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.bot'))bp.classList.remove('open');
+});
+</script>
+</body>
+</html>

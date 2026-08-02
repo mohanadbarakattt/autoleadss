@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KEMETRA — Handcrafted Egyptian skincare, made by two sisters</title>
+<meta name="description" content="Handcrafted Egyptian skincare and home fragrance. Soaps, essential oils, candles and diffusers, made in small batches — and made by women building a living." />
+
+<!-- ============================================================
+     BUILD NOTES (delete before handover)
+
+     What changed vs kemetranaturals.com:
+       1. THE STORY MOVED UP. Two sisters, and a workshop employing
+          single mothers and women facing economic hardship, was a plain
+          text block BELOW the fold with no faces. It is the most
+          valuable thing this brand owns. It now opens the site.
+       2. WHATSAPP ADDED. They had none — in Egypt, where WhatsApp is
+          the default commerce channel. Biggest functional gap.
+       3. BUNDLES. Their constraint is AOV (LE 250-699 per item).
+          Bundles are the single highest-leverage commercial change and
+          the reason a retainer can work at all. Prices left BLANK -
+          I will not invent their pricing.
+       4. Product photography is THEIRS, reused not replaced - it is
+          already good. Generated art is atmosphere only.
+
+     Real and verified from their site 2026-08-02: the six products and
+     their prices, the six categories, the sisters' story, the mission,
+     and that Artisan Curve trays are sold out.
+
+     NOT invented: no order counts, no reviews, no ratings, no "as seen
+     in", no claims about skin results.
+
+     OPEN: the workshop and the sisters must be PHOTOGRAPHED. Faces were
+     deliberately not generated.
+     ============================================================ -->
+
+<style>
+:root{
+  --clay:#B98A6A; --clay-d:#9A6E50; --olive:#3E4B3C; --olive-d:#2B342A;
+  --cream:#F5EFE6; --cream-d:#EBE2D4; --ink:#2A2521;
+  --muted:rgba(42,37,33,.62); --muted-lt:rgba(245,239,230,.72);
+  --line:rgba(42,37,33,.13); --line-d:rgba(245,239,230,.18);
+  --maxw:1180px; --r:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--cream);color:var(--ink);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  font-size:17px;line-height:1.7;overflow-x:hidden}
+h1,h2,h3,.serif{font-family:"Cormorant Garamond","Georgia",serif;font-weight:400;letter-spacing:-.01em;line-height:1.12}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--clay-d)}
+.lede{font-size:18.5px;color:var(--muted);max-width:58ch}
+.sec{padding:104px 0}
+.sec-head{max-width:62ch;margin-bottom:52px}
+.sec-head h2{font-size:clamp(2.1rem,4.2vw,3.3rem);margin:16px 0 18px}
+
+html[dir="rtl"] body{font-family:"Tajawal","Noto Sans Arabic",system-ui,sans-serif}
+html[dir="rtl"] h1,html[dir="rtl"] h2,html[dir="rtl"] h3{font-family:"Tajawal",serif}
+html[dir="rtl"] .eyebrow{letter-spacing:.08em}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:15px 32px;
+  border-radius:100px;font-size:14px;font-weight:600;letter-spacing:.03em;
+  transition:transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s,background .25s;
+  border:1.5px solid transparent;cursor:pointer;white-space:nowrap}
+.btn-clay{background:var(--clay-d);color:var(--cream)}
+.btn-clay:hover{transform:translateY(-2px);box-shadow:0 14px 30px -12px rgba(154,110,80,.7)}
+.btn-line{border-color:var(--line);color:var(--ink)}
+.btn-line:hover{border-color:var(--clay-d);color:var(--clay-d);transform:translateY(-2px)}
+.on-dark .btn-line{border-color:var(--line-d);color:var(--cream)}
+.on-dark .btn-line:hover{border-color:var(--cream);color:var(--cream)}
+
+header{position:fixed;inset:0 0 auto 0;z-index:60;transition:background .35s,box-shadow .35s;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+header.stuck{background:rgba(245,239,230,.94);box-shadow:0 1px 0 var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px;gap:20px}
+/* Their mark ships as a square PNG that is roughly 60% white padding, so a
+   38px box rendered the lotus at ~15px. Scale up and pull the padding back in
+   with negative margin so the header keeps its height. multiply drops the
+   white ground against the cream. */
+.mark{height:104px;width:auto;margin:-34px 0;mix-blend-mode:multiply}
+.nav-links{display:flex;gap:30px;font-size:13.5px;font-weight:500;color:var(--muted);letter-spacing:.02em}
+.nav-links a:hover{color:var(--clay-d)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang{display:flex;border:1.5px solid var(--line);border-radius:100px;overflow:hidden;font-size:12.5px;font-weight:600}
+.lang button{padding:7px 14px;background:none;border:none;cursor:pointer;color:var(--muted);font:inherit;transition:.2s}
+.lang button.on{background:var(--clay-d);color:var(--cream)}
+@media(max-width:940px){.nav-links{display:none}}
+@media(max-width:600px){.nav-right .btn{display:none}}
+
+/* ================= HERO ================= */
+.hero{position:relative;min-height:96svh;display:flex;align-items:center;padding:120px 0 80px;overflow:hidden}
+/* Bias the frame right so the dense stone/leaf detail sits away from the
+   type column rather than directly under the lede. */
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:78% center}
+html[dir="rtl"] .hero-photo{object-position:22% center}
+/* The hero photo is a busy warm texture, so the type side needs a much harder
+   ramp than a normal image would — measured against the lede, not the H1. */
+.hero::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,rgba(245,239,230,.99) 0%,rgba(245,239,230,.98) 38%,rgba(245,239,230,.86) 52%,rgba(245,239,230,.28) 74%,rgba(62,75,60,.32) 100%)}
+html[dir="rtl"] .hero::after{background:linear-gradient(260deg,rgba(245,239,230,.99) 0%,rgba(245,239,230,.98) 38%,rgba(245,239,230,.86) 52%,rgba(245,239,230,.28) 74%,rgba(62,75,60,.32) 100%)}
+/* motion: slow warm sun drift — the light moving across a workshop */
+.sun{position:absolute;top:-25%;left:-25%;width:70%;height:150%;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(255,231,190,.55) 0%,transparent 62%);
+  filter:blur(30px);animation:sun 20s ease-in-out infinite}
+@keyframes sun{0%,100%{transform:translate(0,0) scale(1);opacity:.55}50%{transform:translate(60%,8%) scale(1.15);opacity:.9}}
+.hero-inner{position:relative;z-index:4}
+.hero h1{font-size:clamp(2.9rem,7vw,5.4rem);max-width:13ch;margin:20px 0 24px}
+.hero h1 em{font-style:italic;color:var(--clay-d)}
+.hero .lede{max-width:46ch}
+.hero-cta{display:flex;gap:13px;flex-wrap:wrap;margin-top:36px}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .85s cubic-bezier(.2,.8,.3,1),transform .85s cubic-bezier(.2,.8,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.sun{animation:none}.rv{opacity:1;transform:none;transition:none}}
+
+/* ---------- story ---------- */
+.story{background:var(--olive);color:var(--cream)}
+.story .eyebrow{color:var(--clay)}
+.story .lede{color:var(--muted-lt)}
+.story-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px;align-items:center}
+@media(max-width:940px){.story-grid{grid-template-columns:1fr;gap:38px}}
+.portrait-slot{aspect-ratio:4/5;border:1px solid var(--line-d);display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:28px;background:repeating-linear-gradient(45deg,#36402F 0 12px,#3E4B3C 12px 24px)}
+.portrait-slot span{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted-lt);line-height:2;font-weight:600}
+.story h2{font-size:clamp(2rem,4vw,3rem);margin:16px 0 22px}
+.story p{color:var(--muted-lt);font-size:17px;margin-bottom:16px;max-width:56ch}
+.story .hl{color:var(--cream);font-style:italic;font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;line-height:1.5;
+  border-inline-start:2px solid var(--clay);padding-inline-start:20px;margin:26px 0}
+
+/* ---------- products ---------- */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:26px}
+.prod{background:var(--cream);transition:transform .4s cubic-bezier(.2,.8,.3,1)}
+.prod:hover{transform:translateY(-7px)}
+.prod-img{aspect-ratio:1;overflow:hidden;background:var(--cream-d);position:relative}
+.prod-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.8,.3,1)}
+.photo-needed{display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;
+  background:repeating-linear-gradient(45deg,#E8DFD0 0 12px,#EFE7DA 12px 24px)}
+.photo-needed span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;line-height:1.9}
+.prod:hover .prod-img img{transform:scale(1.05)}
+.sold{position:absolute;inset-block-start:12px;inset-inline-start:12px;background:var(--olive);color:var(--cream);
+  font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;padding:6px 12px;border-radius:100px;font-weight:600}
+.prod h3{font-size:1.32rem;margin:16px 0 4px}
+.prod .price{font-size:14px;color:var(--muted);letter-spacing:.02em}
+.prod .cat{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--clay-d);font-weight:600;margin-top:14px;display:block}
+
+/* ---------- bundles ---------- */
+.bund{background:var(--cream-d)}
+.bund-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.bund-card{background:var(--cream);padding:32px;border:1px solid var(--line);display:flex;flex-direction:column}
+.bund-card h3{font-size:1.5rem;margin-bottom:10px}
+.bund-card p{font-size:14.5px;color:var(--muted);flex:1;margin-bottom:20px}
+.bund-card .inc{list-style:none;font-size:13.5px;color:var(--muted);margin-bottom:20px;display:grid;gap:7px}
+.bund-card .inc li{display:flex;gap:9px}
+.bund-price{padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.price-blank{display:inline-block;min-width:66px;border-bottom:2px dashed rgba(154,110,80,.6);height:1.1em;vertical-align:-2px}
+.owner-note{margin-top:26px;padding:18px 22px;background:#FFF6E3;border:1px solid #E6D4AE;font-size:14px;color:#6B5410}
+.owner-note b{font-weight:700}
+
+/* ---------- texture band ---------- */
+.band{position:relative;height:44svh;min-height:300px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.band img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.band::after{content:"";position:absolute;inset:0;background:rgba(42,37,33,.42)}
+.band .serif{position:relative;z-index:3;color:var(--cream);font-size:clamp(1.5rem,3.6vw,2.6rem);
+  text-align:center;max-width:22ch;padding:0 24px;font-style:italic}
+
+/* ---------- mission ---------- */
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+@media(max-width:940px){.mission-grid{grid-template-columns:1fr;gap:36px}}
+.mission-img{overflow:hidden}
+
+/* ---------- placeholders ---------- */
+.rail{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ph{border:1px dashed rgba(42,37,33,.28);display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:24px 16px;color:var(--muted);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  line-height:1.9;font-weight:600;background:var(--cream-d)}
+.ph.sq{aspect-ratio:1}.ph.st{aspect-ratio:9/16}
+
+footer{background:var(--olive-d);color:var(--muted-lt);padding:60px 0 36px;font-size:14.5px}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;margin-bottom:40px}
+@media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:28px}}
+.foot-grid h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);margin-bottom:15px;font-weight:600}
+.foot-grid a{display:block;margin-bottom:9px}
+.foot-grid a:hover{color:var(--clay)}
+.legal{padding-top:24px;border-top:1px solid var(--line-d);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:12.5px}
+
+.bot{position:fixed;inset:auto 22px 22px auto;z-index:70}
+html[dir="rtl"] .bot{inset:auto auto 22px 22px}
+.bot-btn{width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;
+  justify-content:center;border:none;cursor:pointer;box-shadow:0 12px 32px -8px rgba(37,211,102,.7);transition:transform .25s}
+.bot-btn:hover{transform:scale(1.07)}
+.bot-panel{position:absolute;inset:auto 0 72px auto;width:min(340px,calc(100vw - 44px));background:var(--cream);
+  border:1px solid var(--line);padding:22px;box-shadow:0 30px 70px -20px rgba(42,37,33,.35);
+  opacity:0;transform:translateY(10px) scale(.97);pointer-events:none;transition:.28s cubic-bezier(.2,.8,.3,1)}
+html[dir="rtl"] .bot-panel{inset:auto auto 72px 0}
+.bot-panel.open{opacity:1;transform:none;pointer-events:auto}
+.bot-panel h4{font-size:15px;margin-bottom:6px;font-family:Inter,sans-serif;font-weight:600}
+.bot-panel p{font-size:13.5px;color:var(--muted);margin-bottom:15px}
+.bot-q{display:block;width:100%;text-align:start;padding:12px 15px;margin-bottom:8px;background:var(--cream-d);
+  border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer;transition:.2s}
+.bot-q:hover{border-color:var(--clay-d);background:rgba(185,138,106,.14)}
+.bot-note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a href="#"><img class="mark" src="assets/product/mark.png" alt="KEMETRA" /></a>
+    <nav class="nav-links">
+      <a href="#story"    data-en="Our story" data-ar="قصتنا">Our story</a>
+      <a href="#shop"     data-en="Shop"      data-ar="المتجر">Shop</a>
+      <a href="#bundles"  data-en="Gift sets" data-ar="أطقم الهدايا">Gift sets</a>
+      <a href="#mission"  data-en="The women behind it" data-ar="النساء خلف العمل">The women behind it</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang">
+        <button id="btnEn" class="on" onclick="setLang('en')">EN</button>
+        <button id="btnAr" onclick="setLang('ar')">ع</button>
+      </div>
+      <a class="btn btn-clay" href="#shop" data-en="Shop all" data-ar="تسوّق الكل">Shop all</a>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <img class="hero-photo" src="assets/hero.jpg" alt="" aria-hidden="true" />
+  <div class="sun" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <p class="eyebrow rv" data-en="Handcrafted in Egypt" data-ar="صناعة يدوية في مصر">Handcrafted in Egypt</p>
+    <h1 class="rv" data-en="Made slowly, <em>by hand,</em> by women." data-ar="مصنوع ببطء، <em>يدوياً،</em> بأيدي نساء.">Made slowly, <em>by hand,</em> by women.</h1>
+    <p class="lede rv"
+       data-en="Soap, essential oils, candles and diffusers made in small batches from pure ingredients — in a workshop built to give women stable work."
+       data-ar="صابون وزيوت عطرية وشموع وموزّعات عطر، تُصنع بدفعات صغيرة من مكوّنات نقية — في ورشة أُنشئت لتمنح النساء عملاً مستقراً.">
+      Soap, essential oils, candles and diffusers made in small batches from pure ingredients — in a workshop built to give women stable work.</p>
+    <div class="hero-cta rv">
+      <a class="btn btn-clay" href="#shop" data-en="Shop the collection" data-ar="تسوّق المجموعة">Shop the collection</a>
+      <a class="btn btn-line" href="#story" data-en="Meet the sisters" data-ar="تعرّف على الشقيقتين">Meet the sisters</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== STORY — moved above the fold-ish, with faces ==================== -->
+<section class="sec story on-dark" id="story">
+  <div class="wrap story-grid">
+    <div class="portrait-slot rv"><span data-en="Portrait of the two sisters<br />— to be photographed" data-ar="صورة الشقيقتين<br />— بانتظار التصوير">Portrait of the two sisters<br />— to be photographed</span></div>
+    <div>
+      <p class="eyebrow rv" data-en="Our story" data-ar="قصتنا">Our story</p>
+      <h2 class="rv" data-en="Two sisters, one workshop." data-ar="شقيقتان، وورشة واحدة.">Two sisters, one workshop.</h2>
+      <p class="rv"
+         data-en="Kemetra was created by two sisters who share a deep belief in the power of nature, intention and care. With backgrounds in natural ingredients, essential oils and traditional formulation, we focus on understanding what truly benefits the skin — and respects the environment."
+         data-ar="أنشأت كيمِترا شقيقتان تؤمنان بعمق بقوة الطبيعة والنية والعناية. بخلفية في المكوّنات الطبيعية والزيوت العطرية والتركيب التقليدي، نركّز على فهم ما ينفع البشرة فعلاً — ويحترم البيئة.">
+        Kemetra was created by two sisters who share a deep belief in the power of nature, intention and care. With backgrounds in natural ingredients, essential oils and traditional formulation, we focus on understanding what truly benefits the skin — and respects the environment.</p>
+      <p class="hl rv"
+         data-en="“Every product is developed with simplicity and purpose, combining knowledge with hands-on craft.”"
+         data-ar="«كل منتج يُطوَّر ببساطة وهدف، يجمع بين المعرفة والحرفة اليدوية.»">
+        “Every product is developed with simplicity and purpose, combining knowledge with hands-on craft.”</p>
+      <p class="rv"
+         data-en="Pure ingredients, conscious care. Because your skin absorbs what you feed it."
+         data-ar="مكوّنات نقية وعناية واعية. لأن بشرتك تمتصّ ما تغذّيها به.">
+        Pure ingredients, conscious care. Because your skin absorbs what you feed it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SHOP — their real photography, their real prices ==================== -->
+<section class="sec" id="shop">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow rv" data-en="The collection" data-ar="المجموعة">The collection</p>
+      <h2 class="rv" data-en="Small batches, six ways." data-ar="دفعات صغيرة، بستّ طرق.">Small batches, six ways.</h2>
+      <p class="lede rv" data-en="Fragrances, soaps, candles, body lotions, essential oils and reed diffusers."
+         data-ar="عطور، صابون، شموع، لوشن للجسم، زيوت عطرية، وموزّعات عطر بالعيدان.">Fragrances, soaps, candles, body lotions, essential oils and reed diffusers.</p>
+    </div>
+    <div class="prod-grid">
+
+      <article class="prod rv">
+        <div class="prod-img"><img src="assets/product/soap-balance.jpg" alt="Balance & Glow Soap Bar" loading="lazy" /></div>
+        <span class="cat" data-en="Soap" data-ar="صابون">Soap</span>
+        <h3>Balance &amp; Glow Soap Bar</h3>
+        <p class="price">LE 350.00</p>
+      </article>
+
+      <!-- Only four of Kemetra's six live images carried product alt-text I could
+           verify. This one and CARAMEL WHISPER below did not, so their shots are
+           marked rather than guessed — mislabelling a product photo is the same
+           class of error as inventing one. -->
+      <article class="prod rv">
+        <div class="prod-img photo-needed"><span data-en="Product shot needed" data-ar="مطلوب صورة المنتج">Product shot needed</span></div>
+        <span class="cat" data-en="Signature" data-ar="المميّز">Signature</span>
+        <h3>Camel Milk Soap Bar</h3>
+        <p class="price">LE 499.00</p>
+      </article>
+
+      <article class="prod rv">
+        <div class="prod-img"><img src="assets/product/oil-breathe.jpg" alt="BREATHE essential oil blend" loading="lazy" /></div>
+        <span class="cat" data-en="Essential oil" data-ar="زيت عطري">Essential oil</span>
+        <h3>BREATHE Blend</h3>
+        <p class="price">LE 350.00</p>
+      </article>
+
+      <article class="prod rv">
+        <div class="prod-img"><img src="assets/product/oil-calm.jpg" alt="CALM essential oil blend" loading="lazy" /></div>
+        <span class="cat" data-en="Essential oil" data-ar="زيت عطري">Essential oil</span>
+        <h3>CALM Blend</h3>
+        <p class="price">LE 350.00</p>
+      </article>
+
+      <article class="prod rv">
+        <div class="prod-img photo-needed"><span data-en="Product shot needed" data-ar="مطلوب صورة المنتج">Product shot needed</span></div>
+        <span class="cat" data-en="Fragrance" data-ar="عطر">Fragrance</span>
+        <h3>CARAMEL WHISPER</h3>
+        <p class="price">LE 699.00</p>
+      </article>
+
+      <article class="prod rv">
+        <div class="prod-img">
+          <img src="assets/product/trays.jpg" alt="Artisan Curve trays" loading="lazy" />
+          <span class="sold" data-en="Sold out" data-ar="نفدت الكمية">Sold out</span>
+        </div>
+        <span class="cat" data-en="Home" data-ar="المنزل">Home</span>
+        <h3>Artisan Curve Trays</h3>
+        <p class="price">LE 250.00</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TEXTURE BAND ==================== -->
+<section class="band">
+  <img src="assets/texture.jpg" alt="" aria-hidden="true" loading="lazy" />
+  <p class="serif" data-en="Pure ingredients, conscious care. Because your skin absorbs what you feed it."
+     data-ar="مكوّنات نقية، وعناية واعية. لأن بشرتك تمتصّ ما تغذّيها به.">Pure ingredients, conscious care. Because your skin absorbs what you feed it.</p>
+</section>
+
+<!-- ==================== BUNDLES — the AOV play ==================== -->
+<section class="sec bund" id="bundles">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow rv" data-en="Gift sets" data-ar="أطقم الهدايا">Gift sets</p>
+      <h2 class="rv" data-en="Made to be given." data-ar="صُنعت لتُهدى.">Made to be given.</h2>
+      <p class="lede rv" data-en="Wrapped by hand, ready for Ramadan, Eid, Mother's Day — or a Tuesday."
+         data-ar="تُغلَّف يدوياً، جاهزة لرمضان والعيد وعيد الأم — أو ليوم عادي.">Wrapped by hand, ready for Ramadan, Eid, Mother's Day — or a Tuesday.</p>
+    </div>
+    <div class="bund-grid">
+      <div class="bund-card rv">
+        <h3 data-en="The Calm Set" data-ar="طقم الهدوء">The Calm Set</h3>
+        <p data-en="For someone who needs the evening to slow down." data-ar="لمن يحتاج أن يهدأ مساؤه.">For someone who needs the evening to slow down.</p>
+        <ul class="inc">
+          <li>— CALM essential oil blend</li><li>— Balance &amp; Glow soap bar</li><li>— Hand-wrapped, with a card</li>
+        </ul>
+        <p class="bund-price"><span data-en="Set price" data-ar="سعر الطقم">Set price</span> <b>LE&nbsp;<span class="price-blank"></span></b></p>
+      </div>
+      <div class="bund-card rv">
+        <h3 data-en="The Egyptian Set" data-ar="الطقم المصري">The Egyptian Set</h3>
+        <p data-en="Built around the camel milk soap — the one nobody else makes like this." data-ar="مبني حول صابون حليب الإبل — الذي لا يصنعه أحد هكذا.">Built around the camel milk soap — the one nobody else makes like this.</p>
+        <ul class="inc">
+          <li>— Camel milk soap bar</li><li>— BREATHE essential oil blend</li><li>— Hand-wrapped, with a card</li>
+        </ul>
+        <p class="bund-price"><span data-en="Set price" data-ar="سعر الطقم">Set price</span> <b>LE&nbsp;<span class="price-blank"></span></b></p>
+      </div>
+      <div class="bund-card rv">
+        <h3 data-en="The Full Ritual" data-ar="الطقس الكامل">The Full Ritual</h3>
+        <p data-en="Everything, for someone you actually like." data-ar="كل شيء، لشخص تحبه فعلاً.">Everything, for someone you actually like.</p>
+        <ul class="inc">
+          <li>— Two soap bars</li><li>— Two essential oil blends</li><li>— A fragrance</li><li>— Hand-wrapped, with a card</li>
+        </ul>
+        <p class="bund-price"><span data-en="Set price" data-ar="سعر الطقم">Set price</span> <b>LE&nbsp;<span class="price-blank"></span></b></p>
+      </div>
+    </div>
+    <div class="owner-note rv">
+      <b>Owner action:</b> set prices are blank — I will not invent your pricing. Bundles are the single
+      highest-leverage change available to you: at LE 250–699 an item, raising average basket size does
+      more for the business than any amount of extra traffic. Also worth a stock conversation before we
+      run ads — Artisan Curve trays are already sold out, and ads into a catalogue that can't fulfil
+      waste money.
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MISSION ==================== -->
+<section class="sec" id="mission">
+  <div class="wrap mission-grid">
+    <div class="mission-img rv"><img src="assets/gifting.jpg" alt="" loading="lazy" /></div>
+    <div>
+      <p class="eyebrow rv" data-en="Beyond skincare" data-ar="أبعد من العناية بالبشرة">Beyond skincare</p>
+      <h2 class="rv" style="font-size:clamp(2rem,4vw,3rem);margin:16px 0 20px"
+          data-en="The women who make it." data-ar="النساء اللواتي يصنعنه.">The women who make it.</h2>
+      <p class="lede rv"
+         data-en="Our mission extends beyond skincare. We are committed to creating opportunities for women — particularly single mothers and women facing economic challenges — by providing stable work, skill development, and a supportive environment where they can thrive."
+         data-ar="رسالتنا تتجاوز العناية بالبشرة. نلتزم بخلق فرص للنساء — خصوصاً الأمهات المعيلات والنساء اللواتي يواجهن تحديات اقتصادية — عبر توفير عمل مستقر وتطوير للمهارات وبيئة داعمة يزدهرن فيها.">
+        Our mission extends beyond skincare. We are committed to creating opportunities for women — particularly single mothers and women facing economic challenges — by providing stable work, skill development, and a supportive environment where they can thrive.</p>
+      <div class="owner-note rv" style="margin-top:24px">
+        <b>Owner action:</b> this section deserves photographs of the workshop and the women working in it
+        (with their consent). It is the most powerful thing on the site and currently the only part with
+        nothing to look at. Faces were deliberately not generated.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTENT + ADS PLACEHOLDERS ==================== -->
+<section class="sec" style="background:var(--cream-d)">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow rv" data-en="From the workshop" data-ar="من الورشة">From the workshop</p>
+      <h2 class="rv" data-en="This week" data-ar="هذا الأسبوع">This week</h2>
+      <p class="lede rv" data-en="Slots wired and styled — drop the real posts and ad creative straight in."
+         data-ar="المساحات جاهزة ومصمّمة — أضف المنشورات والإعلانات الفعلية مباشرة.">Slots wired and styled — drop the real posts and ad creative straight in.</p>
+    </div>
+    <div class="rail" style="margin-bottom:18px">
+      <div class="ph sq rv">Post 1<br />1:1</div><div class="ph sq rv">Post 2<br />1:1</div>
+      <div class="ph sq rv">Post 3<br />1:1</div><div class="ph sq rv">Post 4<br />1:1</div>
+    </div>
+    <div class="rail">
+      <div class="ph st rv">Workshop reel<br />9:16</div><div class="ph st rv">Ad creative A<br />9:16</div>
+      <div class="ph st rv">Ad creative B<br />9:16</div><div class="ph st rv">Ad creative C<br />9:16</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img class="mark" src="assets/product/mark.png" alt="KEMETRA" style="filter:brightness(0) invert(1);mix-blend-mode:normal;margin-bottom:14px" />
+        <p style="max-width:34ch" data-en="Handcrafted Egyptian skincare and home fragrance, made in small batches."
+           data-ar="عناية بالبشرة وعطور منزلية مصرية، مصنوعة يدوياً بدفعات صغيرة.">Handcrafted Egyptian skincare and home fragrance, made in small batches.</p>
+      </div>
+      <div>
+        <h4 data-en="Shop" data-ar="المتجر">Shop</h4>
+        <a href="#shop" data-en="Soaps" data-ar="الصابون">Soaps</a>
+        <a href="#shop" data-en="Essential oils" data-ar="الزيوت العطرية">Essential oils</a>
+        <a href="#shop" data-en="Fragrances" data-ar="العطور">Fragrances</a>
+        <a href="#bundles" data-en="Gift sets" data-ar="أطقم الهدايا">Gift sets</a>
+      </div>
+      <div>
+        <h4 data-en="Contact" data-ar="تواصل">Contact</h4>
+        <a href="#" data-en="WhatsApp — number needed" data-ar="واتساب — الرقم مطلوب">WhatsApp — number needed</a>
+        <a href="https://instagram.com/kemetranaturals" target="_blank" rel="noopener">@kemetranaturals</a>
+        <a href="#" data-en="Egypt" data-ar="مصر">Egypt</a>
+      </div>
+    </div>
+    <div class="legal"><span>© 2026 KEMETRA</span><span>Rebuilt by AutoLeadss</span></div>
+  </div>
+</footer>
+
+<!-- ==================== CHATBOT ====================
+     They had NO WhatsApp at all — in Egypt, where WhatsApp/DM ordering
+     is frequently bigger than web checkout. Plausibly the highest-ROI
+     single item on their list. -->
+<div class="bot">
+  <div class="bot-panel" id="botPanel">
+    <h4 data-en="Ask us anything" data-ar="اسألنا عن أي شيء">Ask us anything</h4>
+    <p data-en="Ingredients, skin type, delivery, or order straight through WhatsApp."
+       data-ar="المكوّنات، نوع البشرة، التوصيل، أو اطلبي مباشرة عبر واتساب.">Ingredients, skin type, delivery, or order straight through WhatsApp.</p>
+    <button class="bot-q" data-en="Which soap suits my skin?" data-ar="أي صابون يناسب بشرتي؟">Which soap suits my skin?</button>
+    <button class="bot-q" data-en="What's in the camel milk soap?" data-ar="ما مكوّنات صابون حليب الإبل؟">What's in the camel milk soap?</button>
+    <button class="bot-q" data-en="I want to order a gift set" data-ar="أريد طلب طقم هدية">I want to order a gift set</button>
+    <button class="bot-q" data-en="Where do you deliver, and when?" data-ar="أين تُوصّلون، ومتى؟">Where do you deliver, and when?</button>
+    <p class="bot-note">Demo shell. Needs a WhatsApp Business number, then connect to the AutoLeadss chatbot backend.</p>
+  </div>
+  <button class="bot-btn" id="botBtn" aria-label="WhatsApp">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.86 1.21 3.06c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.04 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.38 9.38 0 0 1-1.44-5A9.47 9.47 0 0 1 18.75 5.3a9.4 9.4 0 0 1 2.78 6.7 9.47 9.47 0 0 1-9.49 9.5M20.16 3.9A11.75 11.75 0 0 0 11.9.5C5.46.5.2 5.76.2 12.22c0 2.07.54 4.09 1.57 5.87L.1 24l6.05-1.59a11.68 11.68 0 0 0 5.75 1.47h.01c6.44 0 11.7-5.26 11.7-11.72 0-3.13-1.22-6.07-3.44-8.28"/></svg>
+  </button>
+</div>
+
+<script>
+function setLang(l){
+  const ar = l==='ar';
+  document.documentElement.lang = ar?'ar':'en';
+  document.documentElement.dir  = ar?'rtl':'ltr';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    const v = el.getAttribute(ar?'data-ar':'data-en');
+    if(v!=null) el.innerHTML = v;
+  });
+  btnEn.classList.toggle('on',!ar); btnAr.classList.toggle('on',ar);
+  try{localStorage.setItem('kemetra-lang',l)}catch(e){}
+}
+try{ if(localStorage.getItem('kemetra-lang')==='ar') setLang('ar'); }catch(e){}
+
+const hdr=document.getElementById('hdr');
+addEventListener('scroll',()=>hdr.classList.toggle('stuck',scrollY>40),{passive:true});
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%6*60)+'ms';io.observe(el)});
+const bb=document.getElementById('botBtn'),bp=document.getElementById('botPanel');
+bb.addEventListener('click',()=>bp.classList.toggle('open'));
+document.addEventListener('click',e=>{if(!e.target.closest('.bot'))bp.classList.remove('open')});
+</script>
+</body>
+</html>
