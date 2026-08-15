@@ -7,17 +7,11 @@
     "dev": "vite",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc && npm run typecheck:api",
-    "typecheck:api": "tsc -p api/tsconfig.json",
-    "check:api-imports": "tsx scripts/check-api-imports.ts",
-    "margin-guard": "tsx scripts/margin-guard.ts",
+    "typecheck": "tsc",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@clerk/backend": "^3.11.3",
-    "@clerk/clerk-react": "^5.61.8",
-    "@neondatabase/serverless": "^1.1.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",

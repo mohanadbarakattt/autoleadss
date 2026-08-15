@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { useT, useLocale } from '../../i18n/LocaleProvider'
-import { retainerPrice } from '../../agency/offer'
-import { resolveCurrency } from '../../saas/currency'
+import { useT } from '../../i18n/LocaleProvider'
+import { packagePrice } from '../../agency/offer'
 
 /**
  * How this compares to the usual way of assembling the same work.
@@ -16,15 +15,14 @@ import { resolveCurrency } from '../../saas/currency'
  * competitor's terms (see t.comparison.footnote). The AutoLeadss column states
  * deliverables only — no outcome claims (src/i18n/claims.test.ts guards that).
  *
- * `{from}` and `{adSpend}` are substituted from src/agency/offer.ts rather than
+ * `{price}` and `{adSpend}` are substituted from src/agency/offer.ts rather than
  * written into the copy, so this table can never quote a price the pricing
  * section has moved on from — which is exactly how the dead $59 survived here.
  */
 export default function Comparison() {
   const t = useT()
-  const { isRTL } = useLocale()
-  const price = retainerPrice(resolveCurrency(), isRTL ? 'ar' : 'en')
-  const fill = (v: string) => v.replace('{from}', price.amount).replace('{adSpend}', price.adSpend)
+  const price = packagePrice()
+  const fill = (v: string) => v.replace('{price}', price.amount).replace('{adSpend}', price.adSpend)
 
   return (
     <section className="relative overflow-hidden bg-background py-24">

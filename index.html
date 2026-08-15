@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt</title>
+    <title>AutoLeadss — Website, Ads &amp; Social Media Management in UAE &amp; Egypt</title>
     <!--
       data-rh="true" below is LOAD-BEARING, not decoration. react-helmet-async
       only reconciles tags carrying that marker, so without it every route that
@@ -16,16 +16,22 @@
       tag that nothing re-asserts is DELETED on the first Helmet render.
       Values must stay byte-identical to DefaultSeo.tsx's.
     -->
-    <meta name="description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
-    <meta name="keywords" content="lead generation UAE, lead generation Egypt, marketing agency Dubai, marketing agency Cairo, sales funnel UAE, google ads Dubai, chatbot WhatsApp UAE, landing page Dubai, digital marketing UAE, social media management Dubai, SEO Dubai, GEO optimization" />
+    <meta name="description" data-rh="true" content="One package, $1,500/month: website build or redesign, AI chatbot, weekly ad management with $500 ad spend included, and 3 social posts a week. Free 30-minute call.">
+    <!--
+      The `keywords` meta tag was removed on 2026-08-15. Google has not used it
+      since 2009 and says so explicitly in its SEO Starter Guide, so it was pure
+      weight that also leaked our target-keyword list to competitors. Do not
+      re-add it. Relevance comes from the visible copy, not a hidden list.
+      https://developers.google.com/search/docs/fundamentals/seo-starter-guide
+    -->
     <meta name="google-site-verification" content="FZa9T-HGhkkbLW1er9dCvDqJg_OectZ0SjFr58VG16M" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
 
     <!-- Open Graph -->
-    <meta property="og:title" data-rh="true" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
-    <meta property="og:description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
+    <meta property="og:title" data-rh="true" content="AutoLeadss — Website, Ads &amp; Social Media Management in UAE &amp; Egypt">
+    <meta property="og:description" data-rh="true" content="One package, $1,500/month: website build or redesign, AI chatbot, weekly ad management with $500 ad spend included, and 3 social posts a week. Free 30-minute call.">
     <meta property="og:url" data-rh="true" content="https://autoleadss.com" />
     <meta property="og:type" data-rh="true" content="website" />
     <meta property="og:image" data-rh="true" content="https://autoleadss.com/og-image.png" />
@@ -36,8 +42,8 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" data-rh="true" content="summary_large_image" />
-    <meta name="twitter:title" data-rh="true" content="AutoLeadss — Growth &amp; Sales Systems for UAE &amp; Egypt">
-    <meta name="twitter:description" data-rh="true" content="We build and run complete sales systems for UAE &amp; Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
+    <meta name="twitter:title" data-rh="true" content="AutoLeadss — Website, Ads &amp; Social Media Management in UAE &amp; Egypt">
+    <meta name="twitter:description" data-rh="true" content="One package, $1,500/month: website build or redesign, AI chatbot, weekly ad management with $500 ad spend included, and 3 social posts a week. Free 30-minute call.">
     <meta name="twitter:image" data-rh="true" content="https://autoleadss.com/og-image.png">
 
     <!-- hreflang (canonical set per-route via Helmet) -->
@@ -45,7 +51,18 @@
     <link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar" />
     <link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en" />
 
-    <!-- JSON-LD Structured Data -->
+    <!--
+      JSON-LD Structured Data.
+
+      The price here is duplicated from src/agency/offer.ts because static HTML
+      cannot import from TypeScript. src/agency/offer.structured-data.test.ts
+      parses this block and fails if the two ever disagree — structured data
+      that contradicts the visible price is a Google spam-policy problem, not
+      just a tidiness one.
+
+      Everything asserted below is visible on the page, which is the rule for
+      structured data: no claim here that a visitor cannot also read.
+    -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -53,9 +70,34 @@
         "name": "AutoLeadss",
         "url": "https://autoleadss.com",
         "email": "info@autoleadss.com",
-        "description": "Done-for-you growth systems for UAE and Egypt businesses: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.",
+        "description": "A done-for-you growth agency for UAE and Egypt businesses. One package includes a website build or redesign, an AI chatbot, weekly ad management with ad spend included, and social media management.",
         "areaServed": ["AE", "EG"],
-        "serviceType": ["Sales Funnels", "Lead Generation", "Digital Marketing", "Google Ads Management", "Social Media Management", "AI Chatbot Development", "Landing Page Design", "SEO", "Generative Engine Optimization"]
+        "knowsLanguage": ["en", "ar"],
+        "serviceType": ["Web Design", "Web Development", "Social Media Management", "Advertising Campaign Management", "AI Chatbot Development"],
+        "makesOffer": {
+          "@type": "Offer",
+          "name": "AutoLeadss growth package",
+          "price": "1500",
+          "priceCurrency": "USD",
+          "description": "Monthly package: website build or redesign, AI chatbot, weekly ad management with 500 USD of ad spend included, and 3 social posts a week.",
+          "availability": "https://schema.org/InStock",
+          "eligibleCustomerType": "https://schema.org/Business",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Done-for-you growth package",
+            "serviceType": "Digital Marketing",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "What is included every month",
+              "itemListElement": [
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "3 social posts a week — UGC, showcase, informative and avatar formats" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "A new ad campaign every week, managed end to end" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website built or redesigned, hosted and kept current" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI chatbot answering customers 24/7" } }
+              ]
+            }
+          }
+        }
       }
     </script>
     <script type="application/ld+json">

@@ -1,51 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Only URLs we actually want indexed belong here.
+
+  /fr-eg was removed on 2026-08-15. The Franco locale is gone and src/main.tsx
+  now 301s /fr-eg/* to /ar — listing a redirecting URL in a sitemap spends
+  crawl budget to learn nothing, which is the "reduce duplicate content"
+  guidance in Google's SEO Starter Guide. The redirect still catches old
+  bookmarks; the sitemap should not advertise it.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://autoleadss.com/en</loc>
-    <lastmod>2026-07-10</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://autoleadss.com/ar</loc>
-    <lastmod>2026-07-10</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://autoleadss.com/fr-eg</loc>
-    <lastmod>2026-07-10</lastmod>
+    <loc>https://autoleadss.com/en/start</loc>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/start</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://autoleadss.com/en/privacy</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://autoleadss.com/en/terms</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://autoleadss.com/ar/privacy</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://autoleadss.com/ar/terms</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://autoleadss.com/pricing</loc>
-    <lastmod>2026-07-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>
 </urlset>

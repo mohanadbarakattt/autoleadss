@@ -2,6 +2,7 @@ import { describe, expect, it, beforeEach, afterEach } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import DefaultSeo from './DefaultSeo'
+import { SITE_TITLE, SITE_DESCRIPTION } from '../seo/copy'
 
 /**
  * Regression tests for the duplicate-<head>-tag defect.
@@ -22,9 +23,9 @@ function seedStaticIndexHtmlTags() {
   document.head.innerHTML = `
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" data-rh="true" content="We build and run complete sales systems for UAE & Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.">
-    <meta name="keywords" content="lead generation UAE">
-    <meta property="og:title" data-rh="true" content="AutoLeadss — Growth & Sales Systems for UAE & Egypt">
+    <meta name="google-site-verification" content="test-verification-token">
+    <meta name="description" data-rh="true" content="${SITE_DESCRIPTION.en}">
+    <meta property="og:title" data-rh="true" content="${SITE_TITLE.en}">
     <meta property="og:image" data-rh="true" content="https://autoleadss.com/og-image.png">
   `
 }
@@ -90,7 +91,7 @@ describe('DefaultSeo + index.html tag ownership', () => {
     )
     await waitFor(() => expect(count('meta[name="robots"]')).toBe(1))
     expect(count('meta[name="description"]')).toBe(1)
-    expect(content('meta[name="description"]')).toContain('complete sales systems')
+    expect(content('meta[name="description"]')).toBe(SITE_DESCRIPTION.en)
   })
 
   it('never touches unmarked tags that nothing re-asserts', async () => {
@@ -103,6 +104,7 @@ describe('DefaultSeo + index.html tag ownership', () => {
     // Marking these would have Helmet delete them on first render.
     expect(count('meta[name="viewport"]')).toBe(1)
     expect(count('meta[charset]')).toBe(1)
-    expect(count('meta[name="keywords"]')).toBe(1)
+    expect(count('meta[name="google-site-verification"]')).toBe(1)
+    expect(content('meta[name="google-site-verification"]')).toBe('test-verification-token')
   })
 })

@@ -1,5 +1,77 @@
 # AutoLeadss — visual scripts & engineered prompts
 
+---
+
+## 2026-08-15 revision — DESCRIPTIVE, not abstract
+
+The original set below is abstract-atmospheric: light, panels, motes. Next to a
+line that says *"3 social posts a week — UGC, showcase, informative, avatar"*,
+an abstract orange gradient describes nothing. Feedback was direct and correct:
+**the image should show the thing the text names.**
+
+### What changed, and what did NOT
+
+Descriptive is not the same as dishonest. The line that still holds:
+
+- **Show the DELIVERABLE.** A phone with a social grid, a laptop with a
+  website, an ad set laid out for review, a chat thread on a phone at night.
+- **Never show a RESULT.** No metrics, no follower counts, no revenue, no
+  "+312%", no charts trending up, no five-star rows. That was the original
+  constraint and it is unchanged — it is the same rule
+  `src/i18n/claims.test.ts` enforces on the copy.
+- **Keep on-screen text non-legible.** Generators mangle words (the old Lash
+  Cartel frame produced "for beaty vindtthout commmnse"). Prompt for interfaces
+  seen at an angle, softly out of focus, or cropped — real-looking, unreadable.
+- **No real brand marks.** No Instagram, Meta, Google or WhatsApp logos.
+
+### Model note (2026-08-15)
+
+`unlim.available: false` on this account — the unlimited windows were
+purchase-gated and their buy-by date has passed. Costs preflighted with
+`get_cost`: `nano_banana` **1 credit**, `nano_banana_pro` **2 credits**,
+`recraft_v4_1` 1.25. There is currently no zero-cost option. The four prompts
+below are written for **`nano_banana_pro`** (best text-suppression and
+photorealism) at 2k — **8 credits for the set**, pending owner approval.
+
+### The four deliverable prompts
+
+**D-01 — 3 social posts a week** *(replaces "content cadence")*
+> Photograph of a smartphone held in one hand against a clean warm-grey studio
+> background, screen showing a grid of nine square lifestyle photographs in a
+> social feed layout. The screen is at a slight angle and slightly out of focus
+> so no text is readable. Soft directional daylight, shallow depth of field,
+> editorial product photography. No legible text, no numbers, no follower
+> counts, no app logos, no faces on the screen.
+
+**D-02 — A new ad campaign every week** *(replaces "ads variants")*
+> Overhead photograph of six printed advertisement layouts arranged in two rows
+> on a matte dark studio surface, one lifted slightly and lit warmer than the
+> rest as if selected. The layouts show photography and colour blocks only —
+> body copy is rendered as soft grey blur, unreadable. Clean overhead studio
+> light, shallow depth of field. No legible text, no charts, no percentages, no
+> logos.
+
+**D-03 — Website built or redesigned** *(replaces "website layers")*
+> Photograph of an open laptop at three-quarter angle on a dark walnut desk,
+> screen showing a modern minimal website: a large hero image, a headline bar
+> and three content cards. Screen content is softly out of focus so no words are
+> readable. Warm desk lamp from the left, dark room, shallow depth of field. No
+> legible text, no numbers, no browser branding, no logos.
+
+**D-04 — AI chatbot answering 24/7** *(replaces "chatbot nightlight")*
+> Photograph of a smartphone lying face-up on a dark surface at night, screen
+> glowing with a messaging thread of alternating chat bubbles. The bubbles are
+> shapes only — no readable characters. Cool screen light against a warm dark
+> room, single light source, intimate and quiet, shallow depth of field. No
+> legible text, no names, no timestamps, no app logos, no people.
+
+**Acceptance is unchanged**, minus the "no recognisable object" rule: a phone, a
+laptop and a printed layout are now exactly what we want. Everything else still
+applies — reject on any legible word, any number, any chart, any logo, any face.
+
+---
+
+
 **Date:** 2026-08-02 · **For:** Higgsfield generation to repolish the marketing site.
 
 Written **before** any prompt, because a prompt without a script produces

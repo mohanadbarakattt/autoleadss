@@ -1,10 +1,8 @@
-import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { Check, PhoneCall } from 'lucide-react'
 import { useT, useLocale } from '../../i18n/LocaleProvider'
-import { retainerPrice } from '../../agency/offer'
-import { resolveCurrency, setStoredCurrency, SUPPORTED_CURRENCIES } from '../../saas/currency'
-import type { Currency } from '../../saas/types'
+import { packagePrice } from '../../agency/offer'
 import imgContent from '../../assets/brand/content-cadence.webp'
 import imgAds from '../../assets/brand/ads-variants.webp'
 import imgWebsite from '../../assets/brand/website-layers.webp'
@@ -12,28 +10,39 @@ import imgChatbot from '../../assets/brand/chatbot-nightlight.webp'
 
 const CAL_URL = 'https://calendar.app.google/JU1WaieYFBNYpmhN9'
 
-/** Flag/globe glyphs for the currency switcher — a display convenience, kept
- * out of currency.ts (which stays UI-agnostic). */
-const CURRENCY_FLAG: Record<Currency, string> = { USD: '🌍', AED: '🇦🇪', SAR: '🇸🇦', EGP: '🇪🇬' }
-
-/** One image per retainer deliverable, in the same order as
- * t.pricingTeaser.includes. Deliberately abstract: a generated "dashboard"
- * would state a result the site cannot source, which is the same lie
- * src/i18n/claims.test.ts guards the copy against — see
- * docs/brand/VISUAL-SCRIPTS.md. */
-const DELIVERABLE_IMAGES = [imgContent, imgAds, imgWebsite, imgChatbot]
+/**
+ * One image per deliverable, in the SAME ORDER as t.pricingTeaser.includes
+ * (content, ads, website, chatbot). Reordering the copy without reordering
+ * this silently mismatches every image, so both carry a warning.
+ *
+ * Deliberately abstract: a generated "dashboard" would state a result the site
+ * cannot source, which is the same lie src/i18n/claims.test.ts guards the copy
+ * against — see docs/brand/VISUAL-SCRIPTS.md.
+ *
+ * Alt text is descriptive rather than empty. These are not decorative: they
+ * illustrate a named service, so per Google's image guidance they get alt text
+ * that explains the image in context. They sit directly beside the text they
+ * relate to, which is also what that guidance asks for.
+ */
+const DELIVERABLES = [
+  { img: imgContent, alt: 'Rows of blank content cards receding into the distance, representing a steady weekly publishing schedule' },
+  { img: imgAds, alt: 'Several ad variants laid out side by side with one lit from above, representing weekly ad campaign testing' },
+  { img: imgWebsite, alt: 'Translucent panels stacked in parallel layers, representing a website built and maintained in layers' },
+  { img: imgChatbot, alt: 'A single warm light in a dark space, representing an AI chatbot answering enquiries overnight' },
+]
 
 /**
- * The agency retainer, on the marketing homepage.
+ * The agency package, on the marketing homepage.
  *
- * This used to render the self-serve SaaS tiers ($59/$149/$349). AutoLeadss is
- * a done-for-you agency now: the suite under src/saas is how the work gets
- * delivered, not something a visitor buys, so there is exactly one offer here
- * and its numbers come from src/agency/offer.ts.
+ * AutoLeadss is a done-for-you agency: the suite under src/saas is how the work
+ * gets delivered, not something a visitor buys, so there is exactly one offer
+ * here and its numbers come from src/agency/offer.ts.
  *
  * Two things are load-bearing and must not be "tidied" away:
- *   - the price is a FLOOR ("from"), because scope varies per client;
- *   - part of the retainer IS ad spend, shown next to the price rather than
+ *   - the price is FIXED. One package, one number, no "from" — a visitor should
+ *     read the price and know what they will pay. (This replaced a "from
+ *     $3,500" floor on 2026-08-15.)
+ *   - part of the price IS ad spend, shown next to the price rather than
  *     footnoted — whether media budget is included is the most disputed line in
  *     agency pricing, and a visitor should never have to hunt for it.
  *
@@ -42,14 +51,8 @@ const DELIVERABLE_IMAGES = [imgContent, imgAds, imgWebsite, imgChatbot]
  */
 export default function PricingTeaser() {
   const t = useT()
-  const { isRTL } = useLocale()
-  const [currency, setCurrencyState] = useState<Currency>(resolveCurrency)
-  const price = retainerPrice(currency, isRTL ? 'ar' : 'en')
-
-  function chooseCurrency(c: Currency) {
-    setStoredCurrency(c)
-    setCurrencyState(c)
-  }
+  const { locale } = useLocale()
+  const price = packagePrice()
 
   return (
     <section id="pricing" className="relative overflow-hidden bg-background py-24">
@@ -72,19 +75,6 @@ export default function PricingTeaser() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-fg">{t.pricingTeaser.sub}</p>
 
-          <div role="group" aria-label="Currency" className="mt-6 inline-flex rounded-full border border-border bg-card p-1">
-            {SUPPORTED_CURRENCIES.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => chooseCurrency(c)}
-                aria-pressed={currency === c}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${currency === c ? 'bg-accent text-white' : 'text-muted-fg hover:text-foreground'}`}
-              >
-                {CURRENCY_FLAG[c]} {c}
-              </button>
-            ))}
-          </div>
         </motion.div>
 
         <motion.div
@@ -95,8 +85,7 @@ export default function PricingTeaser() {
           className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-accent bg-card shadow-[0_24px_60px_-30px_rgba(255,92,42,0.45)]"
         >
           <div className="border-b border-border px-8 py-10 text-center sm:px-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-fg">{t.pricingTeaser.from}</p>
-            <p className="mt-2 font-display font-bold text-foreground" style={{ fontSize: 'clamp(2.4rem, 6vw, 3.6rem)', letterSpacing: '-0.035em', lineHeight: 1 }}>
+            <p className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(2.6rem, 6.4vw, 3.8rem)', letterSpacing: '-0.035em', lineHeight: 1 }}>
               {price.amount}
               <span className="text-[0.3em] font-medium text-muted-fg">{t.pricingTeaser.mo}</span>
             </p>
@@ -104,11 +93,7 @@ export default function PricingTeaser() {
             <p className="mt-3 text-sm font-medium text-accent">
               {t.pricingTeaser.adSpendNote.replace('{adSpend}', price.adSpend)}
             </p>
-            <p className="mx-auto mt-3 max-w-sm text-xs leading-relaxed text-muted-fg">{t.pricingTeaser.fromNote}</p>
-            {price.quotedIn !== currency && (
-              // EGP floats, so it is never derived — see src/agency/offer.ts.
-              <p className="mt-2 text-xs text-muted-fg">{t.pricingTeaser.quotedInNote}</p>
-            )}
+            <p className="mx-auto mt-3 max-w-sm text-xs leading-relaxed text-muted-fg">{t.pricingTeaser.priceNote}</p>
           </div>
 
           <div className="px-8 py-8 sm:px-12">
@@ -117,9 +102,8 @@ export default function PricingTeaser() {
               {t.pricingTeaser.includes.map((line, i) => (
                 <li key={line} className="overflow-hidden rounded-2xl border border-border bg-background">
                   <img
-                    src={DELIVERABLE_IMAGES[i]}
-                    alt=""
-                    aria-hidden
+                    src={DELIVERABLES[i]?.img}
+                    alt={DELIVERABLES[i]?.alt ?? ''}
                     loading="lazy"
                     className="h-24 w-full object-cover"
                   />
@@ -133,14 +117,33 @@ export default function PricingTeaser() {
               ))}
             </ul>
 
+            {/* The free 30-minute call is the actual first step, so it gets its
+                own block rather than living inside the feature list. */}
+            <div className="mt-8 rounded-2xl border border-border bg-background p-6 text-center">
+              <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
+                <PhoneCall size={18} className="text-accent" />
+              </span>
+              <p className="text-base font-semibold text-foreground">{t.pricingTeaser.consultTitle}</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-fg">{t.pricingTeaser.consultSub}</p>
+            </div>
+
             <a
               href={CAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_36px_-8px_rgba(255,92,42,0.6)]"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_36px_-8px_rgba(255,92,42,0.6)]"
             >
               {t.pricingTeaser.cta}
             </a>
+
+            {/* The call is the default first step, but a visitor who has already
+                made up their mind should not be forced through it. */}
+            <Link
+              to={`/${locale}/start`}
+              className="mt-4 flex w-full items-center justify-center text-sm font-semibold text-accent transition-opacity hover:opacity-75"
+            >
+              {t.pricingTeaser.startCta}
+            </Link>
           </div>
         </motion.div>
       </div>

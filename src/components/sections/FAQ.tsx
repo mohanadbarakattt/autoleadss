@@ -4,6 +4,10 @@ import { Plus } from 'lucide-react'
 import { useT } from '../../i18n/LocaleProvider'
 import SectionHeading from '../SectionHeading'
 
+// NOTE: FAQPage structured data for this section is emitted by src/App.tsx,
+// which already derives it from the same t.faq.items AND tags it with
+// inLanguage. Do not add a second FAQPage block here — two FAQPage entities
+// describing one page is invalid structured data.
 export default function FAQ() {
   const t = useT()
   const [open, setOpen] = useState<number | null>(0)

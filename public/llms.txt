@@ -1,17 +1,28 @@
 # AutoLeadss
 
-> Done-for-you lead generation and sales automation for businesses in the UAE and Egypt — landing pages, ads, social media, and AI chatbots working together as a 24/7 sales machine.
+> A done-for-you growth agency for businesses in the UAE, the wider Gulf, and Egypt. One package covers a website build or redesign, an AI chatbot, weekly ad management with ad spend included, and social media content.
 
-AutoLeadss builds full marketing funnels (not just ads) for e-commerce, real estate, and service businesses in the UAE, the wider Gulf, and Egypt. Bilingual (Arabic + English) team. Clients own all ad accounts and creative assets. Pricing for the done-for-you agency service is scoped per engagement on a free strategy call — no fixed published rate.
+AutoLeadss is an agency, not a software product. There is no signup, no login and no self-serve plan — the work is done for the client by the team.
 
-AutoLeadss also runs a separate self-serve product, an AI funnel builder, with published starting prices at [/pricing](/pricing): from $59/mo (Gulf) or 1,500 EGP/mo (Egypt) for the Starter plan.
+## The package
+
+One package at **$1,500 per month**, which includes:
+
+- **A website, built or redesigned** — hosted and kept current, not handed over and abandoned.
+- **An AI chatbot** answering customer enquiries 24/7.
+- **A new ad campaign every week**, managed end to end. **$500 of the $1,500 is ad spend** paid directly to the platforms (Meta, Google, TikTok) on the client's own ad accounts — so the management fee is effectively $1,000 and the media budget is already funded.
+- **3 social posts a week** in whatever format the post calls for: UGC-style video, product and service showcases, informative and educational posts, AI avatar presenters, offers and announcements.
+
+No setup fee and no long contract. New clients start with a **free 30-minute consultation call** — a review of their current site, ads and social, with no card required and no obligation to buy.
+
+Work is produced natively in **both Arabic and English**. Clients own their ad accounts, creative and data.
+
+Typical clients: real estate, e-commerce, clinics, and service businesses in Dubai, Abu Dhabi, Cairo and Alexandria.
 
 ## Pages
 
-- [Home (English)](/en): Overview of services, process, and FAQs.
-- [Home (Arabic)](/ar): النسخة العربية — نظرة عامة على الخدمات والعملية والأسئلة الشائعة.
-- [Home (Franco-Arabic)](/fr-eg): Casual Egyptian Arabic written in the Latin chat alphabet ("Franco"/Arabizi).
-- [Self-serve pricing](/pricing): Published plan pricing for the AI funnel builder.
+- [Home (English)](/en): The package, the work, how it runs, and FAQs.
+- [Home (Arabic)](/ar): النسخة العربية — الباقة والأعمال وطريقة العمل والأسئلة الشائعة.
 
 ## Optional
 

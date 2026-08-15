@@ -57,6 +57,14 @@ describe('untranslated-string drift (ar block)', () => {
   it('has no ASCII-only English string sitting where Arabic prose belongs', () => {
     const offenders = leafEntries(translations.ar)
       .filter(([path]) => !path.endsWith('.href')) // hrefs are code (URLs/anchors), not prose
+      // Same reasoning as .href: the onboarding form's field `id` (the answer
+      // key the brief is assembled from) and `type` ('text' | 'textarea') are
+      // structure, not copy. They MUST be byte-identical across locales — a
+      // "translated" id would break the form. Excluded structurally rather
+      // than per-path, because listing ~40 paths in the allowlist would also
+      // give cover to a genuinely untranslated label sitting next to them.
+      // The prose beside them — .label and .placeholder — is still checked.
+      .filter(([path]) => !path.endsWith('.id') && !path.endsWith('.type'))
       .filter(([path]) => !AR_DRIFT_ALLOWLIST.has(path))
       .filter(([, value]) => isSuspectedDrift(value))
       .map(([path, value]) => `${path} = ${JSON.stringify(value)}`)

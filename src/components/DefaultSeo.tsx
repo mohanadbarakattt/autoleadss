@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async'
+import { SITE_TITLE, SITE_DESCRIPTION } from '../seo/copy'
 
 /**
  * The app-wide default <head> SEO tags, and the other half of a two-part fix —
@@ -36,9 +37,9 @@ import { Helmet } from 'react-helmet-async'
  * deleted on the first Helmet render.
  */
 
-const TITLE = 'AutoLeadss — Growth & Sales Systems for UAE & Egypt'
-const DESCRIPTION =
-  'We build and run complete sales systems for UAE & Egypt: sales funnels, landing pages, Google Ads, social media, AI chatbots, and SEO/GEO.'
+// Single source of truth — see src/seo/copy.ts for why these are not literals.
+const TITLE = SITE_TITLE.en
+const DESCRIPTION = SITE_DESCRIPTION.en
 const URL = 'https://autoleadss.com'
 const IMAGE = 'https://autoleadss.com/og-image.png'
 

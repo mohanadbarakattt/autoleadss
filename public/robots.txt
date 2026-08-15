@@ -1,8 +1,15 @@
+# autoleadss.com — agency site. Every page here is public marketing content.
+#
+# There is nothing to disallow any more. The self-serve platform (/app, /login,
+# /signup, /pricing, /p/:slug) was removed on 2026-08-15 and those URLs now
+# return 404.
+#
+# They are deliberately NOT Disallowed. A Disallow stops Google crawling a URL,
+# which means it can never see the 404 and may keep the dead page in the index
+# indefinitely. Letting the crawler reach them and get a 404 is what actually
+# removes them from search results.
 User-agent: *
 Allow: /
-Disallow: /app
-Disallow: /login
-Disallow: /signup
 
 # AI crawlers - explicitly allowed for GEO/AI-answer-engine visibility
 User-agent: GPTBot

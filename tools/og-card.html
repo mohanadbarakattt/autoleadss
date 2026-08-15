@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&f[]=general-sans@600,700&display=swap" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{
+    background:#0A0A0B;
+    font-family:'Switzer',-apple-system,system-ui,sans-serif;
+    color:#FAFAF7;
+    position:relative;
+    display:flex;align-items:center;
+  }
+  /* warm accent sweep from lower-left, matching the site's hero treatment */
+  .glow{
+    position:absolute;left:-18%;bottom:-45%;width:85%;height:150%;
+    background:radial-gradient(ellipse at center,rgba(255,92,42,.55) 0%,rgba(255,92,42,.16) 38%,transparent 68%);
+    filter:blur(30px);
+  }
+  .glow2{
+    position:absolute;right:-14%;top:-40%;width:60%;height:120%;
+    background:radial-gradient(ellipse at center,rgba(255,138,92,.22) 0%,transparent 62%);
+    filter:blur(40px);
+  }
+  /* fine drafting grid */
+  .grid{
+    position:absolute;inset:0;
+    background-image:linear-gradient(rgba(250,250,247,.045) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(250,250,247,.045) 1px,transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse 85% 85% at 35% 55%,#000,transparent 78%);
+    -webkit-mask-image:radial-gradient(ellipse 85% 85% at 35% 55%,#000,transparent 78%);
+  }
+  .inner{position:relative;z-index:3;padding:0 86px;width:100%}
+  .rule{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+  .rule i{display:block;width:52px;height:2px;background:#FF5C2A}
+  .rule span{
+    font-family:'General Sans',sans-serif;font-weight:600;font-size:15px;
+    letter-spacing:.22em;text-transform:uppercase;color:#FF8A5C;
+  }
+  h1{
+    font-family:'General Sans',sans-serif;font-weight:700;
+    font-size:82px;line-height:1.02;letter-spacing:-.035em;margin-bottom:26px;
+  }
+  h1 em{font-style:normal;color:#FF5C2A}
+  p.sub{font-size:25px;line-height:1.45;color:rgba(250,250,247,.66);max-width:22ch}
+  .deliverables{display:flex;gap:12px;margin-top:40px;flex-wrap:wrap}
+  .chip{
+    border:1px solid rgba(250,250,247,.18);border-radius:999px;
+    padding:11px 22px;font-size:17px;color:rgba(250,250,247,.9);
+    background:rgba(250,250,247,.04);
+  }
+  .wordmark{
+    position:absolute;right:86px;bottom:52px;z-index:3;
+    font-family:'General Sans',sans-serif;font-weight:700;font-size:30px;
+    letter-spacing:-.02em;color:#FAFAF7;
+  }
+  .wordmark s{text-decoration:none;color:#FF5C2A}
+  .region{
+    position:absolute;left:86px;bottom:56px;z-index:3;
+    font-size:16px;letter-spacing:.06em;color:rgba(250,250,247,.42);
+  }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="glow2"></div>
+  <div class="grid"></div>
+
+  <div class="inner">
+    <div class="rule"><i></i><span>Done-for-you growth</span></div>
+    <h1>Stop chasing customers.<br /><em>Start receiving them.</em></h1>
+    <p class="sub">One package. Your website, ads, content and an AI chatbot — run for you every month.</p>
+    <div class="deliverables">
+      <span class="chip">Website</span>
+      <span class="chip">AI chatbot</span>
+      <span class="chip">Weekly ads</span>
+      <span class="chip">Social content</span>
+    </div>
+  </div>
+
+  <div class="region">Dubai · Abu Dhabi · Cairo · Alexandria</div>
+  <div class="wordmark">Auto<s>Leadss</s></div>
+</body>
+</html>

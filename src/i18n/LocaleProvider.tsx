@@ -1,7 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { translations, type Locale, type Dict } from './translations'
-import { LOCALE_KEY } from '../saas/i18n'
+
+/** localStorage key for the visitor's chosen language.
+ *
+ * This used to be imported from src/saas/i18n.tsx so the marketing site and the
+ * self-serve app shared one key. The SaaS was removed on 2026-08-15, so the
+ * constant is inlined here — the VALUE is deliberately unchanged, because
+ * returning visitors already have their choice stored under this exact key and
+ * renaming it would silently reset everyone to English. */
+const LOCALE_KEY = 'autoleadss:locale'
 
 type Ctx = {
   locale: Locale
@@ -17,12 +25,10 @@ const LocaleContext = createContext<Ctx | null>(null)
 const LOCALE_ROUTE_RE = /^\/(en|ar)/
 
 /**
- * `persist` bridges this choice into the SaaS app (`src/saas/i18n.tsx` reads the
- * same `LOCALE_KEY`), so a language picked on the marketing site carries into
- * /signup and /app instead of silently resetting to English. Defaults to true for
- * the explicit `/en`, `/ar` routes and `switchLocale`; the bare `/`
- * fallback route passes `persist={false}` so it never clobbers an already-stored
- * preference with its hardcoded "en" default.
+ * `persist` stores the visitor's language choice so it survives a reload and a
+ * later visit. Defaults to true for the explicit `/en`, `/ar` routes and
+ * `switchLocale`; the bare `/` fallback route passes `persist={false}` so it
+ * never clobbers an already-stored preference with its hardcoded "en" default.
  */
 export function LocaleProvider({ locale, persist = true, children }: { locale: Locale; persist?: boolean; children: ReactNode }) {
   const navigate = useNavigate()
