@@ -70,10 +70,20 @@ export default function Showcase() {
         {/* ---------- UGC videos ---------- */}
         <div className="mb-16">
           <GroupHeading icon={<Film size={18} />} title={s.ugcTitle} sub={s.ugcSub} />
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {UGC_VIDEOS.length > 0
               ? UGC_VIDEOS.map((v, i) => (
                   <figure key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
+                    {/* object-cover, not the browser default.
+                        A <video> defaults to object-fit:contain, so a clip whose
+                        native ratio is not 9:16 gets black bars inside the tile
+                        — two of these are 834x1112 (3:4) and looked broken next
+                        to the 9:16 ones. Cover fills the tile instead; every
+                        subject here is centre-framed, so the small side crop
+                        takes nothing that matters.
+                        preload="metadata" keeps the page light: the browser
+                        fetches a few KB per clip, not the whole file, until
+                        someone actually presses play. */}
                     <video
                       src={v.src}
                       poster={v.poster}
@@ -81,7 +91,7 @@ export default function Showcase() {
                       playsInline
                       preload="metadata"
                       aria-label={v.title}
-                      className="w-full bg-black"
+                      className="w-full bg-black object-cover"
                       style={{ aspectRatio: '9 / 16' }}
                     />
                     <figcaption className="px-3 py-2.5 text-xs text-muted-fg">
