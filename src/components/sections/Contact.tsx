@@ -6,36 +6,42 @@ export default function Contact() {
   const t = useT()
   const wa = waLink(t.hero.waText)
   return (
-    <section id="contact" className="section-padding bg-background">
-      <div className="content-width max-w-2xl text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="eyebrow text-accent"
-        >
-          {t.cta.eyebrow}
-        </motion.p>
-        <motion.h2
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-4 font-display font-bold"
-          style={{ fontSize: 'clamp(1.9rem, 3.8vw, 3rem)', letterSpacing: '-0.03em' }}
-        >
-          {t.cta.title}
-        </motion.h2>
-        <p className="mx-auto mt-4 max-w-lg text-muted-fg">{t.cta.body}</p>
-        <motion.a
-          href={wa}
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ y: -3, scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-8 py-4 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(37,211,102,0.45)]"
-        >
-          {t.cta.button}
-        </motion.a>
+    <section id="contact" className="section-padding bg-paper">
+      <div className="content-width">
+        <div className="relative flex flex-col items-center justify-between gap-8 overflow-hidden rounded-2xl bg-[#121110] px-8 py-12 text-center md:flex-row md:text-start lg:px-14">
+          <div aria-hidden className="grain-overlay pointer-events-none absolute inset-0 opacity-40" />
+          <div aria-hidden className="pointer-events-none absolute -end-10 -top-16 h-56 w-56 rounded-full bg-accent/20 blur-3xl" />
+          <div className="relative z-10">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="eyebrow text-[#fe8c58]"
+            >
+              {t.cta.eyebrow}
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-3 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-medium leading-tight text-white"
+            >
+              {t.cta.title}
+            </motion.h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm text-white/55 md:mx-0">{t.cta.body}</p>
+          </div>
+          <motion.a
+            href={wa}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ y: -3, scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full bg-wa px-8 py-4 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)]"
+          >
+            <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+            {t.cta.button}
+          </motion.a>
+        </div>
       </div>
     </section>
   )

@@ -34,11 +34,13 @@ export default function LocalChat({
   accent = '#FF5C2A',
   rtl = false,
   footer,
+  docked = false,
 }: {
   copy: LocalChatCopy
   accent?: string
   rtl?: boolean
   footer?: ReactNode
+  docked?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
@@ -64,9 +66,13 @@ export default function LocalChat({
   const side = rtl ? 'left-6' : 'right-6'
 
   return (
-    <div className={`fixed bottom-6 z-[60] ${side}`}>
+    <div className={docked ? 'relative' : `fixed bottom-6 z-[60] ${side}`}>
       {open && (
-        <div className="mb-3 flex h-[min(28rem,70vh)] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]">
+        <div
+          className={`${
+            docked ? `fixed z-[70] bottom-24 ${rtl ? 'left-6' : 'right-6'}` : 'mb-3'
+          } flex h-[min(28rem,70vh)] w-[min(22rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]`}
+        >
           <div className="flex items-center justify-between px-4 py-3 text-white" style={{ background: accent }}>
             <div>
               <p className="text-sm font-semibold">{copy.title}</p>

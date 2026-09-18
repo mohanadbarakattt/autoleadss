@@ -55,6 +55,10 @@ html[dir="rtl"] .font-display {
   font-family: 'IBM Plex Sans Arabic', 'General Sans', sans-serif !important;
 }
 
+html[dir="rtl"] .font-serif {
+  font-family: 'IBM Plex Sans Arabic', 'Newsreader', serif !important;
+}
+
 @layer utilities {
   .section-padding {
     @apply py-[120px] max-md:py-20;
@@ -104,6 +108,11 @@ html[dir="rtl"] .font-display {
       linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 46px 46px;
+  }
+
+  .grain-overlay {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 0);
+    background-size: 24px 24px;
   }
 
   .card-hover {
@@ -164,6 +173,24 @@ html[dir="rtl"] .marquee-track {
 }
 @keyframes sheen-sweep {
   to { transform: translateX(120%); }
+}
+
+.qahwa {
+  font-family: 'Plus Jakarta Sans', 'Switzer', sans-serif;
+}
+.qahwa h1,
+.qahwa h2,
+.qahwa h3,
+.qahwa .font-display {
+  font-family: 'Syne', 'General Sans', sans-serif;
+}
+
+html[dir='rtl'] .qahwa,
+html[dir='rtl'] .qahwa h1,
+html[dir='rtl'] .qahwa h2,
+html[dir='rtl'] .qahwa h3,
+html[dir='rtl'] .qahwa .font-display {
+  font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif !important;
 }
 
 .marquee-wrap:hover .marquee-track {

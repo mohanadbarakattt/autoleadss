@@ -83,8 +83,8 @@ export default function Work() {
                 transition={{ duration: 0.28 }}
                 className="max-w-lg"
               >
-                <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-accent">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                <p className="inline-flex items-center gap-2 rounded-full bg-wa/15 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.16em] text-[#4ade80]">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-wa" />
                   {t.work.live}
                 </p>
                 <p className="mt-2 font-display text-2xl font-bold text-white">{copy.name}</p>

@@ -9,8 +9,7 @@ import Pricing from './components/sections/Pricing'
 import Process from './components/sections/Process'
 import Contact from './components/sections/Contact'
 import Footer from './components/Footer'
-import WhatsAppButton from './components/WhatsAppButton'
-import ChatWidget from './components/ChatWidget'
+import ActionDock from './components/ActionDock'
 import ScrollProgress from './components/ScrollProgress'
 import CookieConsent from './components/CookieConsent'
 import { useLocale, useT } from './i18n/LocaleProvider'
@@ -114,8 +113,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-      <WhatsAppButton />
-      <ChatWidget />
+      <ActionDock />
       <CookieConsent />
     </div>
   )

@@ -14,10 +14,13 @@ export default {
         card: '#FFFFFF',
         'muted-fg': '#57544E',
         'text-dim': '#6B6660',
+        paper: '#F7F5F0',
+        wa: '#1E7E48',
       },
       fontFamily: {
         sans: ['Switzer', 'sans-serif'],
         display: ['"General Sans"', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
         arabic: ['"IBM Plex Sans Arabic"', 'sans-serif'],
       },

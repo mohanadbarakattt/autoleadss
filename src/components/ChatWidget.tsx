@@ -2,7 +2,7 @@ import LocalChat from './LocalChat'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import { waLink } from '../site'
 
-export default function ChatWidget() {
+export default function ChatWidget({ docked = false }: { docked?: boolean }) {
   const t = useT()
   const { isRTL } = useLocale()
   const wa = waLink(t.hero.waText)
@@ -27,11 +27,12 @@ export default function ChatWidget() {
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
-          className="block bg-[#25D366] py-2.5 text-center text-xs font-medium text-white"
+          className="block bg-wa py-2.5 text-center text-xs font-medium text-white"
         >
           {t.chat.waCta}
         </a>
       }
+      docked={docked}
     />
   )
 }

@@ -17,7 +17,9 @@ export default function Process() {
               whileHover={{ y: -6, borderColor: 'rgba(255,92,42,0.4)' }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
-              className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-7"
+              className={`relative rounded-2xl border bg-white/[0.04] p-7 ${
+                i === 1 ? 'border-accent/40' : 'border-white/10'
+              }`}
             >
               <p className="eyebrow text-accent">{step.n}</p>
               <p className="mt-4 font-display text-xl font-bold text-white">{step.title}</p>

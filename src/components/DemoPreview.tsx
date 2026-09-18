@@ -1,6 +1,7 @@
 import { MessageCircle } from 'lucide-react'
 import { useLocale } from '../i18n/LocaleProvider'
 import type { Demo } from '../demos/data'
+import MacChrome from './MacChrome'
 
 export default function DemoPreview({ demo, compact = false }: { demo: Demo; compact?: boolean }) {
   const { locale } = useLocale()
@@ -8,15 +9,7 @@ export default function DemoPreview({ demo, compact = false }: { demo: Demo; com
   const dark = demo.bg.startsWith('#0') || demo.bg.startsWith('#1')
 
   return (
-    <div className="shot-frame relative overflow-hidden rounded-xl border border-white/12 bg-[#111113] shadow-[0_28px_60px_-28px_rgba(0,0,0,0.85)]">
-      <div className={`flex items-center gap-1.5 border-b border-white/10 ${compact ? 'px-2.5 py-1.5' : 'px-3 py-2'}`}>
-        <span className="h-2 w-2 rounded-full bg-[#FF5C2A]" />
-        <span className="h-2 w-2 rounded-full bg-white/25" />
-        <span className="h-2 w-2 rounded-full bg-white/15" />
-        <span className="ms-2 truncate font-mono text-[10px] text-white/40" dir="ltr">
-          {demo.url}
-        </span>
-      </div>
+    <MacChrome url={demo.url} label={c.kind} compact={compact}>
       <div className="relative aspect-[16/10] overflow-hidden">
         <img src={demo.img} alt={c.brand} className="absolute inset-0 h-full w-full object-cover" />
         <div
@@ -54,6 +47,6 @@ export default function DemoPreview({ demo, compact = false }: { demo: Demo; com
           <MessageCircle size={compact ? 12 : 14} />
         </span>
       </div>
-    </div>
+    </MacChrome>
   )
 }

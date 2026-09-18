@@ -8,7 +8,7 @@ import { LocaleProvider } from './i18n/LocaleProvider'
 import NotFound from './pages/NotFound'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
-import DemoPage from './pages/DemoPage'
+import DemoPage, { DemoRedirect } from './pages/DemoPage'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +16,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LocaleProvider locale="en" persist={false}><App /></LocaleProvider>} />
+          <Route path="/demo/:kind" element={<DemoRedirect />} />
           <Route path="/en/demo/:kind" element={<LocaleProvider locale="en"><DemoPage /></LocaleProvider>} />
           <Route path="/ar/demo/:kind" element={<LocaleProvider locale="ar"><DemoPage /></LocaleProvider>} />
           <Route path="/en/privacy" element={<LocaleProvider locale="en"><Privacy /></LocaleProvider>} />
