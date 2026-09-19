@@ -20,7 +20,7 @@ export default function Examples() {
   const featuredDemoCopy = featured.copy[locale]
 
   return (
-    <section id="examples" className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
+    <section id="examples" className="section-padding relative scroll-mt-28 overflow-hidden" style={{ background: '#0A0A0B' }}>
       <div aria-hidden className="grain-overlay pointer-events-none absolute inset-0 opacity-50" />
       <div className="content-width relative z-10">
         <SectionHeading dark eyebrow={t.examples.eyebrow} title={t.examples.title} sub={t.examples.sub} />
@@ -32,9 +32,9 @@ export default function Examples() {
             </Link>
             <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-5">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-accent">{featuredCopy?.kind ?? featuredDemoCopy.kind}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{t.testimonial.packageLabel}</p>
+                <p className="mt-4 text-[11px] uppercase tracking-[0.14em] text-accent">{featuredCopy?.kind ?? featuredDemoCopy.kind}</p>
                 <p className="mt-2 font-display text-3xl font-bold text-white">{featuredCopy?.name ?? featuredDemoCopy.brand}</p>
-                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{t.testimonial.packageLabel}</p>
                 <p className="mt-3 text-sm leading-relaxed text-white/60">{featuredCopy?.body ?? featuredDemoCopy.sub}</p>
                 <LashCartelProof compact showLink={false} />
               </div>

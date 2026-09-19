@@ -29,7 +29,7 @@ export default function Work() {
   }
 
   return (
-    <section id="work" className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
+    <section id="work" className="section-padding relative scroll-mt-28 overflow-hidden" style={{ background: '#0A0A0B' }}>
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[42%] h-[420px] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
