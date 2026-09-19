@@ -1,5 +1,6 @@
 import { motion, type Variants } from 'framer-motion'
-import { useT } from '../../i18n/LocaleProvider'
+import { Link } from 'react-router-dom'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { waLink } from '../../site'
 import HeroStage from '../HeroStage'
 
@@ -14,8 +15,10 @@ const fadeUp: Variants = {
 
 export default function Hero() {
   const t = useT()
+  const { localePath } = useLocale()
   const wa = waLink(t.hero.waText)
   const loop = [...t.hero.marquee, ...t.hero.marquee]
+  const cafeName = t.examples.items[0].name
 
   return (
     <section className="relative overflow-hidden" style={{ background: '#0A0A0B' }}>
@@ -96,7 +99,7 @@ export default function Hero() {
             ))}
           </motion.ul>
 
-          <motion.div custom={0.24} variants={fadeUp} initial="hidden" animate="show" className="mt-10 flex flex-wrap items-center gap-4">
+          <motion.div custom={0.24} variants={fadeUp} initial="hidden" animate="show" className="mt-10 flex flex-wrap items-center gap-3">
             <motion.a
               href={wa}
               target="_blank"
@@ -111,7 +114,12 @@ export default function Hero() {
               </span>
               {t.hero.cta}
             </motion.a>
-            <p className="text-xs text-white/40">{t.hero.proof}</p>
+            <Link
+              to={localePath('/demo/cafe')}
+              className="inline-flex items-center rounded-full border border-white/20 px-6 py-4 text-sm font-medium text-white/85 hover:border-white/40 hover:text-white"
+            >
+              {t.hero.openDemo} · {cafeName}
+            </Link>
           </motion.div>
         </div>
 

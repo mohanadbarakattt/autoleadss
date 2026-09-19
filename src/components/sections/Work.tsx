@@ -36,6 +36,7 @@ export default function Work() {
       />
       <div className="content-width relative z-10">
         <SectionHeading dark eyebrow={t.work.eyebrow} title={t.work.title} sub={t.work.sub} />
+        <p className="-mt-8 mb-10 max-w-xl text-sm text-white/45">{t.work.packageNote}</p>
 
         <div className="relative mx-auto max-w-5xl">
           <div

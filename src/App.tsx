@@ -4,16 +4,17 @@ import Hero from './components/sections/Hero'
 import Offer from './components/sections/Offer'
 import Examples from './components/sections/Examples'
 import Work from './components/sections/Work'
-import Extras from './components/sections/Extras'
-import Pricing from './components/sections/Pricing'
+import Faq from './components/sections/Faq'
 import Process from './components/sections/Process'
 import Contact from './components/sections/Contact'
 import Footer from './components/Footer'
 import ActionDock from './components/ActionDock'
 import ScrollProgress from './components/ScrollProgress'
 import CookieConsent from './components/CookieConsent'
+import JsonLd from './components/JsonLd'
 import { useLocale, useT } from './i18n/LocaleProvider'
 import { SITE } from './site'
+import { homeGraph } from './seo/jsonld'
 
 const HTML_LANG = { en: 'en', ar: 'ar' } as const
 
@@ -27,7 +28,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet defer={false}>
+      <Helmet defer={false} prioritizeSeoTags>
         <html lang={HTML_LANG[locale]} dir={isAr ? 'rtl' : 'ltr'} />
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -45,61 +46,8 @@ export default function App() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'ProfessionalService',
-            name: 'AutoLeadss',
-            url: canonical,
-            description,
-            areaServed: [
-              { '@type': 'Country', name: 'Egypt' },
-              { '@type': 'City', name: 'Cairo' },
-              { '@type': 'City', name: 'Giza' },
-              { '@type': 'City', name: 'Alexandria' },
-              { '@type': 'Country', name: 'United Arab Emirates' },
-              { '@type': 'City', name: 'Dubai' },
-              { '@type': 'Country', name: 'Saudi Arabia' },
-            ],
-            serviceType: [
-              'Website design',
-              'Landing page design',
-              'Appointment booking website',
-              'Website chatbot',
-              'تصميم مواقع',
-              'تصميم صفحات هبوط',
-            ],
-            telephone: '+201100054278',
-            address: {
-              '@type': 'PostalAddress',
-              addressLocality: 'Cairo',
-              addressCountry: 'EG',
-            },
-            offers: {
-              '@type': 'AggregateOffer',
-              priceCurrency: 'EGP',
-              lowPrice: '10000',
-              highPrice: '10000',
-              offerCount: '2',
-              offers: [
-                {
-                  '@type': 'Offer',
-                  price: '10000',
-                  priceCurrency: 'EGP',
-                  description: 'Basic package in Egypt — landing page, FAQ chatbot, connect your domain. 50% upfront, 50% before handoff',
-                  areaServed: 'EG',
-                },
-                {
-                  '@type': 'Offer',
-                  price: '200',
-                  priceCurrency: 'USD',
-                  description: 'Basic package outside Egypt — landing page, FAQ chatbot, connect your domain. 50% upfront, 50% before handoff',
-                },
-              ],
-            },
-          })}
-        </script>
       </Helmet>
+      <JsonLd data={homeGraph(locale, title, description)} />
       <ScrollProgress />
       <Navigation />
       <main>
@@ -107,8 +55,7 @@ export default function App() {
         <Offer />
         <Examples />
         <Work />
-        <Extras />
-        <Pricing />
+        <Faq />
         <Process />
         <Contact />
       </main>

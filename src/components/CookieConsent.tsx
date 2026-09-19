@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocale } from '../i18n/LocaleProvider'
 
 const STORAGE_KEY = 'mbai-cookie-consent'
+const CONSENT_EVENT = 'al-consent'
 
 type Consent = { essential: true; analytics: boolean; ts: number }
 
@@ -21,8 +22,19 @@ export function hasAnalyticsConsent(): boolean {
   return getConsent()?.analytics === true
 }
 
+export function useCookieDecided() {
+  const [decided, setDecided] = useState(() => !!getConsent())
+  useEffect(() => {
+    const sync = () => setDecided(!!getConsent())
+    window.addEventListener(CONSENT_EVENT, sync)
+    return () => window.removeEventListener(CONSENT_EVENT, sync)
+  }, [])
+  return decided
+}
+
 function save(analytics: boolean) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  window.dispatchEvent(new Event(CONSENT_EVENT))
 }
 
 export default function CookieConsent() {
@@ -43,7 +55,7 @@ export default function CookieConsent() {
       role="region"
       aria-label="Cookie consent"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card"
+      className="fixed inset-x-0 bottom-0 z-[80] border-t border-border bg-card"
     >
       <div className="mx-auto max-w-3xl px-4 py-4 sm:px-6">
         <p className="text-sm text-foreground">{c.body}</p>
@@ -53,7 +65,7 @@ export default function CookieConsent() {
             <input
               type="checkbox"
               checked={analytics}
-              onChange={(e) => setAnalytics(e.target.checked)}
+              onChange={e => setAnalytics(e.target.checked)}
               className="h-5 w-5 shrink-0 accent-accent"
             />
             {c.analyticsLabel}
@@ -63,14 +75,20 @@ export default function CookieConsent() {
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => { save(true); setVisible(false) }}
+            onClick={() => {
+              save(true)
+              setVisible(false)
+            }}
             className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-2"
           >
             {c.acceptAll}
           </button>
           <button
             type="button"
-            onClick={() => { save(false); setVisible(false) }}
+            onClick={() => {
+              save(false)
+              setVisible(false)
+            }}
             className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
             {c.rejectAll}
@@ -78,7 +96,10 @@ export default function CookieConsent() {
           {manage ? (
             <button
               type="button"
-              onClick={() => { save(analytics); setVisible(false) }}
+              onClick={() => {
+                save(analytics)
+                setVisible(false)
+              }}
               className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
             >
               {c.saveChoices}

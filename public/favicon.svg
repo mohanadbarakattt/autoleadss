@@ -1,10 +1,12 @@
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+    <linearGradient id="al-grad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FF7A4D"/>
       <stop offset="1" stop-color="#FF5C2A"/>
     </linearGradient>
   </defs>
-  <rect x="1" y="1" width="46" height="46" rx="13" fill="url(#g)"/>
-  <text x="24" y="32" text-anchor="middle" fill="#FFFFFF" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="-0.8">MB</text>
+  <rect x="1" y="1" width="46" height="46" rx="13" fill="url(#al-grad)"/>
+  <path d="M12 14h24l-4.4 6H16.4L12 14Z" fill="#FFFFFF"/>
+  <path d="M17.6 24.5h12.8L27 30.5h-6l-3.4-6Z" fill="#FFFFFF" fill-opacity="0.82"/>
+  <circle cx="24" cy="36.5" r="3.2" fill="#FFFFFF"/>
 </svg>

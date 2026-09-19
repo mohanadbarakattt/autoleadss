@@ -4,23 +4,36 @@ import { Helmet } from 'react-helmet-async'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useLocale } from '../../i18n/LocaleProvider'
 import LocalChat from '../../components/LocalChat'
-import { waLink } from '../../site'
+import JsonLd from '../../components/JsonLd'
+import { SITE, waLink } from '../../site'
 import type { Demo } from '../../demos/data'
 import { siteCopy } from '../../demos/siteCopy'
+import { DEMO_SEO } from '../../demos/seo'
+import { demoGraph } from '../../seo/jsonld'
 
 export default function DemoChrome({ demo, children }: { demo: Demo; children: ReactNode }) {
   const { locale, localePath, isRTL, switchLocale } = useLocale()
   const c = demo.copy[locale]
   const s = siteCopy[demo.id][locale]
+  const seo = DEMO_SEO[demo.id][locale]
   const BackIcon = isRTL ? ArrowRight : ArrowLeft
   const dark = demo.bg.startsWith('#0') || demo.bg.startsWith('#1')
+  const canonical = `${SITE.origin}/${locale}/demo/${demo.id}`
 
   return (
     <div className="min-h-screen" style={{ background: demo.bg, color: demo.fg }}>
-      <Helmet defer={false}>
-        <title>{`${c.brand} — AutoLeadss demo`}</title>
-        <meta name="robots" content="noindex" />
+      <Helmet defer={false} prioritizeSeoTags>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
+        <link rel="canonical" href={canonical} />
+        <link rel="alternate" hrefLang="en" href={`${SITE.origin}/en/demo/${demo.id}`} />
+        <link rel="alternate" hrefLang="ar" href={`${SITE.origin}/ar/demo/${demo.id}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${SITE.origin}/en/demo/${demo.id}`} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:description" content={seo.description} />
+        <meta property="og:url" content={canonical} />
       </Helmet>
+      <JsonLd data={demoGraph(locale, demo.id)} />
 
       <div
         className="border-b text-[11px]"

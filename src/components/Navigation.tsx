@@ -39,18 +39,19 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const wa = waLink(t.hero.waText)
-  const forceGlass = /privacy|terms/.test(location.pathname)
+  const forceGlass = /privacy|terms|pricing|se3r/.test(location.pathname)
 
+  const home = localePath()
   const navLinks = [
-    { label: t.nav.offer, href: '#offer' },
-    { label: t.nav.examples, href: '#examples' },
-    { label: t.nav.work, href: '#work' },
-    { label: t.nav.pricing, href: '#pricing' },
-    { label: t.nav.process, href: '#process' },
+    { label: t.nav.offer, href: `${home}#offer`, id: 'offer' },
+    { label: t.nav.examples, href: `${home}#examples`, id: 'examples' },
+    { label: t.nav.work, href: `${home}#work`, id: 'work' },
+    { label: t.nav.pricing, href: `${home}#pricing`, id: 'pricing' },
+    { label: t.nav.process, href: `${home}#process`, id: 'process' },
   ]
 
   useEffect(() => {
-    const ids = navLinks.map(l => l.href.slice(1))
+    const ids = navLinks.map(l => l.id)
     const onScroll = () => {
       setScrolled(window.scrollY > 40)
       const y = window.scrollY + 140
@@ -85,7 +86,7 @@ export default function Navigation() {
 
           <nav className="relative hidden items-center rounded-full bg-black/30 p-1 lg:flex">
             {navLinks.map(link => {
-              const on = active === link.href.slice(1)
+              const on = active === link.id
               return (
                 <a
                   key={link.href}
