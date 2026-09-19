@@ -24,7 +24,7 @@ function collapseHead() {
   keepLast('link[rel="apple-touch-icon"]', () => 'apple-touch-icon')
 }
 
-/** Funnel mark only — never the old MB tile. Also collapse SPA duplicate meta/hreflang. */
+/** A-arrow mark only — never the old MB or funnel tile. Also collapse SPA duplicate meta/hreflang. */
 export default function SeoIcons() {
   const { pathname } = useLocation()
 

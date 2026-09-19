@@ -5,28 +5,27 @@ type LogoProps = {
   className?: string
 }
 
-/** AutoLeadss mark: a funnel converging into a lead-dot. */
+/** A-arrow mark paths in a 394×322 viewBox (traced from the provided brand PNG). */
+export const MARK_VIEWBOX = { w: 394, h: 322 } as const
+export const MARK_ORANGE = '#FF5C2A'
+export const MARK_PATH =
+  'M385 9 280 50 310 71 224 188 148 188 194 87 228 154 267 101 220 9 169 9 8 312 77 312 117 243 248 242 354 100 383 118Z M310 182 271 237 313 312 380 312Z'
+
+/** AutoLeadss mark: geometric A with an upward arrow in the right stroke. Orange on transparent — no tile. */
 export function LogoMark({ size = 32, className = '' }: { size?: number; className?: string }) {
+  const height = size
+  const width = Math.round((size * MARK_VIEWBOX.w) / MARK_VIEWBOX.h)
   return (
     <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
+      width={width}
+      height={height}
+      viewBox={`0 0 ${MARK_VIEWBOX.w} ${MARK_VIEWBOX.h}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className={`shrink-0 ${className}`}
       aria-hidden="true"
     >
-      <defs>
-        <linearGradient id="al-grad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FF7A4D" />
-          <stop offset="1" stopColor="#FF5C2A" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="46" height="46" rx="13" fill="url(#al-grad)" />
-      <path d="M12 14h24l-4.4 6H16.4L12 14Z" fill="#FFFFFF" />
-      <path d="M17.6 24.5h12.8L27 30.5h-6l-3.4-6Z" fill="#FFFFFF" fillOpacity="0.82" />
-      <circle cx="24" cy="36.5" r="3.2" fill="#FFFFFF" />
+      <path d={MARK_PATH} fill={MARK_ORANGE} />
     </svg>
   )
 }
@@ -34,7 +33,7 @@ export function LogoMark({ size = 32, className = '' }: { size?: number; classNa
 export default function Logo({ variant = 'light', size = 30, withWordmark = true, className = '' }: LogoProps) {
   const textColor = variant === 'dark' ? '#FAFAF7' : '#0A0A0B'
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+    <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark size={size} />
       {withWordmark && (
         <span
@@ -42,7 +41,7 @@ export default function Logo({ variant = 'light', size = 30, withWordmark = true
           style={{ color: textColor, fontSize: size * 0.62, letterSpacing: '-0.02em' }}
           dir="ltr"
         >
-          AutoLeadss<span style={{ color: '#FF5C2A' }}>.</span>
+          AutoLeadss<span style={{ color: MARK_ORANGE }}>.</span>
         </span>
       )}
     </span>

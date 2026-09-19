@@ -52,6 +52,8 @@ export default function Offer() {
                 </li>
               ))}
             </ol>
+            <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-accent">{t.offer.chip}</p>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-fg">{t.offer.craft}</p>
           </div>
 
           <aside className="lg:col-span-5 lg:sticky lg:top-24">

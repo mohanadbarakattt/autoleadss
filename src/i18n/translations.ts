@@ -51,6 +51,8 @@ export const translations = {
       eyebrow: 'The service',
       title: 'This is what you get.',
       sub: 'One package. The website, booking on the page, forms that arrive, and a local FAQ chatbot. Bigger sites are quoted after we see the brief.',
+      chip: 'SEO · GEO · geo pricing available',
+      craft: 'Built with SEO and local GEO inside — not bolted on later. Need different prices by country? We can add geo pricing.',
       previewHint: 'Each shape is a different demo — open Examples to click through.',
       domainTitle: 'Your domain, if you own one',
       domainBody: 'We connect a domain you already have. A new one is quoted separately.',
@@ -109,7 +111,7 @@ export const translations = {
     faqPage: {
       eyebrow: 'FAQ',
       title: 'Questions on this page.',
-      sub: 'The same five answers. The chatbot here runs on the page — it is not a WhatsApp bot.',
+      sub: 'The same answers. The chatbot here runs on the page — it is not a WhatsApp bot.',
       botLabel: 'FAQ on this page',
     },
     pricing: {
@@ -182,7 +184,7 @@ export const translations = {
       hello: 'Ask anything about what we build. The answers are on this page. For a quote, send the brief on WhatsApp or email.',
       fallback: 'I only answer FAQs here. For a quote, WhatsApp 011 0005 4278 or email mohanad.barakat@mbai-group.com.',
       waCta: 'WhatsApp for a quote',
-      suggestions: ['What do I get?', 'How much is it?', 'Is this a WhatsApp website or a WhatsApp bot product?', 'Do you connect my domain?', 'How do I start?'],
+      suggestions: ['What do I get?', 'How much is it?', 'Is SEO included?', 'Is this a WhatsApp website or a WhatsApp bot product?', 'Do you connect my domain?', 'How do I start?'],
     },
   },
   ar: {
@@ -233,6 +235,8 @@ export const translations = {
       eyebrow: 'الخدمة',
       title: 'ده اللي بتاخده.',
       sub: 'باقة واحدة. الموقع، حجز على الصفحة، فورم بيوصل، وشات بوت للأسئلة. المواقع الأكبر بعد التفاصيل.',
+      chip: 'SEO · GEO · geo pricing متاح',
+      craft: 'الموقع بيتبني بسيو وGEO محلي جوّه — مش إضافة بعدين. محتاج أسعار تختلف حسب البلد؟ نقدر نضيف geo pricing.',
       previewHint: 'كل بند ديمو مختلف — افتح الأمثلة وجرّب.',
       domainTitle: 'الدومين لو عندك',
       domainBody: 'لو الدومين عندك بنوصّله. لو محتاج جديد، نسعّره لوحده.',
@@ -291,7 +295,7 @@ export const translations = {
     faqPage: {
       eyebrow: 'أسئلة',
       title: 'أسئلة على الصفحة.',
-      sub: 'نفس الخمس إجابات. الشات بوت هنا بيشتغل على الصفحة — مش بوت واتساب.',
+      sub: 'نفس الإجابات على الصفحة. الشات بوت هنا بيشتغل على الصفحة — مش بوت واتساب.',
       botLabel: 'أسئلة على الصفحة',
     },
     pricing: {
@@ -364,7 +368,7 @@ export const translations = {
       hello: 'اسأل عما نبنيه. الإجابات على الصفحة. لعرض السعر ابعت الموجز واتساب أو إيميل.',
       fallback: 'أجيب الأسئلة الشائعة هنا فقط. لعرض السعر واتساب ٠١١ ٠٠٠٥ ٤٢٧٨ أو إيميل mohanad.barakat@mbai-group.com.',
       waCta: 'واتساب لعرض سعر',
-      suggestions: ['إيه اللي باخده؟', 'كام السعر؟', 'ده موقع واتساب ولا منتج شات بوت؟', 'هتوصلوا الدومين؟', 'أبدأ إزاي؟'],
+      suggestions: ['إيه اللي باخده؟', 'كام السعر؟', 'السيو ضمن الخطة؟', 'ده موقع واتساب ولا منتج شات بوت؟', 'هتوصلوا الدومين؟', 'أبدأ إزاي؟'],
     },
   },
 }

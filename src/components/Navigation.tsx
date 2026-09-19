@@ -73,12 +73,12 @@ export default function Navigation() {
         <div
           className={`mx-auto flex h-[4.25rem] max-w-[1180px] items-center justify-between gap-3 rounded-full px-2.5 ps-2.5 pe-2.5 transition-all duration-300 ${
             scrolled || forceGlass
-              ? 'border border-white/12 bg-[#0A0A0B]/78 shadow-[0_22px_50px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl'
+              ? 'border border-white/12 bg-black/80 shadow-[0_22px_50px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl'
               : 'border border-white/10 bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl'
           }`}
         >
           <a href={localePath()} aria-label="AutoLeadss home" className="flex items-center rounded-full bg-white/10 py-1 pe-3.5 ps-1">
-            <Logo variant="dark" size={32} />
+            <Logo variant="dark" size={30} />
             <span className="ms-2 hidden font-mono text-[9px] uppercase tracking-[0.14em] text-white/45 sm:inline" dir="ltr">
               {SITE.cities}
             </span>

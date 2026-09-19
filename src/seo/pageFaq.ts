@@ -24,6 +24,11 @@ export const PAGE_FAQ: Record<Locale, PageFaqItem[]> = {
       a: 'No. We build a website. The chatbot runs on the page. WhatsApp is how you send a brief, and how contact forms can arrive.',
     },
     {
+      q: 'Is SEO included?',
+      keys: ['seo', 'geo', 'ranking', 'google', 'search', 'geo pricing', 'local'],
+      a: 'Yes. We build the site with SEO and local GEO in mind — titles, structure, and the places you serve. Geo pricing can be added when your offer needs different prices by country. We do not promise rankings or traffic numbers.',
+    },
+    {
       q: 'Do you connect my domain?',
       keys: ['domain', 'dns', 'connect', 'own'],
       a: 'Yes if you already own one. A new domain is quoted separately.',
@@ -49,6 +54,11 @@ export const PAGE_FAQ: Record<Locale, PageFaqItem[]> = {
       q: 'ده موقع واتساب ولا منتج شات بوت؟',
       keys: ['واتساب', 'شات بوت', 'منتج', 'سااس'],
       a: 'لأ. بنبني موقع. الشات بوت بيشتغل على الصفحة. واتساب عشان تبعت الموجز، والفورم ممكن يوصل عليه.',
+    },
+    {
+      q: 'السيو ضمن الخطة؟',
+      keys: ['سيو', 'seo', 'geo', 'جوجل', 'بحث', 'ترتيب'],
+      a: 'أه. الموقع بيتبني بسيو وGEO محلي جوّه — عناوين، هيكل، والأماكن اللي بتخدمها. لو محتاج أسعار تختلف حسب البلد نقدر نضيف geo pricing. من غير وعد بترتيب أو أرقام ترافيك.',
     },
     {
       q: 'هتوصلوا الدومين؟',
