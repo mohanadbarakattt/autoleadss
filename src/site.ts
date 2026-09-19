@@ -1,8 +1,9 @@
 export const SITE = {
   name: 'AutoLeadss',
-  email: 'info@autoleadss.com',
+  email: 'mohanad.barakat@mbai-group.com',
   whatsapp: '201100054278',
   whatsappDisplay: '+20 110 005 4278',
+  whatsappLocal: '011 0005 4278',
   waBase: 'https://wa.me/201100054278',
   mbai: 'https://mbai-group.com',
   origin: 'https://autoleadss.com',
@@ -17,4 +18,8 @@ export const WORK = [
 
 export function waLink(text: string) {
   return `${SITE.waBase}?text=${encodeURIComponent(text)}`
+}
+
+export function mailLink(text: string, subject: string) {
+  return `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`
 }

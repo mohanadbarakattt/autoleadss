@@ -5,6 +5,9 @@ import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
 import { useLocale } from '../i18n/LocaleProvider'
 import type { LegalDoc } from '../content/legal'
+import JsonLd from '../components/JsonLd'
+import SeoIcons from '../components/SeoIcons'
+import { innerPageGraph } from '../seo/jsonld'
 import { SITE } from '../site'
 import type { Locale } from '../i18n/translations'
 
@@ -31,7 +34,15 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
         <title>{doc.title} — {SITE.name}</title>
         <meta name="description" content={doc.intro} />
         <link rel="canonical" href={`${SITE.origin}${localePath(`/${kind}`)}`} />
+        <link rel="alternate" hrefLang="en" href={`${SITE.origin}/en/${kind}`} />
+        <link rel="alternate" hrefLang="ar" href={`${SITE.origin}/ar/${kind}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${SITE.origin}/en/${kind}`} />
+        <meta property="og:title" content={`${doc.title} — ${SITE.name}`} />
+        <meta property="og:description" content={doc.intro} />
+        <meta property="og:url" content={`${SITE.origin}${localePath(`/${kind}`)}`} />
       </Helmet>
+      <SeoIcons />
+      <JsonLd data={innerPageGraph(locale, `/${kind}`, `${doc.title} — ${SITE.name}`, doc.intro)} />
       <Navigation />
       <main className="section-padding pt-40">
         <div className="content-width max-w-3xl">

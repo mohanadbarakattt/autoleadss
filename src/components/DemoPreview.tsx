@@ -11,7 +11,7 @@ export default function DemoPreview({ demo, compact = false }: { demo: Demo; com
   return (
     <MacChrome url={demo.url} label={c.kind} compact={compact}>
       <div className="relative aspect-[16/10] overflow-hidden">
-        <img src={demo.img} alt={c.brand} className="absolute inset-0 h-full w-full object-cover" />
+        <img src={demo.img} alt={`${c.kind} website — ${c.brand}`} className="absolute inset-0 h-full w-full object-cover" />
         <div
           className="absolute inset-0"
           style={{
