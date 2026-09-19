@@ -20,7 +20,7 @@ const GET_ICONS = [
 export default function PricingPage() {
   const { locale, isRTL } = useLocale()
   const t = useT()
-  const title = `${t.pricing.title} | ${SITE.name}`
+  const title = t.seo.pricingTitle
   const description = t.seo.description
   const path = locale === 'ar' ? '/se3r' : '/pricing'
   const canonical = `${SITE.origin}/${locale}${path}`

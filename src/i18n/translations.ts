@@ -8,6 +8,7 @@ export const translations = {
       title: 'Website design in Egypt & Cairo | Landing pages, chatbot & booking | AutoLeadss',
       description:
         'Website and on-page FAQ chatbot for small businesses in Egypt and Cairo. Landing page, booking on the page, forms that arrive. Egypt 10,000 EGP · elsewhere $200. Quote on WhatsApp.',
+      pricingTitle: 'Website + chatbot package | 10,000 EGP or $200 | AutoLeadss',
       keywords:
         'website design Egypt, website design Cairo, landing page design Egypt, web design company Egypt, تصميم مواقع مصر, تصميم مواقع القاهرة, شركة تصميم مواقع, تصميم صفحات هبوط, عمل موقع الكتروني, موقع حجز مواعيد, شات بوت للمواقع, dentist website Egypt, cafe website Cairo, gym website Egypt, website chatbot, domain setup Egypt',
     },
@@ -175,6 +176,7 @@ export const translations = {
       title: 'تصميم مواقع في مصر والقاهرة | صفحات هبوط وشات بوت وحجز | أوتوليدز',
       description:
         'بنبني الموقع والشات بوت على الصفحة للمحلات في مصر والقاهرة. صفحة هبوط، حجز مواعيد على الصفحة، فورم بيوصل. مصر ١٠٬٠٠٠ جنيه · برا مصر ٢٠٠ دولار. عرض السعر على واتساب.',
+      pricingTitle: 'باكدج موقع وشات بوت | ١٠٬٠٠٠ جنيه أو ٢٠٠ دولار | أوتوليدز',
       keywords:
         'تصميم مواقع مصر, تصميم مواقع القاهرة, شركة تصميم مواقع, تصميم صفحات هبوط, عمل موقع الكتروني, برمجة مواقع مصر, موقع حجز مواعيد, شات بوت للمواقع, تصميم موقع عيادة, تصميم موقع كافيه, تصميم موقع جيم, website design Egypt, landing page Cairo',
     },

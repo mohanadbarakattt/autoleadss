@@ -13,25 +13,26 @@ const AREA_SERVED = [
   { '@type': 'City', name: 'Dubai' },
 ]
 
-const OFFER_EGP = {
-  '@type': 'Offer',
-  price: '10000',
-  priceCurrency: 'EGP',
-  availability: 'https://schema.org/InStock',
-  url: `${SITE.origin}/en`,
-  description:
-    'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Egypt. Half before we start. Half before handoff.',
-  areaServed: 'EG',
-}
-
-const OFFER_USD = {
-  '@type': 'Offer',
-  price: '200',
-  priceCurrency: 'USD',
-  availability: 'https://schema.org/InStock',
-  url: `${SITE.origin}/en`,
-  description:
-    'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Outside Egypt. Half before we start. Half before handoff.',
+function packageOffers(pageUrl: string) {
+  return [
+    {
+      '@type': 'Offer',
+      price: '10000',
+      priceCurrency: 'EGP',
+      url: pageUrl,
+      description:
+        'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Egypt. Half before we start. Half before handoff.',
+      areaServed: 'EG',
+    },
+    {
+      '@type': 'Offer',
+      price: '200',
+      priceCurrency: 'USD',
+      url: pageUrl,
+      description:
+        'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Outside Egypt. Half before we start. Half before handoff.',
+    },
+  ]
 }
 
 function faqEntities(locale: Locale) {
@@ -47,11 +48,10 @@ function faqEntities(locale: Locale) {
 
 function professionalService(locale: Locale, pageUrl: string) {
   const isAr = locale === 'ar'
-  return {
+  const node: Record<string, unknown> = {
     '@type': 'ProfessionalService',
     '@id': `${SITE.origin}/#business`,
     name: SITE.name,
-    alternateName: isAr ? 'أوتوليدز' : undefined,
     url: SITE.origin,
     email: SITE.email,
     telephone: '+201100054278',
@@ -73,11 +73,10 @@ function professionalService(locale: Locale, pageUrl: string) {
       availableLanguage: ['en', 'ar'],
       areaServed: ['EG', 'AE'],
     },
-    makesOffer: [
-      { ...OFFER_EGP, url: pageUrl },
-      { ...OFFER_USD, url: pageUrl },
-    ],
+    offers: packageOffers(pageUrl),
   }
+  if (isAr) node.alternateName = 'أوتوليدز'
+  return node
 }
 
 export function homeGraph(locale: Locale, title: string, description: string) {
@@ -129,66 +128,32 @@ export function homeGraph(locale: Locale, title: string, description: string) {
   }
 }
 
+/** Demo pages: WebPage only — no second ProfessionalService / business entity. */
 export function demoGraph(locale: Locale, id: DemoId) {
   const seo = DEMO_SEO[id][locale]
   const pageUrl = `${SITE.origin}/${locale}/demo/${id}`
-  const homeUrl = `${SITE.origin}/${locale}`
   return {
     '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebPage',
-        '@id': `${pageUrl}#webpage`,
-        url: pageUrl,
-        name: seo.title,
-        description: seo.description,
-        inLanguage: locale === 'ar' ? 'ar' : 'en',
-        isPartOf: {
-          '@type': 'WebSite',
-          '@id': `${SITE.origin}/#website`,
-          name: SITE.name,
-          url: SITE.origin,
-        },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: SITE.name, item: homeUrl },
-          { '@type': 'ListItem', position: 2, name: seo.title, item: pageUrl },
-        ],
-      },
-    ],
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    url: pageUrl,
+    name: seo.title,
+    description: seo.description,
+    inLanguage: locale === 'ar' ? 'ar' : 'en',
+    isPartOf: { '@id': `${SITE.origin}/#website` },
   }
 }
 
 export function innerPageGraph(locale: Locale, path: string, title: string, description: string) {
   const pageUrl = `${SITE.origin}/${locale}${path}`
-  const homeUrl = `${SITE.origin}/${locale}`
   return {
     '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebPage',
-        '@id': `${pageUrl}#webpage`,
-        url: pageUrl,
-        name: title,
-        description,
-        inLanguage: locale === 'ar' ? 'ar' : 'en',
-        isPartOf: {
-          '@type': 'WebSite',
-          '@id': `${SITE.origin}/#website`,
-          name: SITE.name,
-          url: SITE.origin,
-        },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: SITE.name, item: homeUrl },
-          { '@type': 'ListItem', position: 2, name: title, item: pageUrl },
-        ],
-      },
-    ],
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    url: pageUrl,
+    name: title,
+    description,
+    inLanguage: locale === 'ar' ? 'ar' : 'en',
+    isPartOf: { '@id': `${SITE.origin}/#website` },
   }
 }
-
