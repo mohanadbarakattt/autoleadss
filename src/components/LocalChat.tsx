@@ -54,7 +54,11 @@ export default function LocalChat({
   }, [copy.hello])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (!open) return
+    const el = bottomRef.current
+    if (!el) return
+    const pane = el.parentElement
+    if (pane) pane.scrollTop = pane.scrollHeight
   }, [messages, open])
 
   function ask(text: string) {
