@@ -90,7 +90,9 @@ export default function HeroStage() {
 
           <div className="flex flex-col justify-between gap-3 bg-[#EFECE4] p-4 md:col-span-5">
             <div className="flex items-center gap-2 border-b border-black/10 pb-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E7E48] text-[10px] font-bold text-white">AL</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold" style={{ background: cafe.accent, color: '#003824' }}>
+                Q
+              </span>
               <div className="leading-tight">
                 <p className="font-mono text-[11px] font-bold text-[#121110]">{m.chatName}</p>
                 <p className="font-mono text-[10px] text-[#1E7E48]">{m.typing}</p>
@@ -102,15 +104,8 @@ export default function HeroStage() {
                 <p className="text-[12px] leading-relaxed text-[#121110]">{m.userMsg}</p>
               </div>
               <div className="me-2 space-y-1 rounded-lg rounded-tl-none bg-[#1b3b2b] p-2.5 text-[#FAFAF7]">
-                <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-white/55">
-                  <span>{m.quoteLabel}</span>
-                  <span className="rounded bg-white px-1.5 py-0.5 font-bold text-[#1E7E48]">OK</span>
-                </div>
-                <p className="text-[12px] font-medium">{m.quoteBody}</p>
-                <div className="flex items-baseline justify-between border-t border-white/15 pt-1.5">
-                  <span className="font-mono text-[10px] text-white/50">{t.pricing.split}</span>
-                  <span className="font-mono text-sm font-bold text-[#fe8c58]">{m.quotePrice}</span>
-                </div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-white/55">{m.quoteLabel}</p>
+                <p className="text-[12px] font-medium leading-relaxed">{m.quoteBody}</p>
               </div>
             </div>
 

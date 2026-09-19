@@ -5,15 +5,20 @@ import { siteCopy } from '../../demos/siteCopy'
 import { useLocale } from '../../i18n/LocaleProvider'
 import DemoChrome, { DemoFaqs } from './DemoChrome'
 import DemoBook from './DemoBook'
+import LashGate, { isLashUnlocked } from './LashGate'
 
 export default function LashCartelDemo({ demo }: { demo: Demo }) {
   const { locale } = useLocale()
   const c = demo.copy[locale]
   const s = siteCopy.lashes[locale]
   const [slot, setSlot] = useState('')
+  const [unlocked, setUnlocked] = useState(isLashUnlocked)
 
   return (
-    <DemoChrome demo={demo}>
+    <DemoChrome demo={demo} bare chat={unlocked}>
+      {unlocked ? (
+        <>
+      <div id="studio">
       <header className="border-b border-white/10">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
           <div className="flex items-center gap-3">
@@ -38,7 +43,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
         </div>
       </header>
 
-      <section className="relative overflow-hidden">
+      <section id="hero" className="relative overflow-hidden">
         <div aria-hidden className="pointer-events-none absolute inset-0 grain-overlay opacity-70" />
         <div aria-hidden className="pointer-events-none absolute -top-24 end-[-10%] h-80 w-80 rounded-full bg-[#E8C9A8]/15 blur-[90px]" />
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-20 pt-10 lg:grid-cols-12">
@@ -62,7 +67,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
           </div>
           <div className="relative lg:col-span-6">
             <div className="overflow-hidden rounded-[1.6rem] border border-white/10">
-              <img src={demo.img} alt="" className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]" />
+              <img src={demo.img} alt={`${c.kind} website — ${c.brand}`} className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]" />
             </div>
             <div className="absolute -bottom-5 start-6 hidden max-w-xs rounded-2xl border border-[#E8C9A8]/25 bg-[#14110E]/90 p-4 backdrop-blur-md sm:block">
               <p className="font-mono text-[10px] uppercase tracking-widest text-[#E8C9A8]">{s.mapLabel}</p>
@@ -71,6 +76,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
           </div>
         </div>
       </section>
+      </div>
 
       <section id="sets" className="border-y border-white/10 bg-[#100E10] py-20">
         <div className="mx-auto max-w-6xl px-5">
@@ -84,7 +90,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
                 <div className="mt-6 overflow-hidden rounded-xl">
                   <img
                     src={demo.img}
-                    alt=""
+                    alt={`${c.kind} website — ${c.brand}`}
                     className="h-36 w-full object-cover opacity-80"
                     style={{ objectPosition: `${18 + i * 20}% 40%` }}
                   />
@@ -114,6 +120,17 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-white/10 px-5 py-10">
+        <div className="mx-auto max-w-6xl">
+          <p className="font-serif text-lg italic">{c.brand}</p>
+          <p className="mt-1 text-sm text-white/50">{s.footerNote}</p>
+        </div>
+      </footer>
+        </>
+      ) : (
+        <LashGate onUnlock={() => setUnlocked(true)} />
+      )}
     </DemoChrome>
   )
 }
