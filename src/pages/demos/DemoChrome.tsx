@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useLocale } from '../../i18n/LocaleProvider'
 import LocalChat from '../../components/LocalChat'
 import JsonLd from '../../components/JsonLd'
+import SeoIcons from '../../components/SeoIcons'
 import { SITE, waLink } from '../../site'
 import type { Demo } from '../../demos/data'
 import { siteCopy } from '../../demos/siteCopy'
@@ -33,6 +34,7 @@ export default function DemoChrome({ demo, children }: { demo: Demo; children: R
         <meta property="og:description" content={seo.description} />
         <meta property="og:url" content={canonical} />
       </Helmet>
+      <SeoIcons />
       <JsonLd data={demoGraph(locale, demo.id)} />
 
       <div

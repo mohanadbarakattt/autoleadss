@@ -62,7 +62,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
           </div>
           <div className="relative lg:col-span-6">
             <div className="overflow-hidden rounded-[1.6rem] border border-white/10">
-              <img src={demo.img} alt="" className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]" />
+              <img src={demo.img} alt={`${c.kind} website — ${c.brand}`} className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]" />
             </div>
             <div className="absolute -bottom-5 start-6 hidden max-w-xs rounded-2xl border border-[#E8C9A8]/25 bg-[#14110E]/90 p-4 backdrop-blur-md sm:block">
               <p className="font-mono text-[10px] uppercase tracking-widest text-[#E8C9A8]">{s.mapLabel}</p>
@@ -84,7 +84,7 @@ export default function LashCartelDemo({ demo }: { demo: Demo }) {
                 <div className="mt-6 overflow-hidden rounded-xl">
                   <img
                     src={demo.img}
-                    alt=""
+                    alt={`${c.kind} website — ${c.brand}`}
                     className="h-36 w-full object-cover opacity-80"
                     style={{ objectPosition: `${18 + i * 20}% 40%` }}
                   />

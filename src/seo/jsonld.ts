@@ -11,6 +11,7 @@ const AREA_SERVED = [
   { '@type': 'City', name: 'Alexandria' },
   { '@type': 'Country', name: 'United Arab Emirates' },
   { '@type': 'City', name: 'Dubai' },
+  { '@type': 'Place', name: 'Gulf' },
 ]
 
 function packageOffers(pageUrl: string) {

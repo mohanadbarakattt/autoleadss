@@ -1,16 +1,23 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
-import { DEMOS } from '../../demos/data'
+import { DEMOS, type DemoId } from '../../demos/data'
 import SectionHeading from '../SectionHeading'
 import DemoPreview from '../DemoPreview'
+import LashCartelProof from '../LashCartelProof'
+
+const FEATURED_ID: DemoId = 'lashes'
 
 export default function Examples() {
   const t = useT()
   const { locale, localePath } = useLocale()
 
-  const featured = DEMOS[0]
-  const rest = DEMOS.slice(1)
+  const featured = DEMOS.find(d => d.id === FEATURED_ID) ?? DEMOS[0]
+  const rest = DEMOS.filter(d => d.id !== featured.id)
+  const copyFor = (id: DemoId) => t.examples.items[DEMOS.findIndex(d => d.id === id)]
+
+  const featuredCopy = copyFor(featured.id)
+  const featuredDemoCopy = featured.copy[locale]
 
   return (
     <section id="examples" className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
@@ -25,27 +32,29 @@ export default function Examples() {
             </Link>
             <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-5">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-accent">{t.examples.items[0].kind}</p>
-                <p className="mt-2 font-display text-3xl font-bold text-white">{t.examples.items[0].name}</p>
-                <p className="mt-3 text-sm leading-relaxed text-white/60">{t.examples.items[0].body}</p>
+                <p className="text-[11px] uppercase tracking-[0.14em] text-accent">{featuredCopy?.kind ?? featuredDemoCopy.kind}</p>
+                <p className="mt-2 font-display text-3xl font-bold text-white">{featuredCopy?.name ?? featuredDemoCopy.brand}</p>
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{t.testimonial.packageLabel}</p>
+                <p className="mt-3 text-sm leading-relaxed text-white/60">{featuredCopy?.body ?? featuredDemoCopy.sub}</p>
+                <LashCartelProof compact showLink={false} />
               </div>
               <div className="mt-8">
                 <Link
                   to={localePath(`/demo/${featured.id}`)}
                   className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-medium text-[#0A0A0B]"
                 >
-                  {t.examples.open}
+                  {t.testimonial.openDemo}
                   <ArrowUpRight size={14} />
                 </Link>
-                <p className="mt-4 font-mono text-[10px] uppercase tracking-wider text-white/35">{featured.copy[locale].navBook}</p>
+                <p className="mt-4 font-mono text-[10px] uppercase tracking-wider text-white/35">{featuredDemoCopy.navBook}</p>
               </div>
             </div>
           </div>
         </article>
 
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
-          {rest.map((demo, i) => {
-            const item = t.examples.items[i + 1]
+          {rest.map(demo => {
+            const item = copyFor(demo.id)
             const c = demo.copy[locale]
             return (
               <article key={demo.id} className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-transform duration-300 hover:-translate-y-1">

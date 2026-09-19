@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import Logo from '../components/Logo'
+import SeoIcons from '../components/SeoIcons'
 import { SITE, waLink } from '../site'
 
 export default function NotFound() {
@@ -10,6 +11,7 @@ export default function NotFound() {
         <title>Page not found — {SITE.name}</title>
         <meta name="robots" content="noindex" />
       </Helmet>
+      <SeoIcons />
       <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(255,92,42,0.18) 0%, transparent 70%)' }} />
       <div className="relative z-10 flex flex-col items-center">
         <Logo variant="dark" size={36} />

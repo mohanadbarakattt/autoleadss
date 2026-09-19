@@ -5,6 +5,7 @@ import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { WORK } from '../../site'
 import SectionHeading from '../SectionHeading'
 import SiteShot from '../SiteShot'
+import LashCartelProof from '../LashCartelProof'
 
 function wrappedOffset(i: number, active: number, n: number) {
   let d = i - active
@@ -118,6 +119,11 @@ export default function Work() {
               ))}
             </div>
             <p className="mt-4 text-[11px] text-white/30">{t.work.hint}</p>
+          </div>
+
+          <div className="mx-auto mt-14 max-w-2xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">{t.testimonial.workLabel}</p>
+            <LashCartelProof compact />
           </div>
         </div>
       </div>

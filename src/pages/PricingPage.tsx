@@ -5,6 +5,7 @@ import ActionDock from '../components/ActionDock'
 import CookieConsent from '../components/CookieConsent'
 import PriceCard from '../components/PriceCard'
 import JsonLd from '../components/JsonLd'
+import SeoIcons from '../components/SeoIcons'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import { SITE } from '../site'
 import { innerPageGraph } from '../seo/jsonld'
@@ -39,6 +40,7 @@ export default function PricingPage() {
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
       </Helmet>
+      <SeoIcons />
       <JsonLd data={innerPageGraph(locale, path, title, description)} />
       <Navigation />
       <main className="section-padding pt-40">

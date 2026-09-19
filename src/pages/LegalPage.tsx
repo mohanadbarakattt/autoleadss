@@ -6,6 +6,7 @@ import Footer from '../components/Footer'
 import { useLocale } from '../i18n/LocaleProvider'
 import type { LegalDoc } from '../content/legal'
 import JsonLd from '../components/JsonLd'
+import SeoIcons from '../components/SeoIcons'
 import { innerPageGraph } from '../seo/jsonld'
 import { SITE } from '../site'
 import type { Locale } from '../i18n/translations'
@@ -40,6 +41,7 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
         <meta property="og:description" content={doc.intro} />
         <meta property="og:url" content={`${SITE.origin}${localePath(`/${kind}`)}`} />
       </Helmet>
+      <SeoIcons />
       <JsonLd data={innerPageGraph(locale, `/${kind}`, `${doc.title} — ${SITE.name}`, doc.intro)} />
       <Navigation />
       <main className="section-padding pt-40">

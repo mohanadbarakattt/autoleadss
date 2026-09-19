@@ -12,6 +12,7 @@ import ActionDock from './components/ActionDock'
 import ScrollProgress from './components/ScrollProgress'
 import CookieConsent from './components/CookieConsent'
 import JsonLd from './components/JsonLd'
+import SeoIcons from './components/SeoIcons'
 import { useLocale, useT } from './i18n/LocaleProvider'
 import { SITE } from './site'
 import { homeGraph } from './seo/jsonld'
@@ -47,6 +48,7 @@ export default function App() {
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
       </Helmet>
+      <SeoIcons />
       <JsonLd data={homeGraph(locale, title, description)} />
       <ScrollProgress />
       <Navigation />
