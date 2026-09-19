@@ -5,6 +5,7 @@ import { DEMOS, type DemoId } from '../../demos/data'
 import SectionHeading from '../SectionHeading'
 import DemoPreview from '../DemoPreview'
 import LashCartelProof from '../LashCartelProof'
+import LashCartelShowcase from '../LashCartelShowcase'
 
 const FEATURED_ID: DemoId = 'lashes'
 
@@ -27,9 +28,9 @@ export default function Examples() {
 
         <article className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_24px_60px_-36px_rgba(0,0,0,0.8)]">
           <div className="grid lg:grid-cols-12">
-            <Link to={localePath(`/demo/${featured.id}`)} className="group block lg:col-span-7">
-              <DemoPreview demo={featured} />
-            </Link>
+            <div className="lg:col-span-7 p-4 sm:p-5">
+              <LashCartelShowcase />
+            </div>
             <div className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-5">
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{t.testimonial.packageLabel}</p>

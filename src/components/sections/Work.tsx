@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { WORK } from '../../site'
 import SectionHeading from '../SectionHeading'
@@ -16,7 +17,7 @@ function wrappedOffset(i: number, active: number, n: number) {
 
 export default function Work() {
   const t = useT()
-  const { isRTL } = useLocale()
+  const { locale, localePath, isRTL } = useLocale()
   const [active, setActive] = useState(0)
   const n = WORK.length
   const copy = t.work.items[active]
@@ -121,9 +122,18 @@ export default function Work() {
             <p className="mt-4 text-[11px] text-white/30">{t.work.hint}</p>
           </div>
 
-          <div className="mx-auto mt-14 max-w-2xl rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">{t.testimonial.workLabel}</p>
-            <LashCartelProof compact />
+          <div className="mx-auto mt-14 grid max-w-5xl gap-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] lg:grid-cols-12">
+            <Link to={localePath('/demo/lashes')} className="block lg:col-span-6">
+              <img
+                src={`/demos/lashes/${locale === 'ar' ? 'ar' : 'en'}-hero.png`}
+                alt={t.testimonial.openDemo}
+                className="h-full min-h-[220px] w-full object-cover object-top"
+              />
+            </Link>
+            <div className="p-6 sm:p-8 lg:col-span-6">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">{t.testimonial.workLabel}</p>
+              <LashCartelProof compact />
+            </div>
           </div>
         </div>
       </div>

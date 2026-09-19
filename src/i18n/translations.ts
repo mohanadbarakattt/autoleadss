@@ -70,6 +70,12 @@ export const translations = {
       open: 'Open demo',
       note: 'Demos. Booking does not create a real appointment. Chatbot runs on the page.',
       packageNote: 'These five demos are the package — booking and the FAQ bot on the page.',
+      shots: [
+        { id: 'hero', label: 'Studio' },
+        { id: 'sets', label: 'Sets' },
+        { id: 'book', label: 'Booking' },
+        { id: 'chat', label: 'FAQ on the page' },
+      ],
       items: [
         { name: 'Qahwa House', kind: 'Roastery', body: 'Book a tasting table on Road 9. Ask the barista bot about grind and dispatch.' },
         { name: 'Nile Dental', kind: 'Clinic', body: 'Book a checkup. First-visit questions on the page.' },
@@ -246,6 +252,12 @@ export const translations = {
       open: 'افتح الديمو',
       note: 'ديموهات. الحجز مش حقيقي. الشات بوت شغال على الصفحة.',
       packageNote: 'الخمس ديموهات دي هي الباكدج — حجز وشات بوت على الصفحة.',
+      shots: [
+        { id: 'hero', label: 'الاستوديو' },
+        { id: 'sets', label: 'الستات' },
+        { id: 'book', label: 'الحجز' },
+        { id: 'chat', label: 'أسئلة على الصفحة' },
+      ],
       items: [
         { name: 'قهوة هاوس', kind: 'محمصة', body: 'احجز ترابيزة تذوق على شارع ٩. اسأل البوت عن الطحن والتوصيل.' },
         { name: 'نايل دينتال', kind: 'عيادة', body: 'احجز كشف. أسئلة أول زيارة على الصفحة.' },

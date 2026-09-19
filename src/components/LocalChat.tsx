@@ -149,7 +149,7 @@ export default function LocalChat({
   }
 
   return (
-    <div className={docked ? 'relative' : `fixed bottom-6 z-[60] ${side}`}>
+    <div className={docked ? 'relative' : `fixed bottom-6 z-[60] ${side}`} data-local-chat>
       {panel}
       <button
         type="button"

@@ -12,7 +12,17 @@ import { siteCopy } from '../../demos/siteCopy'
 import { DEMO_SEO } from '../../demos/seo'
 import { demoGraph } from '../../seo/jsonld'
 
-export default function DemoChrome({ demo, children }: { demo: Demo; children: ReactNode }) {
+export default function DemoChrome({
+  demo,
+  children,
+  bare = false,
+  chat = true,
+}: {
+  demo: Demo
+  children: ReactNode
+  bare?: boolean
+  chat?: boolean
+}) {
   const { locale, localePath, isRTL, switchLocale } = useLocale()
   const c = demo.copy[locale]
   const s = siteCopy[demo.id][locale]
@@ -37,64 +47,73 @@ export default function DemoChrome({ demo, children }: { demo: Demo; children: R
       <SeoIcons />
       <JsonLd data={demoGraph(locale, demo.id)} />
 
-      <div
-        className="border-b text-[11px]"
-        style={{
-          borderColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-          background: dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.7)',
-        }}
-      >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-2.5">
-          <Link to={localePath()} className="inline-flex items-center gap-1.5 opacity-70 hover:opacity-100">
-            <BackIcon size={13} />
-            AutoLeadss
-          </Link>
-          <p className="hidden opacity-55 sm:block">{s.ribbon}</p>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => switchLocale(locale === 'en' ? 'ar' : 'en')}
-              className="opacity-70 hover:opacity-100"
-            >
-              {locale === 'en' ? 'عربي' : 'EN'}
-            </button>
-            <a
-              href={waLink(s.wantWa)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium"
-              style={{ color: demo.accent }}
-            >
-              {s.want}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {children}
-
-      <footer
-        className="border-t px-5 py-10"
-        style={{ borderColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="font-display text-lg font-bold">{c.brand}</p>
-            <p className="mt-1 text-sm opacity-60">{s.footerNote}</p>
-          </div>
-          <a
-            href={waLink(s.wantWa)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-fit rounded-full px-5 py-2.5 text-sm font-semibold text-[#111]"
-            style={{ background: demo.accent }}
+      {bare ? (
+        <>
+          {children}
+          {chat ? <LocalChat copy={c.chat} accent={demo.accent} rtl={isRTL} /> : null}
+        </>
+      ) : (
+        <>
+          <div
+            className="border-b text-[11px]"
+            style={{
+              borderColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              background: dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.7)',
+            }}
           >
-            {s.want}
-          </a>
-        </div>
-      </footer>
+            <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-2.5">
+              <Link to={localePath()} className="inline-flex items-center gap-1.5 opacity-70 hover:opacity-100">
+                <BackIcon size={13} />
+                AutoLeadss
+              </Link>
+              <p className="hidden opacity-55 sm:block">{s.ribbon}</p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => switchLocale(locale === 'en' ? 'ar' : 'en')}
+                  className="opacity-70 hover:opacity-100"
+                >
+                  {locale === 'en' ? 'عربي' : 'EN'}
+                </button>
+                <a
+                  href={waLink(s.wantWa)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium"
+                  style={{ color: demo.accent }}
+                >
+                  {s.want}
+                </a>
+              </div>
+            </div>
+          </div>
 
-      <LocalChat copy={c.chat} accent={demo.accent} rtl={isRTL} />
+          {children}
+
+          <footer
+            className="border-t px-5 py-10"
+            style={{ borderColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
+          >
+            <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="font-display text-lg font-bold">{c.brand}</p>
+                <p className="mt-1 text-sm opacity-60">{s.footerNote}</p>
+              </div>
+              <a
+                href={waLink(s.wantWa)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-fit rounded-full px-5 py-2.5 text-sm font-semibold text-[#111]"
+                style={{ background: demo.accent }}
+              >
+                {s.want}
+              </a>
+            </div>
+          </footer>
+
+          <LocalChat copy={c.chat} accent={demo.accent} rtl={isRTL} />
+        </>
+      )}
     </div>
   )
 }
