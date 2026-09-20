@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import type { Locale } from '../i18n/translations'
 import Logo from './Logo'
+import { trackLeadFormConversion } from '../analytics'
 import { SITE, waLink } from '../site'
 
 const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR' }
@@ -114,6 +115,7 @@ export default function Navigation() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackLeadFormConversion}
               className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white shadow-[0_10px_28px_-8px_rgba(30,126,72,0.55)] transition-transform hover:-translate-y-0.5"
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
@@ -157,6 +159,7 @@ export default function Navigation() {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={trackLeadFormConversion}
                   className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white"
                 >
                   {t.nav.cta}

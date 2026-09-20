@@ -6,6 +6,7 @@ import { useLocale } from '../../i18n/LocaleProvider'
 import LocalChat from '../../components/LocalChat'
 import JsonLd from '../../components/JsonLd'
 import SeoIcons from '../../components/SeoIcons'
+import { trackLeadFormConversion } from '../../analytics'
 import { SITE, waLink } from '../../site'
 import type { Demo } from '../../demos/data'
 import { siteCopy } from '../../demos/siteCopy'
@@ -79,6 +80,7 @@ export default function DemoChrome({
                   href={waLink(s.wantWa)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={trackLeadFormConversion}
                   className="font-medium"
                   style={{ color: demo.accent }}
                 >
@@ -103,6 +105,7 @@ export default function DemoChrome({
                 href={waLink(s.wantWa)}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={trackLeadFormConversion}
                 className="inline-flex w-fit rounded-full px-5 py-2.5 text-sm font-semibold text-[#111]"
                 style={{ background: demo.accent }}
               >

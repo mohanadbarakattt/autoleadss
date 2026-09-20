@@ -1,6 +1,7 @@
 import LocalChat from './LocalChat'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import { PAGE_FAQ } from '../seo/pageFaq'
+import { trackLeadFormConversion } from '../analytics'
 import { waLink } from '../site'
 
 export default function ChatWidget({ docked = false, inline = false }: { docked?: boolean; inline?: boolean }) {
@@ -30,6 +31,7 @@ export default function ChatWidget({ docked = false, inline = false }: { docked?
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={trackLeadFormConversion}
           className="block bg-wa py-2.5 text-center text-xs font-medium text-white"
         >
           {t.chat.waCta}

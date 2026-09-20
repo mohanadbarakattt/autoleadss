@@ -1,6 +1,7 @@
 import { motion, type Variants } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
 import HeroStage from '../HeroStage'
 
@@ -104,6 +105,7 @@ export default function Hero() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackLeadFormConversion}
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-3.5 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)] sm:px-8 sm:py-4"

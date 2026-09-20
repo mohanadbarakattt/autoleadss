@@ -1,3 +1,4 @@
+import { trackLeadFormConversion } from '../analytics'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import { waLink } from '../site'
 
@@ -14,6 +15,7 @@ export default function WhatsAppButton({ docked = false }: { docked?: boolean })
         target="_blank"
         rel="noopener noreferrer"
         aria-label={t.whatsappTip}
+        onClick={trackLeadFormConversion}
         className="flex items-center gap-2.5 rounded-full bg-wa px-4 py-3 text-white shadow-[0_12px_32px_-10px_rgba(30,126,72,0.7)] transition-transform hover:scale-[1.03]"
       >
         <span className="relative flex h-2.5 w-2.5">
@@ -37,6 +39,7 @@ export default function WhatsAppButton({ docked = false }: { docked?: boolean })
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t.whatsappTip}
+      onClick={trackLeadFormConversion}
       className={`group fixed bottom-6 z-[60] flex items-center justify-center rounded-full shadow-lg hover:scale-105 transition-transform ${pos}`}
       style={{ width: 52, height: 52, background: '#1E7E48' }}
     >
