@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { trackLeadFormConversion } from '../analytics'
 import { useT } from '../i18n/LocaleProvider'
 import { useEgypt } from '../hooks/useEgypt'
 import { mailLink, waLink } from '../site'
@@ -52,12 +53,14 @@ export default function PriceCard({ id }: { id?: string }) {
         href={wa}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={trackLeadFormConversion}
         className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-wa px-6 py-3.5 text-sm font-medium text-white"
       >
         {t.pricing.cta}
       </a>
       <a
         href={mail}
+        onClick={trackLeadFormConversion}
         className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-[#1b3b2b]/20 bg-white px-6 py-3 text-sm font-medium text-[#121110] hover:border-[#1b3b2b]/40"
       >
         {t.pricing.mailCta}

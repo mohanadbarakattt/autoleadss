@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import Logo from '../components/Logo'
 import SeoIcons from '../components/SeoIcons'
+import { trackLeadFormConversion } from '../analytics'
 import { SITE, waLink } from '../site'
 
 export default function NotFound() {
@@ -35,7 +36,7 @@ export default function NotFound() {
             الصفحة الرئيسية
           </a>
         </div>
-        <a href={wa} target="_blank" rel="noopener noreferrer" className="mt-6 text-xs text-white/40 underline-offset-4 hover:text-white/70 hover:underline">
+        <a href={wa} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} className="mt-6 text-xs text-white/40 underline-offset-4 hover:text-white/70 hover:underline">
           WhatsApp a quote
         </a>
       </div>
