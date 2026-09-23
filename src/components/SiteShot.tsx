@@ -18,7 +18,7 @@ export default function SiteShot({ src, url, alt, className = '', compact = fals
         </span>
       </div>
       <div className="relative overflow-hidden bg-[#111113]">
-        <img src={src} alt={alt} className="block h-auto w-full" />
+        <img src={src} alt={alt} loading="lazy" decoding="async" className="block h-auto w-full" />
       </div>
     </div>
   )

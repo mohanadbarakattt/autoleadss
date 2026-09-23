@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
@@ -8,12 +8,16 @@ import { LocaleProvider } from './i18n/LocaleProvider'
 import NotFound from './pages/NotFound'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
-import DemoPage, { DemoRedirect } from './pages/DemoPage'
+import DemoRedirect from './pages/DemoRedirect'
+
+const DemoPage = lazy(() => import('./pages/DemoPage'))
+const VerticalLanding = lazy(() => import('./pages/VerticalLanding'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
       <BrowserRouter>
+        <Suspense fallback={<div className="min-h-screen bg-[#0A0A0B]" />}>
         <Routes>
           <Route path="/" element={<LocaleProvider locale="en" persist={false}><App /></LocaleProvider>} />
           <Route path="/demo/:kind" element={<DemoRedirect />} />
@@ -23,10 +27,12 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/en/terms" element={<LocaleProvider locale="en"><Terms /></LocaleProvider>} />
           <Route path="/ar/privacy" element={<LocaleProvider locale="ar"><Privacy /></LocaleProvider>} />
           <Route path="/ar/terms" element={<LocaleProvider locale="ar"><Terms /></LocaleProvider>} />
+          <Route path="/en/:slug" element={<LocaleProvider locale="en"><VerticalLanding /></LocaleProvider>} />
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </HelmetProvider>
   </StrictMode>,

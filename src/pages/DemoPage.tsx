@@ -1,4 +1,4 @@
-import { Navigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { demoById } from '../demos/data'
 import NotFound from './NotFound'
 import CafeDemo from './demos/CafeDemo'
@@ -17,9 +17,4 @@ export default function DemoPage() {
   if (demo.id === 'gym') return <GymDemo demo={demo} />
   if (demo.id === 'lashes') return <LashCartelDemo demo={demo} />
   return <AgencyDemo demo={demo} />
-}
-
-export function DemoRedirect() {
-  const { kind } = useParams()
-  return <Navigate to={`/en/demo/${kind ?? ''}`} replace />
 }

@@ -23,6 +23,7 @@ export function hasAnalyticsConsent(): boolean {
 
 function save(analytics: boolean) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  window.dispatchEvent(new CustomEvent('autoleadss:consent', { detail: { analytics } }))
 }
 
 export default function CookieConsent() {
@@ -43,10 +44,10 @@ export default function CookieConsent() {
       role="region"
       aria-label="Cookie consent"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card"
+      className="fixed bottom-3 left-3 right-3 z-50 mx-auto max-w-4xl rounded-2xl border border-border bg-card/95 shadow-2xl backdrop-blur-md sm:left-6 sm:right-6"
     >
-      <div className="mx-auto max-w-3xl px-4 py-4 sm:px-6">
-        <p className="text-sm text-foreground">{c.body}</p>
+      <div className="px-4 py-3 sm:flex sm:items-center sm:gap-5 sm:px-5">
+        <p className="min-w-0 flex-1 text-sm text-foreground">{c.body}</p>
 
         {manage && (
           <label className="mt-3 flex items-center gap-2 text-sm text-muted-fg">
@@ -60,7 +61,7 @@ export default function CookieConsent() {
           </label>
         )}
 
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex shrink-0 flex-wrap gap-2 sm:mt-0">
           <button
             type="button"
             onClick={() => { save(true); setVisible(false) }}

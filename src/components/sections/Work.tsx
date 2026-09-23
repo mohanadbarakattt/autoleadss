@@ -37,6 +37,20 @@ export default function Work() {
       <div className="content-width relative z-10">
         <SectionHeading dark eyebrow={t.work.eyebrow} title={t.work.title} sub={t.work.sub} />
 
+        <div className="mb-14 grid gap-4 md:grid-cols-3">
+          {[
+            ['Live product', 'TUT', 'Travel product built and operated by the same studio.'],
+            ['Live product', 'IBNI', 'Commerce tooling built for Egyptian sellers.'],
+            ['Ongoing client work', 'Lash Cartel', 'Website demo plus continued UGC ad and ad-management work.'],
+          ].map(([label, name, body]) => (
+            <article key={name} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-[#4ade80]">{label}</p>
+              <h3 className="mt-2 font-display text-xl font-bold text-white">{name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/55">{body}</p>
+            </article>
+          ))}
+        </div>
+
         <div className="relative mx-auto max-w-5xl">
           <div
             role="listbox"

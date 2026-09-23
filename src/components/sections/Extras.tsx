@@ -22,7 +22,7 @@ export default function Extras() {
               className="overflow-hidden rounded-2xl border border-border bg-card"
             >
               <div className="relative h-40 overflow-hidden">
-                <img src={IMAGES[i]} alt="" className="h-full w-full object-cover" />
+                <img src={IMAGES[i]} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </div>
               <div className="p-6">
                 <p className="eyebrow text-accent">0{i + 1}</p>

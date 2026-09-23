@@ -155,7 +155,7 @@ export const translations = {
       terms: 'Terms',
     },
     cookieConsent: {
-      body: 'We use essential cookies to run this site. Optional cookies are only for analytics if we add them later.',
+      body: 'Essential cookies keep the site working. With permission, analytics help us measure demo and WhatsApp conversions.',
       acceptAll: 'Accept all',
       rejectAll: 'Reject non-essential',
       manage: 'Manage',
@@ -375,7 +375,7 @@ export const translations = {
       terms: 'الشروط',
     },
     cookieConsent: {
-      body: 'نستخدم ملفات تعريف أساسية لتشغيل الموقع. الاختيارية للتحليلات فقط إن أضفناها لاحقاً.',
+      body: 'الملفات الأساسية تشغّل الموقع. بموافقتك، تساعدنا التحليلات في قياس فتح الديموهات والتواصل عبر واتساب.',
       acceptAll: 'قبول الكل',
       rejectAll: 'رفض غير الضروري',
       manage: 'إدارة',

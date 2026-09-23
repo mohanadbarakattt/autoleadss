@@ -45,6 +45,7 @@ export default function LocalChat({
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Msg[]>([{ role: 'bot', text: copy.hello }])
+  const [questions, setQuestions] = useState(0)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -59,7 +60,9 @@ export default function LocalChat({
     const q = text.trim()
     if (!q) return
     const a = answerFor(q, copy.faq, copy.fallback)
-    setMessages(m => [...m, { role: 'user', text: q }, { role: 'bot', text: a }])
+    const followUp = questions === 0 ? ' Tell me your business type and I can point you to the closest demo.' : ''
+    setMessages(m => [...m, { role: 'user', text: q }, { role: 'bot', text: a + followUp }])
+    setQuestions(n => n + 1)
     setInput('')
   }
 
@@ -129,6 +132,11 @@ export default function LocalChat({
               <Send size={14} />
             </button>
           </form>
+          {questions >= 2 && (
+            <a href="#quote-builder" onClick={() => setOpen(false)} className="border-t border-neutral-200 bg-neutral-950 px-4 py-2.5 text-center text-xs font-semibold text-white">
+              Build my quote
+            </a>
+          )}
           {footer}
         </div>
       )}

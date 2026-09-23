@@ -12,6 +12,8 @@ import Footer from './components/Footer'
 import ActionDock from './components/ActionDock'
 import ScrollProgress from './components/ScrollProgress'
 import CookieConsent from './components/CookieConsent'
+import Analytics from './components/Analytics'
+import QuoteBuilder from './components/sections/QuoteBuilder'
 import { useLocale, useT } from './i18n/LocaleProvider'
 import { SITE } from './site'
 
@@ -101,6 +103,7 @@ export default function App() {
         </script>
       </Helmet>
       <ScrollProgress />
+      <Analytics />
       <Navigation />
       <main>
         <Hero />
@@ -109,6 +112,7 @@ export default function App() {
         <Work />
         <Extras />
         <Pricing />
+        <QuoteBuilder />
         <Process />
         <Contact />
       </main>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useT } from '../../i18n/LocaleProvider'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { useEgypt } from '../../hooks/useEgypt'
 import { waLink } from '../../site'
 
@@ -13,6 +13,7 @@ const GET_ICONS = [
 
 export default function Offer() {
   const t = useT()
+  const { isRTL } = useLocale()
   const egypt = useEgypt()
   const [egp, setEgp] = useState(egypt)
   const wa = waLink(t.hero.waText)
@@ -42,6 +43,8 @@ export default function Offer() {
                   <img
                     src={GET_ICONS[i]}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-14 w-14 shrink-0 rounded-xl border border-border bg-white object-cover"
                   />
                   <div className="min-w-0 pt-0.5">
@@ -51,6 +54,21 @@ export default function Offer() {
                 </li>
               ))}
             </ul>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-white p-5">
+                <p className="font-display text-base font-bold">{isRTL ? 'ضمن الباقة' : 'Included in the package'}</p>
+                <ul className="mt-3 space-y-2 text-sm text-muted-fg">
+                  {(isRTL ? ['صفحة هبوط واحدة مركزة', 'حتى ٤ منتجات أو خدمات', 'عربي أو إنجليزي أو الاثنين', 'جولتان من التعديلات', 'حجز ونموذج ليدز ومساعد أسئلة محلي', 'توصيل الدومين الموجود', '١٤ يوماً لإصلاحات ما بعد الإطلاق'] : ['One focused landing page', 'Up to 4 featured products or services', 'English, Arabic, or bilingual', '2 revision rounds', 'Booking, lead form, and local FAQ assistant', 'Your existing domain connected', '14 days of post-launch fixes']).map(item => <li key={item}>✓ {item}</li>)}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-border bg-[#F7F5F0] p-5">
+                <p className="font-display text-base font-bold">{isRTL ? 'بتسعير منفصل' : 'Quoted separately'}</p>
+                <ul className="mt-3 space-y-2 text-sm text-muted-fg">
+                  {(isRTL ? ['تسجيل دومين جديد', 'مواقع كبيرة متعددة الصفحات', 'أكثر من ٤ منتجات', 'متجر إلكتروني ودفع أونلاين', 'استضافة أو صيانة مستمرة', 'تكاملات ولوحات تحكم مخصصة'] : ['New domain registration', 'Large multi-page sites', 'More than 4 products', 'E-commerce and online payments', 'Ongoing hosting or maintenance', 'Custom integrations and dashboards']).map(item => <li key={item}>— {item}</li>)}
+                </ul>
+              </div>
+            </div>
           </div>
 
           <aside className="lg:col-span-5 lg:sticky lg:top-24">
