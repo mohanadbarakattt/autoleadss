@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
 import { useT } from '../../i18n/LocaleProvider'
-import { waLink } from '../../site'
+import { trackLeadFormConversion } from '../../analytics'
+import { mailLink, waLink } from '../../site'
 
 export default function Contact() {
   const t = useT()
   const wa = waLink(t.hero.waText)
+  const mail = mailLink(t.hero.waText, t.hero.mailSubject)
   return (
     <section id="contact" className="section-padding bg-paper">
       <div className="content-width">
@@ -30,17 +32,27 @@ export default function Contact() {
             </motion.h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-white/55 md:mx-0">{t.cta.body}</p>
           </div>
-          <motion.a
-            href={wa}
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ y: -3, scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full bg-wa px-8 py-4 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)]"
-          >
-            <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-            {t.cta.button}
-          </motion.a>
+          <div className="relative z-10 flex w-full max-w-sm flex-col gap-3">
+            <motion.a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={trackLeadFormConversion}
+              whileHover={{ y: -3, scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-wa px-8 py-4 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)]"
+            >
+              <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+              {t.cta.button}
+            </motion.a>
+            <a
+              href={mail}
+              onClick={trackLeadFormConversion}
+              className="inline-flex items-center justify-center rounded-full border border-white/20 px-8 py-3.5 text-sm font-medium text-white/90 hover:border-white/40"
+            >
+              {t.cta.mail}
+            </a>
+          </div>
         </div>
       </div>
     </section>

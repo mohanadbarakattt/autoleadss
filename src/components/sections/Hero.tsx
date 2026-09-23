@@ -1,5 +1,7 @@
 import { motion, type Variants } from 'framer-motion'
-import { useT } from '../../i18n/LocaleProvider'
+import { Link } from 'react-router-dom'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
 import HeroStage from '../HeroStage'
 
@@ -14,8 +16,10 @@ const fadeUp: Variants = {
 
 export default function Hero() {
   const t = useT()
+  const { localePath } = useLocale()
   const wa = waLink(t.hero.waText)
   const loop = [...t.hero.marquee, ...t.hero.marquee]
+  const cafeName = t.examples.items[0].name
 
   return (
     <section className="relative overflow-hidden" style={{ background: '#0A0A0B' }}>
@@ -46,7 +50,7 @@ export default function Hero() {
         />
       </div>
 
-      <div className="content-width relative z-10 grid items-center gap-12 pb-16 pt-32 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10 lg:pt-36">
+      <div className="content-width relative z-10 grid items-center gap-12 pb-20 pt-32 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10 lg:pb-16 lg:pt-36">
         <div>
           <motion.p
             custom={0}
@@ -96,14 +100,15 @@ export default function Hero() {
             ))}
           </motion.ul>
 
-          <motion.div custom={0.24} variants={fadeUp} initial="hidden" animate="show" className="mt-10 flex flex-wrap items-center gap-4">
+          <motion.div custom={0.24} variants={fadeUp} initial="hidden" animate="show" className="mt-8 flex flex-row flex-wrap items-center gap-2 sm:mt-10 sm:gap-3">
             <motion.a
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackLeadFormConversion}
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 rounded-full bg-wa px-8 py-4 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)]"
+              className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-3.5 text-sm font-medium text-white shadow-[0_12px_36px_-8px_rgba(30,126,72,0.45)] sm:px-8 sm:py-4"
             >
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/80" />
@@ -111,7 +116,13 @@ export default function Hero() {
               </span>
               {t.hero.cta}
             </motion.a>
-            <p className="text-xs text-white/40">{t.hero.proof}</p>
+            <Link
+              to={localePath('/demo/cafe')}
+              className="inline-flex items-center rounded-full border border-white/20 px-5 py-3.5 text-sm font-medium text-white/85 hover:border-white/40 hover:text-white sm:px-6 sm:py-4"
+            >
+              {t.hero.openDemo}
+              <span className="hidden sm:inline"> · {cafeName}</span>
+            </Link>
           </motion.div>
         </div>
 

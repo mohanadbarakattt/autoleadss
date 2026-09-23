@@ -10,6 +10,69 @@
     <loc>https://autoleadss.com/ar</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en" />
     <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/pricing" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/se3r" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/pricing" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/se3r</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/pricing" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/se3r" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/pricing" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/demo/cafe</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/cafe" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/cafe" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/demo/cafe</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/cafe" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/cafe" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/demo/dentist</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/dentist" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/dentist" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/demo/dentist</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/dentist" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/dentist" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/demo/gym</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/gym" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/gym" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/demo/gym</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/gym" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/gym" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/demo/agency</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/agency" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/agency" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/demo/agency</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/agency" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/agency" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/en/demo/lashes</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/lashes" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/lashes" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/demo/lashes</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/lashes" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/lashes" />
   </url>
   <url><loc>https://autoleadss.com/en/privacy</loc></url>
   <url><loc>https://autoleadss.com/en/terms</loc></url>

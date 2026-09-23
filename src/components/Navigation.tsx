@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import type { Locale } from '../i18n/translations'
 import Logo from './Logo'
+import { trackLeadFormConversion } from '../analytics'
 import { SITE, waLink } from '../site'
 
 const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR' }
@@ -39,18 +40,19 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const wa = waLink(t.hero.waText)
-  const forceGlass = /privacy|terms/.test(location.pathname)
+  const forceGlass = /privacy|terms|pricing|se3r/.test(location.pathname)
 
+  const home = localePath()
   const navLinks = [
-    { label: t.nav.offer, href: '#offer' },
-    { label: t.nav.examples, href: '#examples' },
-    { label: t.nav.work, href: '#work' },
-    { label: t.nav.pricing, href: '#pricing' },
-    { label: t.nav.process, href: '#process' },
+    { label: t.nav.offer, href: `${home}#offer`, id: 'offer' },
+    { label: t.nav.examples, href: `${home}#examples`, id: 'examples' },
+    { label: t.nav.work, href: `${home}#work`, id: 'work' },
+    { label: t.nav.pricing, href: `${home}#pricing`, id: 'pricing' },
+    { label: t.nav.process, href: `${home}#process`, id: 'process' },
   ]
 
   useEffect(() => {
-    const ids = navLinks.map(l => l.href.slice(1))
+    const ids = navLinks.map(l => l.id)
     const onScroll = () => {
       setScrolled(window.scrollY > 40)
       const y = window.scrollY + 140
@@ -72,12 +74,12 @@ export default function Navigation() {
         <div
           className={`mx-auto flex h-[4.25rem] max-w-[1180px] items-center justify-between gap-3 rounded-full px-2.5 ps-2.5 pe-2.5 transition-all duration-300 ${
             scrolled || forceGlass
-              ? 'border border-white/12 bg-[#0A0A0B]/78 shadow-[0_22px_50px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl'
+              ? 'border border-white/12 bg-black/80 shadow-[0_22px_50px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl'
               : 'border border-white/10 bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl'
           }`}
         >
           <a href={localePath()} aria-label="AutoLeadss home" className="flex items-center rounded-full bg-white/10 py-1 pe-3.5 ps-1">
-            <Logo variant="dark" size={32} />
+            <Logo variant="dark" size={30} />
             <span className="ms-2 hidden font-mono text-[9px] uppercase tracking-[0.14em] text-white/45 sm:inline" dir="ltr">
               {SITE.cities}
             </span>
@@ -85,7 +87,7 @@ export default function Navigation() {
 
           <nav className="relative hidden items-center rounded-full bg-black/30 p-1 lg:flex">
             {navLinks.map(link => {
-              const on = active === link.href.slice(1)
+              const on = active === link.id
               return (
                 <a
                   key={link.href}
@@ -113,6 +115,7 @@ export default function Navigation() {
               href={wa}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackLeadFormConversion}
               className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white shadow-[0_10px_28px_-8px_rgba(30,126,72,0.55)] transition-transform hover:-translate-y-0.5"
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
@@ -156,6 +159,7 @@ export default function Navigation() {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={trackLeadFormConversion}
                   className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white"
                 >
                   {t.nav.cta}

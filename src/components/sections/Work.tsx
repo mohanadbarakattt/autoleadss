@@ -1,10 +1,12 @@
 import { useState, type KeyboardEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { WORK } from '../../site'
 import SectionHeading from '../SectionHeading'
 import SiteShot from '../SiteShot'
+import LashCartelProof from '../LashCartelProof'
 
 function wrappedOffset(i: number, active: number, n: number) {
   let d = i - active
@@ -15,7 +17,7 @@ function wrappedOffset(i: number, active: number, n: number) {
 
 export default function Work() {
   const t = useT()
-  const { isRTL } = useLocale()
+  const { locale, localePath, isRTL } = useLocale()
   const [active, setActive] = useState(0)
   const n = WORK.length
   const copy = t.work.items[active]
@@ -28,7 +30,7 @@ export default function Work() {
   }
 
   return (
-    <section id="work" className="section-padding relative overflow-hidden" style={{ background: '#0A0A0B' }}>
+    <section id="work" className="section-padding relative scroll-mt-28 overflow-hidden" style={{ background: '#0A0A0B' }}>
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[42%] h-[420px] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
@@ -36,6 +38,7 @@ export default function Work() {
       />
       <div className="content-width relative z-10">
         <SectionHeading dark eyebrow={t.work.eyebrow} title={t.work.title} sub={t.work.sub} />
+        <p className="-mt-8 mb-10 max-w-xl text-sm text-white/45">{t.work.packageNote}</p>
 
         <div className="mb-14 grid gap-4 md:grid-cols-3">
           {[
@@ -131,6 +134,20 @@ export default function Work() {
               ))}
             </div>
             <p className="mt-4 text-[11px] text-white/30">{t.work.hint}</p>
+          </div>
+
+          <div className="mx-auto mt-14 grid max-w-5xl gap-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] lg:grid-cols-12">
+            <Link to={localePath('/demo/lashes')} className="block lg:col-span-6">
+              <img
+                src={`/demos/lashes/${locale === 'ar' ? 'ar' : 'en'}-hero.png`}
+                alt={t.testimonial.openDemo}
+                className="h-full min-h-[220px] w-full object-cover object-top"
+              />
+            </Link>
+            <div className="p-6 sm:p-8 lg:col-span-6">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">{t.testimonial.workLabel}</p>
+              <LashCartelProof compact />
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App'
@@ -9,6 +9,7 @@ import NotFound from './pages/NotFound'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import DemoRedirect from './pages/DemoRedirect'
+import PricingPage from './pages/PricingPage'
 
 const DemoPage = lazy(() => import('./pages/DemoPage'))
 const VerticalLanding = lazy(() => import('./pages/VerticalLanding'))
@@ -27,7 +28,13 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/en/terms" element={<LocaleProvider locale="en"><Terms /></LocaleProvider>} />
           <Route path="/ar/privacy" element={<LocaleProvider locale="ar"><Privacy /></LocaleProvider>} />
           <Route path="/ar/terms" element={<LocaleProvider locale="ar"><Terms /></LocaleProvider>} />
+          <Route path="/en/pricing" element={<LocaleProvider locale="en"><PricingPage /></LocaleProvider>} />
+          <Route path="/ar/se3r" element={<LocaleProvider locale="ar"><PricingPage /></LocaleProvider>} />
+          <Route path="/ar/pricing" element={<LocaleProvider locale="ar"><PricingPage /></LocaleProvider>} />
+          <Route path="/pricing" element={<Navigate to="/en/pricing" replace />} />
           <Route path="/en/:slug" element={<LocaleProvider locale="en"><VerticalLanding /></LocaleProvider>} />
+          <Route path="/en" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
+          <Route path="/ar" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
           <Route path="/en/*" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar/*" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />
           <Route path="*" element={<NotFound />} />

@@ -1,5 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import Logo from '../components/Logo'
+import SeoIcons from '../components/SeoIcons'
+import { trackLeadFormConversion } from '../analytics'
 import { SITE, waLink } from '../site'
 
 export default function NotFound() {
@@ -10,6 +12,7 @@ export default function NotFound() {
         <title>Page not found — {SITE.name}</title>
         <meta name="robots" content="noindex" />
       </Helmet>
+      <SeoIcons />
       <div aria-hidden className="absolute inset-0 opacity-60" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(255,92,42,0.18) 0%, transparent 70%)' }} />
       <div className="relative z-10 flex flex-col items-center">
         <Logo variant="dark" size={36} />
@@ -33,7 +36,7 @@ export default function NotFound() {
             الصفحة الرئيسية
           </a>
         </div>
-        <a href={wa} target="_blank" rel="noopener noreferrer" className="mt-6 text-xs text-white/40 underline-offset-4 hover:text-white/70 hover:underline">
+        <a href={wa} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} className="mt-6 text-xs text-white/40 underline-offset-4 hover:text-white/70 hover:underline">
           WhatsApp a quote
         </a>
       </div>
