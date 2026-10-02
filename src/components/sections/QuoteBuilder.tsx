@@ -5,34 +5,34 @@ import { track } from '../../lib/analytics'
 import { waLink } from '../../site'
 
 const options = {
-  type: ['Landing page', 'Small website', 'Product catalogue', 'Not sure'],
-  business: ['Clinic / salon', 'Cafe / restaurant', 'Gym / studio', 'Services / other'],
-  language: ['English', 'Arabic', 'English + Arabic'],
-  booking: ['Appointments', 'Table / class', 'Contact form only', 'Not needed'],
-  domain: ['I own one', 'I need one', 'Not sure'],
+  business: ['Barber / salon', 'Car wash / laundry', 'Cafe / bakery', 'Pet shop / other'],
+  repeat: ['Weekly', 'Every 2 weeks', 'Monthly', 'Not sure yet'],
+  package: ['Visits / services', 'Credits / EGP value', 'Product delivery', 'Help me design it'],
+  payment: ['Paymob account', 'Another merchant account', 'Cash / InstaPay first', 'Not sure'],
+  website: ['I have a website', 'Instagram only', 'No website yet', 'Not sure'],
 } as const
 
 export default function QuoteBuilder() {
   const { isRTL } = useLocale()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const labels = isRTL
-    ? { eye: 'عرض سعر أوضح', title: 'كوّن موجزك قبل فتح واتساب.', sub: 'اختر الإجابات. سنجهّز رسالة مرتبة ترسلها مباشرة.', send: 'افتح واتساب بالموجز', done: 'اكتمل' }
-    : { eye: 'Better brief, faster quote', title: 'Build your brief before WhatsApp.', sub: 'Choose the basics. We turn them into a structured message you can send in one tap.', send: 'Open WhatsApp with brief', done: 'complete' }
+    ? { eye: 'اختبار مناسبة الاشتراك', title: 'هل الاشتراك مناسب لنشاطك؟', sub: 'جاوب خمس أسئلة. نرتب لك فكرة الباقة قبل ما تفتح واتساب.', send: 'افتح واتساب بفكرة الباقة', done: 'اكتمل' }
+    : { eye: 'Subscription fit check', title: 'Could this work for your business?', sub: 'Answer five questions. We turn them into a useful package brief before WhatsApp opens.', send: 'Open WhatsApp with package brief', done: 'complete' }
 
   const fields = isRTL
     ? [
-        ['type', 'نوع الموقع', ['صفحة هبوط', 'موقع صغير', 'كتالوج منتجات', 'غير متأكد']],
-        ['business', 'نوع النشاط', ['عيادة / صالون', 'كافيه / مطعم', 'جيم / ستوديو', 'خدمات / غير ذلك']],
-        ['language', 'اللغة', ['إنجليزي', 'عربي', 'عربي + إنجليزي']],
-        ['booking', 'الحجز', ['مواعيد', 'ترابيزة / كلاس', 'نموذج تواصل فقط', 'غير مطلوب']],
-        ['domain', 'الدومين', ['عندي دومين', 'محتاج دومين', 'غير متأكد']],
+        ['business', 'نوع النشاط', ['حلاق / صالون', 'غسيل سيارات / مغسلة', 'كافيه / مخبز', 'حيوانات أليفة / غير ذلك']],
+        ['repeat', 'تكرار الشراء', ['أسبوعي', 'كل أسبوعين', 'شهري', 'غير متأكد']],
+        ['package', 'شكل الباقة', ['زيارات / خدمات', 'رصيد بقيمة مالية', 'توصيل منتجات', 'ساعدني أصممها']],
+        ['payment', 'الدفع الحالي', ['عندي Paymob', 'بوابة دفع أخرى', 'كاش / إنستاباي أولاً', 'غير متأكد']],
+        ['website', 'وجودك أونلاين', ['عندي موقع', 'إنستجرام فقط', 'مفيش موقع', 'غير متأكد']],
       ] as const
-    : (Object.entries(options).map(([key, values]) => [key, ({ type: 'Site type', business: 'Business', language: 'Language', booking: 'Booking', domain: 'Domain' } as Record<string, string>)[key], values]) as unknown as ReadonlyArray<readonly [string, string, readonly string[]]>)
+    : (Object.entries(options).map(([key, values]) => [key, ({ business: 'Business', repeat: 'Repeat purchase', package: 'Package format', payment: 'Current payment setup', website: 'Online presence' } as Record<string, string>)[key], values]) as unknown as ReadonlyArray<readonly [string, string, readonly string[]]>)
 
   const completed = Object.keys(answers).length
   const message = useMemo(() => {
-    const intro = isRTL ? 'مرحباً أوتوليدز، أريد عرض سعر. هذا موجزي:' : 'Hi AutoLeadss — I would like a quote. Here is my brief:'
-    return [intro, ...fields.map(([key, label]) => `- ${label}: ${answers[key] || '—'}`), isRTL ? '- الموعد المطلوب:' : '- Desired launch date:'].join('\n')
+    const intro = isRTL ? 'مرحباً أوتوليدز، عايز أحول خدماتي لاشتراكات شهرية. ده الموجز:' : 'Hi AutoLeadss — I want to turn repeat services into monthly subscriptions. Here is my brief:'
+    return [intro, ...fields.map(([key, label]) => `- ${label}: ${answers[key] || '—'}`), isRTL ? '- متوسط سعر الخدمة:' : '- Current average service price:'].join('\n')
   }, [answers, fields, isRTL])
 
   return (

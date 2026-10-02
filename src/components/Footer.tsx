@@ -45,26 +45,29 @@ export default function Footer() {
             </div>
           </div>
 
-          <a
-            href={SITE.mbai}
-            target="_blank"
-            rel="noopener noreferrer"
+          <div
             className="group flex max-w-md items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition-colors hover:border-accent/40"
           >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 font-serif text-lg text-white">M</span>
             <div>
               <p className="text-sm leading-relaxed text-white/80">
                 {t.footer.advanced}{' '}
-                <span className="inline-flex items-center gap-1 font-medium text-accent" dir="ltr">
+                <a
+                  href={SITE.mbai}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-accent"
+                  dir="ltr"
+                >
                   mbai-group.com
                   <ArrowUpRight size={14} />
-                </span>
+                </a>
               </p>
               <div className="mt-4">
                 <MbaiBadge variant="dark" />
               </div>
             </div>
-          </a>
+          </div>
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">

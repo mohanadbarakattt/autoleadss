@@ -18,20 +18,21 @@ function packageOffers(pageUrl: string) {
   return [
     {
       '@type': 'Offer',
-      price: '10000',
+      price: '20000',
       priceCurrency: 'EGP',
       url: pageUrl,
       description:
-        'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Egypt. Half before we start. Half before handoff.',
+        'Founding-client offer for the first five businesses: bilingual membership storefront, three packages, customer QR pass, staff redemption, owner dashboard, setup, training, and handoff.',
       areaServed: 'EG',
     },
     {
       '@type': 'Offer',
-      price: '200',
-      priceCurrency: 'USD',
+      price: '35000',
+      priceCurrency: 'EGP',
       url: pageUrl,
       description:
-        'Website, appointment booking on the page, forms that arrive, local FAQ chatbot on the page, connect a domain you already own. Outside Egypt. Half before we start. Half before handoff.',
+        'Standard membership-system implementation starting price after the founding-client offer: branded bilingual storefront, package terms, QR, staff flow, dashboard, training, and source handoff.',
+      areaServed: 'EG',
     },
   ]
 }
@@ -64,8 +65,8 @@ function professionalService(locale: Locale, pageUrl: string) {
     },
     areaServed: AREA_SERVED,
     serviceType: isAr
-      ? ['تصميم مواقع', 'صفحات هبوط', 'حجز مواعيد على الصفحة', 'شات بوت أسئلة على الصفحة']
-      : ['Website design', 'Landing page design', 'Appointment booking on the page', 'On-page FAQ chatbot'],
+      ? ['نظام اشتراكات شهرية', 'موقع اشتراكات', 'بطاقة عضوية QR', 'ماسح اشتراكات', 'لوحة تحكم للمشتركين']
+      : ['Membership system', 'Subscription storefront', 'QR membership pass', 'Staff redemption scanner', 'Subscriber dashboard'],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',

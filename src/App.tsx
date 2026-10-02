@@ -1,18 +1,10 @@
 import { Helmet } from 'react-helmet-async'
 import Navigation from './components/Navigation'
-import Hero from './components/sections/Hero'
-import Offer from './components/sections/Offer'
-import Examples from './components/sections/Examples'
-import Work from './components/sections/Work'
-import Faq from './components/sections/Faq'
-import Process from './components/sections/Process'
-import Contact from './components/sections/Contact'
+import HomePageSystem from './components/sections/HomePageSystem'
 import Footer from './components/Footer'
-import ActionDock from './components/ActionDock'
 import ScrollProgress from './components/ScrollProgress'
 import CookieConsent from './components/CookieConsent'
 import Analytics from './components/Analytics'
-import QuoteBuilder from './components/sections/QuoteBuilder'
 import JsonLd from './components/JsonLd'
 import SeoIcons from './components/SeoIcons'
 import { useLocale, useT } from './i18n/LocaleProvider'
@@ -55,18 +47,8 @@ export default function App() {
       <ScrollProgress />
       <Analytics />
       <Navigation />
-      <main>
-        <Hero />
-        <Offer />
-        <Examples />
-        <Work />
-        <QuoteBuilder />
-        <Faq />
-        <Process />
-        <Contact />
-      </main>
+      <main><HomePageSystem /></main>
       <Footer />
-      <ActionDock />
       <CookieConsent />
     </div>
   )

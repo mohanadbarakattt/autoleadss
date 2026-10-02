@@ -40,16 +40,22 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const wa = waLink(t.hero.waText)
-  const forceGlass = /privacy|terms|pricing|se3r/.test(location.pathname)
+  const forceGlass = /privacy|terms|pricing|se3r|work|packages|demo/.test(location.pathname)
 
   const home = localePath()
-  const navLinks = [
-    { label: t.nav.offer, href: `${home}#offer`, id: 'offer' },
-    { label: t.nav.examples, href: `${home}#examples`, id: 'examples' },
-    { label: t.nav.work, href: `${home}#work`, id: 'work' },
-    { label: t.nav.pricing, href: `${home}#pricing`, id: 'pricing' },
-    { label: t.nav.process, href: `${home}#process`, id: 'process' },
-  ]
+  const navLinks = locale === 'ar'
+    ? [
+        { label: 'المنتج', href: `${home}#offer`, id: 'offer' },
+        { label: 'الأمثلة', href: localePath('/work'), id: 'work' },
+        { label: 'الباقات', href: localePath('/packages'), id: 'packages' },
+        { label: 'الأسعار', href: localePath('/se3r'), id: 'pricing' },
+      ]
+    : [
+        { label: 'Product', href: `${home}#offer`, id: 'offer' },
+        { label: 'Examples', href: localePath('/work'), id: 'work' },
+        { label: 'Packages', href: localePath('/packages'), id: 'packages' },
+        { label: 'Pricing', href: localePath('/pricing'), id: 'pricing' },
+      ]
 
   useEffect(() => {
     const ids = navLinks.map(l => l.id)
@@ -123,14 +129,17 @@ export default function Navigation() {
             </a>
           </div>
 
-          <button
-            type="button"
-            className="lg:hidden me-1 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white"
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <LocaleSwitcher locale={locale} switchLocale={switchLocale} size="sm" />
+            <button
+              type="button"
+              className="me-1 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white"
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -153,8 +162,7 @@ export default function Navigation() {
                   {link.label}
                 </a>
               ))}
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <LocaleSwitcher locale={locale} switchLocale={switchLocale} size="sm" />
+              <div className="mt-3 flex items-center justify-end gap-3">
                 <a
                   href={wa}
                   target="_blank"

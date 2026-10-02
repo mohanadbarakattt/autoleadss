@@ -2,20 +2,19 @@ import { useState } from 'react'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { PAGE_FAQ } from '../../seo/pageFaq'
 import SectionHeading from '../SectionHeading'
-import ChatWidget from '../ChatWidget'
 
 export default function Faq() {
   const t = useT()
   const { locale } = useLocale()
-  const items = PAGE_FAQ[locale]
+  const items = PAGE_FAQ[locale].slice(0, 4)
   const [open, setOpen] = useState(0)
 
   return (
     <section id="faq" className="section-padding bg-background">
       <div className="content-width">
         <SectionHeading eyebrow={t.faqPage.eyebrow} title={t.faqPage.title} sub={t.faqPage.sub} />
-        <div className="grid items-start gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+        <div className="max-w-4xl">
+          <div>
             <ul className="divide-y divide-border border-y border-border">
               {items.map((item, i) => {
                 const expanded = open === i
@@ -38,10 +37,6 @@ export default function Faq() {
               })}
             </ul>
           </div>
-          <aside className="lg:col-span-5">
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-wider text-accent">{t.faqPage.botLabel}</p>
-            <ChatWidget inline />
-          </aside>
         </div>
       </div>
     </section>

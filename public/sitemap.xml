@@ -25,6 +25,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/pricing" />
   </url>
   <url>
+    <loc>https://autoleadss.com/en/packages</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/packages" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/packages" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/packages</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/packages" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/packages" />
+  </url>
+  <url><loc>https://autoleadss.com/en/work</loc></url>
+  <url><loc>https://autoleadss.com/ar/work</loc></url>
+  <url><loc>https://autoleadss.com/en/demo/membership-flow</loc></url>
+  <url><loc>https://autoleadss.com/ar/demo/membership-flow</loc></url>
+  <url>
     <loc>https://autoleadss.com/en/demo/cafe</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/demo/cafe" />
     <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/demo/cafe" />

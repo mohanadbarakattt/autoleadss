@@ -12,8 +12,7 @@ export const SITE = {
 
 export const WORK = [
   { id: 'tut', href: 'https://tutapp.co', img: '/work/tut.png', url: 'tutapp.co' },
-  { id: 'ibni', href: 'https://ibni.app', img: '/work/ibni.png', url: 'ibni.app' },
-  { id: 'virlo', href: 'https://mbai-group.com/virlo', img: '/work/virlo.png', url: 'mbai-group.com/virlo' },
+  { id: 'mbai', href: 'https://mbai-group.com', img: '/work/mbai.png', url: 'mbai-group.com' },
 ] as const
 
 export function waLink(text: string) {

@@ -167,6 +167,12 @@ html[dir="rtl"] .marquee-track {
 }
 .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
 
+@keyframes scan-line {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(110px); opacity: 1; }
+}
+.scan-line { animation: scan-line 2.2s ease-in-out infinite; }
+
 .shot-sheen {
   background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.16) 50%, transparent 60%);
   transform: translateX(-120%);
@@ -198,7 +204,7 @@ html[dir='rtl'] .qahwa .font-display {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track, .float-slow, .float-slower, .spin-slow, .pulse-ring, .shot-sheen {
+  .marquee-track, .float-slow, .float-slower, .spin-slow, .pulse-ring, .shot-sheen, .scan-line {
     animation: none;
   }
 }

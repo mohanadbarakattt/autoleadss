@@ -1,55 +1,10 @@
-import { useLocale, useT } from '../../i18n/LocaleProvider'
-import PriceCard from '../PriceCard'
-
-const GET_ICONS = ['/offer/icon-website.png', '/offer/icon-booking.png', '/offer/icon-forms.png', '/offer/icon-chat.png', '/offer/icon-domain.png'] as const
+import { BarChart3, CreditCard, LayoutTemplate, QrCode } from 'lucide-react'
+import { useLocale } from '../../i18n/LocaleProvider'
 
 export default function Offer() {
-  const t = useT()
   const { isRTL } = useLocale()
-  const included = isRTL
-    ? ['صفحة هبوط واحدة مركزة', 'حتى ٤ منتجات أو خدمات', 'عربي أو إنجليزي أو الاثنين', 'جولتان من التعديلات', 'حجز ونموذج ليدز ومساعد أسئلة محلي', 'توصيل الدومين الموجود', '١٤ يوماً لإصلاحات ما بعد الإطلاق']
-    : ['One focused landing page', 'Up to 4 featured products or services', 'English, Arabic, or bilingual', '2 revision rounds', 'Booking, lead form, and local FAQ assistant', 'Your existing domain connected', '14 days of post-launch fixes']
-  const separate = isRTL
-    ? ['تسجيل دومين جديد', 'مواقع كبيرة متعددة الصفحات', 'أكثر من ٤ منتجات', 'متجر إلكتروني ودفع أونلاين', 'استضافة أو صيانة مستمرة', 'تكاملات ولوحات تحكم مخصصة']
-    : ['New domain registration', 'Large multi-page sites', 'More than 4 products', 'E-commerce and online payments', 'Ongoing hosting or maintenance', 'Custom integrations and dashboards']
-
-  return (
-    <section id="offer" className="section-padding relative overflow-hidden bg-paper">
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(rgba(10,10,11,0.05) 1px, transparent 0)', backgroundSize: '22px 22px' }} />
-      <div className="content-width relative z-10">
-        <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-7">
-            <p className="eyebrow text-accent">{t.offer.eyebrow}</p>
-            <h2 className="mt-3 font-display font-bold" style={{ fontSize: 'clamp(1.9rem, 3.8vw, 3rem)', letterSpacing: '-0.03em', lineHeight: 1.08 }}>{t.offer.title}</h2>
-            <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-fg">{t.offer.sub}</p>
-            <ol className="mt-10 divide-y divide-border border-y border-border">
-              {t.offer.gets.map((item, i) => (
-                <li key={item.title} className="flex items-start gap-4 py-5">
-                  <span className="mt-1 hidden font-mono text-[11px] uppercase tracking-wider text-accent sm:block">0{i + 1}</span>
-                  <img src={GET_ICONS[i]} alt="" loading="lazy" decoding="async" className="h-14 w-14 shrink-0 rounded-xl border border-border bg-white object-cover" />
-                  <div className="min-w-0 pt-0.5">
-                    <p className="font-display text-lg font-bold leading-tight"><span className="me-2 font-mono text-[11px] uppercase tracking-wider text-accent sm:hidden">0{i + 1}</span>{item.title}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-muted-fg">{item.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-white p-5">
-                <p className="font-display text-base font-bold">{isRTL ? 'ضمن الباقة' : 'Included in the package'}</p>
-                <ul className="mt-3 space-y-2 text-sm text-muted-fg">{included.map(item => <li key={item}>✓ {item}</li>)}</ul>
-              </div>
-              <div className="rounded-2xl border border-border bg-[#F7F5F0] p-5">
-                <p className="font-display text-base font-bold">{isRTL ? 'بتسعير منفصل' : 'Quoted separately'}</p>
-                <ul className="mt-3 space-y-2 text-sm text-muted-fg">{separate.map(item => <li key={item}>— {item}</li>)}</ul>
-              </div>
-            </div>
-            <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-accent" dir="ltr">{t.offer.chip}</p>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-fg">{t.offer.craft}</p>
-          </div>
-          <aside className="lg:col-span-5 lg:sticky lg:top-24"><PriceCard id="pricing" /></aside>
-        </div>
-      </div>
-    </section>
-  )
+  const items = isRTL
+    ? [['موقع بيع عربي وإنجليزي', 'صفحة باسم البراند تعرض الباقات وتبيعها بوضوح.', LayoutTemplate], ['باقات ودفع أونلاين', 'شهر أو ٣ أو ٦ أو ١٢ شهر على حساب التاجر المعتمد.', CreditCard], ['QR للعميل والموظف', 'بطاقة عضوية وماسح يسجل كل استخدام أو توصيل.', QrCode], ['لوحة تحكم للمالك', 'المشتركين والإيراد والتجديدات وأداء كل باقة.', BarChart3]] as const
+    : [['Bilingual sales website', 'A branded Arabic and English page that presents and sells the packages.', LayoutTemplate], ['Packages and online payment', '1, 3, 6 or 12-month terms through the merchant’s approved account.', CreditCard], ['Customer pass + staff QR', 'A mobile membership pass and scanner that records every use or delivery.', QrCode], ['Simple owner dashboard', 'Members, revenue, renewals and package performance in one place.', BarChart3]] as const
+  return <section id="offer" className="scroll-mt-28 bg-[#EFECE4] py-20 sm:py-24"><div className="content-width"><div className="max-w-2xl"><p className="eyebrow text-accent">{isRTL ? 'تستلم إيه' : 'What you get'}</p><h2 className="mt-3 font-display text-[clamp(2.1rem,4vw,3.5rem)] font-bold leading-[1.04] tracking-[-0.04em]">{isRTL ? 'منتج اشتراكات كامل باسم نشاطك.' : 'A complete membership product under your brand.'}</h2></div><div className="mt-10 grid gap-3 md:grid-cols-2">{items.map(([title, body, Icon], index) => <article key={title} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl bg-[#111214] p-5 text-white sm:p-6"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fe8c58] text-[#111214]"><Icon size={20} /></span><div><p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/35">0{index + 1}</p><h3 className="mt-1 font-display text-xl font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-white/62">{body}</p></div></article>)}</div><p className="mt-5 text-sm text-muted-fg">{isRTL ? 'التطبيق يُضاف على الموبايل كـ PWA. العميل يمتلك النسخة المسلّمة والبيانات.' : 'The product installs on phones as a PWA. The client owns the delivered software and data.'}</p></div></section>
 }

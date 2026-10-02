@@ -1,9 +1,9 @@
 import { motion, type Variants } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { useT } from '../../i18n/LocaleProvider'
 import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
-import HeroStage from '../HeroStage'
+import MembershipStage from '../MembershipStage'
+import { Check } from 'lucide-react'
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
@@ -16,10 +16,7 @@ const fadeUp: Variants = {
 
 export default function Hero() {
   const t = useT()
-  const { localePath } = useLocale()
   const wa = waLink(t.hero.waText)
-  const loop = [...t.hero.marquee, ...t.hero.marquee]
-  const cafeName = t.examples.items[0].name
 
   return (
     <section className="relative overflow-hidden" style={{ background: '#0A0A0B' }}>
@@ -91,11 +88,12 @@ export default function Hero() {
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            className="mt-7 flex flex-wrap gap-2"
+            className="mt-7 grid max-w-lg gap-2 sm:grid-cols-2"
           >
             {t.hero.pills.map(pill => (
-              <li key={pill} className="rounded-full border border-white/12 bg-white/[0.05] px-3 py-1.5 text-[11px] uppercase tracking-[0.12em] text-white/70">
-                {pill}
+              <li key={pill} className="flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.07] px-3 py-2.5 text-sm font-medium text-white">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#fe8c58]/15 text-[#fe8c58]"><Check size={13} strokeWidth={2.5} /></span>
+                <span>{pill}</span>
               </li>
             ))}
           </motion.ul>
@@ -116,13 +114,6 @@ export default function Hero() {
               </span>
               {t.hero.cta}
             </motion.a>
-            <Link
-              to={localePath('/demo/cafe')}
-              className="inline-flex items-center rounded-full border border-white/20 px-5 py-3.5 text-sm font-medium text-white/85 hover:border-white/40 hover:text-white sm:px-6 sm:py-4"
-            >
-              {t.hero.openDemo}
-              <span className="hidden sm:inline"> · {cafeName}</span>
-            </Link>
           </motion.div>
         </div>
 
@@ -131,22 +122,10 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <HeroStage />
+          <MembershipStage />
         </motion.div>
       </div>
 
-      <div className="relative z-10 border-t border-white/10 py-4">
-        <div className="marquee-wrap overflow-hidden">
-          <div className="marquee-track flex w-max gap-10 px-6">
-            {loop.map((item, i) => (
-              <span key={`${item}-${i}`} className="flex items-center gap-10 text-xs uppercase tracking-[0.18em] text-white/35">
-                {item}
-                <span className="h-1 w-1 rounded-full bg-accent" />
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   )
 }

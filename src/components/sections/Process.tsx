@@ -1,33 +1,11 @@
-import { motion } from 'framer-motion'
-import { useT } from '../../i18n/LocaleProvider'
-import SectionHeading from '../SectionHeading'
+import { Check } from 'lucide-react'
+import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { trackLeadFormConversion } from '../../analytics'
+import { waLink } from '../../site'
 
 export default function Process() {
-  const t = useT()
-  return (
-    <section id="process" className="section-padding" style={{ background: '#0A0A0B' }}>
-      <div className="content-width">
-        <SectionHeading dark eyebrow={t.process.eyebrow} title={t.process.title} />
-        <div className="grid gap-5 md:grid-cols-3">
-          {t.process.steps.map((step, i) => (
-            <motion.div
-              key={step.n}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -6, borderColor: 'rgba(255,92,42,0.4)' }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.45, delay: i * 0.08 }}
-              className={`relative rounded-2xl border bg-white/[0.04] p-7 ${
-                i === 1 ? 'border-accent/40' : 'border-white/10'
-              }`}
-            >
-              <p className="eyebrow text-accent">{step.n}</p>
-              <p className="mt-4 font-display text-xl font-bold text-white">{step.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-white/60">{step.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+  const { isRTL } = useLocale(); const t = useT()
+  const steps = isRTL ? [['١', 'ورشة الباقة', 'الخدمة والرصيد والسعر والصلاحية والتجديد وقواعد التشغيل.'], ['٢', 'البراند والبناء', 'المحتوى الحقيقي، واجهة البيع، لوحة التحكم واختبار الـ QR.'], ['٣', 'التدريب والتسليم', 'تجربة الحالات، ربط الحسابات، تدريب الفريق وتسليم المشروع.']] : [['1', 'Package workshop', 'Repeat service, allowance, price, expiry, renewal and operating rules.'], ['2', 'Brand and build', 'Real content, storefront design, dashboard setup and QR testing.'], ['3', 'Train and hand over', 'Scenario testing, production accounts, staff training and project handoff.']]
+  const included = isRTL ? ['أول ٥ عملاء فقط', '١٠٬٠٠٠ جنيه للبدء', '١٠٬٠٠٠ جنيه عند قبول التسليم', 'تسليم خلال أسبوعين بعد استلام المحتوى والحسابات', 'ملكية كاملة للنسخة المسلّمة'] : ['First five clients only', '10,000 EGP to start', '10,000 EGP at accepted handoff', 'Two-week delivery after content and accounts arrive', 'Full ownership of the delivered software']
+  return <section id="pricing" className="scroll-mt-28 bg-[#EFECE4] py-20 sm:py-24"><div className="content-width grid gap-6 lg:grid-cols-12"><div className="rounded-3xl bg-[#1b3b2b] p-7 text-white sm:p-9 lg:col-span-5"><p className="eyebrow text-[#fe8c58]">{isRTL ? 'عرض التأسيس' : 'Founding offer'}</p><p className="mt-4 font-serif text-[clamp(3rem,7vw,5rem)] leading-none">{isRTL ? '٢٠٬٠٠٠' : '20,000'}</p><p className="mt-2 text-sm text-white/55">{isRTL ? 'جنيه مصري · إجمالي المشروع' : 'EGP · total project fee'}</p><ul className="mt-7 space-y-3 border-t border-white/12 pt-6">{included.map(item => <li key={item} className="flex gap-2.5 text-sm text-white/78"><Check size={16} className="mt-0.5 shrink-0 text-[#fe8c58]" />{item}</li>)}</ul><a href={waLink(t.hero.waText)} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-wa px-6 py-4 text-sm font-medium text-white">{isRTL ? 'احجز مكان من أول ٥' : 'Claim one of the first five places'}</a><p className="mt-4 text-xs leading-relaxed text-white/40">{isRTL ? 'بعد أول ٥ عملاء، الباقة الأساسية تبدأ من ٣٥٬٠٠٠ جنيه. رسوم مقدم الدفع والاستضافة الخارجية منفصلة.' : 'After the first five clients, the standard basic package starts from 35,000 EGP. Payment-provider and external hosting fees are separate.'}</p></div><div id="process" className="rounded-3xl border border-border bg-white p-7 sm:p-9 lg:col-span-7"><p className="eyebrow text-accent">{isRTL ? 'أسبوعان للتسليم' : 'Two-week delivery'}</p><h2 className="mt-3 max-w-xl font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[1.04] tracking-[-0.04em]">{isRTL ? 'من فكرة الباقة لنظام متسلّم.' : 'From package idea to handed-over product.'}</h2><ol className="mt-8 divide-y divide-border border-y border-border">{steps.map(([n,title,body]) => <li key={n} className="grid gap-2 py-5 sm:grid-cols-[2.5rem_11rem_1fr]"><span className="font-mono text-xs text-accent">0{n}</span><h3 className="font-display text-lg font-bold">{title}</h3><p className="text-sm leading-relaxed text-muted-fg">{body}</p></li>)}</ol></div></div></section>
 }

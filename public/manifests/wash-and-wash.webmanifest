@@ -1,0 +1,25 @@
+{
+  "name": "Wash & Wash Plans",
+  "short_name": "Wash & Wash Plan",
+  "description": "Membership packages and digital member pass.",
+  "start_url": "/en/pilot/wash-and-wash",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7F7F2",
+  "theme_color": "#171815",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
