@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import MembershipFlowDemo from '../MembershipFlowDemo'
+import QuoteBuilder from './QuoteBuilder'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
@@ -150,6 +151,27 @@ function MembershipFlow() {
             </li>
           ))}
         </ol>
+      </div>
+    </section>
+  )
+}
+
+function TrustStrip() {
+  const { isRTL } = useLocale()
+  const points = isRTL
+    ? ['عربي وإنجليزي', 'SEO محلي من البداية', 'على دومينك وحساباتك', 'النسخة والبيانات ملكك']
+    : ['Arabic + English', 'Local SEO from day one', 'Your domain and accounts', 'You own the build and data']
+
+  return (
+    <section className="border-y border-black/10 bg-white">
+      <div className="content-width grid sm:grid-cols-2 lg:grid-cols-4">
+        {points.map((point, index) => (
+          <div key={point} className="flex min-h-24 items-center gap-3 border-b border-black/10 py-5 sm:px-5 lg:border-b-0 lg:border-e first:ps-0 last:border-e-0">
+            <Check size={16} className="shrink-0 text-[#1E7E48]" />
+            <span className="text-sm font-semibold">{point}</span>
+            <span className="ms-auto font-mono text-[9px] text-black/25">0{index + 1}</span>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -410,6 +432,8 @@ export default function HomePageSystem() {
       <Hero />
       <MembershipFlow />
       <PackageLab />
+      <TrustStrip />
+      <QuoteBuilder />
       <Work />
       <FoundingOffer />
       <FaqAndContact />

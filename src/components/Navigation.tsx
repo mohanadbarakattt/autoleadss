@@ -46,15 +46,17 @@ export default function Navigation() {
   const navLinks = locale === 'ar'
     ? [
         { label: 'المنتج', href: `${home}#offer`, id: 'offer' },
-        { label: 'الأمثلة', href: localePath('/work'), id: 'work' },
-        { label: 'الباقات', href: localePath('/packages'), id: 'packages' },
-        { label: 'الأسعار', href: localePath('/se3r'), id: 'pricing' },
+        { label: 'الباقات', href: `${home}#packages`, id: 'packages' },
+        { label: 'اختبر الفكرة', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'شغلنا', href: `${home}#work`, id: 'work' },
+        { label: 'السعر', href: `${home}#pricing`, id: 'pricing' },
       ]
     : [
         { label: 'Product', href: `${home}#offer`, id: 'offer' },
-        { label: 'Examples', href: localePath('/work'), id: 'work' },
-        { label: 'Packages', href: localePath('/packages'), id: 'packages' },
-        { label: 'Pricing', href: localePath('/pricing'), id: 'pricing' },
+        { label: 'Packages', href: `${home}#packages`, id: 'packages' },
+        { label: 'Fit check', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'Work', href: `${home}#work`, id: 'work' },
+        { label: 'Price', href: `${home}#pricing`, id: 'pricing' },
       ]
 
   useEffect(() => {
