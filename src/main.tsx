@@ -25,6 +25,7 @@ const PilotsIndex = lazy(() => import('./pages/PilotsIndex'))
 const WorkIndex = lazy(() => import('./pages/WorkIndex'))
 const MembershipFlowDemoPage = lazy(() => import('./pages/MembershipFlowDemoPage'))
 const PackagesPage = lazy(() => import('./pages/PackagesPage'))
+const GuidedShowcasePage = lazy(() => import('./pages/GuidedShowcasePage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -34,6 +35,9 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<LocaleProvider locale="en" persist={false}><App /></LocaleProvider>} />
           <Route path="/demo/:kind" element={<DemoRedirect />} />
+          <Route path="/showroom" element={<Navigate to="/en/showroom" replace />} />
+          <Route path="/en/showroom" element={<LocaleProvider locale="en"><GuidedShowcasePage /></LocaleProvider>} />
+          <Route path="/ar/showroom" element={<LocaleProvider locale="ar"><GuidedShowcasePage /></LocaleProvider>} />
           <Route path="/en/demo/membership-flow" element={<LocaleProvider locale="en"><MembershipFlowDemoPage /></LocaleProvider>} />
           <Route path="/ar/demo/membership-flow" element={<LocaleProvider locale="ar"><MembershipFlowDemoPage /></LocaleProvider>} />
           <Route path="/en/demo/:kind" element={<LocaleProvider locale="en"><DemoPage /></LocaleProvider>} />

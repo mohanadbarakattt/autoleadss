@@ -61,7 +61,7 @@ function SectionIntro({ eyebrow, title, body, dark = false }: { eyebrow: string;
 }
 
 function Hero() {
-  const { isRTL } = useLocale()
+  const { isRTL, localePath } = useLocale()
   const deliverables = isRTL
     ? ['بيع الباقات', 'تحصيل الدفع', 'استخدام QR', 'متابعة الأداء']
     : ['Sell packages', 'Take payment', 'Redeem by QR', 'See performance']
@@ -87,9 +87,7 @@ function Hero() {
               <a href="#pricing" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#fe8c58] px-6 text-sm font-semibold text-[#111214] transition-transform hover:-translate-y-0.5">
                 {isRTL ? 'عرض أول ٥ عملاء' : 'Founding offer'}
               </a>
-              <a href="#packages" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/16 bg-white/[0.05] px-6 text-sm font-medium text-white transition-colors hover:bg-white/10">
-                {isRTL ? 'شوف القالب' : 'See the template'}
-              </a>
+                <Link to={localePath('/showroom')} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/16 bg-white/[0.05] px-6 text-sm font-medium text-white transition-colors hover:bg-white/10">{isRTL ? 'شوف النظام كاملاً' : 'See the full system'}</Link>
             </div>
           </div>
           <div className="mx-auto w-full max-w-xl lg:max-w-none lg:ps-4">
@@ -283,7 +281,7 @@ function PackageLab() {
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:p-10">
             <div className="flex flex-col justify-between">
               <div><p className="font-mono text-[10px] uppercase tracking-[0.17em] text-[#fe8c58]">{selected.eyebrow}</p><h3 className="mt-4 max-w-md font-display text-[clamp(2.4rem,5vw,4.8rem)] font-bold leading-[0.94] tracking-[-0.05em]">{demoIdentity[1]}</h3></div>
-              <Link to={localePath('/demo/membership-flow')} className="mt-8 inline-flex w-fit items-center gap-2 border-b border-white/25 pb-1 text-sm font-semibold text-white transition-colors hover:border-[#fe8c58] hover:text-[#fe8c58]">{isRTL ? 'شوف تدفق النظام' : 'See the system flow'} <ArrowUpRight size={15} /></Link>
+                <Link to={localePath('/showroom')} className="mt-8 inline-flex w-fit items-center gap-2 border-b border-white/25 pb-1 text-sm font-semibold text-white transition-colors hover:border-[#fe8c58] hover:text-[#fe8c58]">{isRTL ? 'شوف العرض الكامل' : 'Open the guided showroom'} <ArrowUpRight size={15} /></Link>
             </div>
             <div className="grid gap-3">
               {selected.plans.map(plan => {
