@@ -11,30 +11,52 @@ const AREA_SERVED = [
   { '@type': 'City', name: 'Alexandria' },
   { '@type': 'Country', name: 'United Arab Emirates' },
   { '@type': 'City', name: 'Dubai' },
+  { '@type': 'Country', name: 'Saudi Arabia' },
+  { '@type': 'City', name: 'Riyadh' },
   { '@type': 'Place', name: 'Gulf' },
 ]
 
-function packageOffers(pageUrl: string) {
-  return [
-    {
-      '@type': 'Offer',
-      price: '20000',
-      priceCurrency: 'EGP',
-      url: pageUrl,
-      description:
-        'Founding-client offer for the first five businesses: bilingual membership storefront, three packages, customer QR pass, staff redemption, owner dashboard, setup, training, and handoff.',
-      areaServed: 'EG',
-    },
-    {
-      '@type': 'Offer',
-      price: '35000',
-      priceCurrency: 'EGP',
-      url: pageUrl,
-      description:
-        'Standard membership-system implementation starting price after the founding-client offer: branded bilingual storefront, package terms, QR, staff flow, dashboard, training, and source handoff.',
-      areaServed: 'EG',
-    },
-  ]
+type Pkg = { id: string; en: string; ar: string; descEn: string; descAr: string; egp: number; usd?: number }
+
+const PACKAGES: Pkg[] = [
+  { id: 'launch', en: 'Launch: lead page for ads', ar: 'Launch: صفحة عملاء للإعلانات', egp: 18000, usd: 750,
+    descEn: 'Bilingual landing page or site up to 5 pages, lead form delivered to WhatsApp and a Google Sheet, click-to-chat, Meta Pixel and Google Analytics, basic SEO. Delivered in 10 working days.',
+    descAr: 'صفحة هبوط أو موقع حتى ٥ صفحات عربي وإنجليزي، فورم عملاء يوصل على واتساب وGoogle Sheet، زر واتساب، Meta Pixel وGoogle Analytics، وSEO أساسي. التسليم في ١٠ أيام عمل.' },
+  { id: 'growth', en: 'Growth: AI WhatsApp agent', ar: 'Growth: وكيل واتساب بالذكاء الاصطناعي', egp: 32000, usd: 1500,
+    descEn: 'AI agent on the official WhatsApp Business Platform, trained on your prices and FAQs in Arabic and English. Replies in seconds, qualifies leads, books appointments or viewings, hands off to staff, simple CRM and automatic follow-ups, 30 days of tuning. Delivered in about 3 weeks.',
+    descAr: 'وكيل ذكاء اصطناعي على منصة WhatsApp Business الرسمية، متدرب على أسعارك وأسئلتك بالعربي والإنجليزي. بيرد في ثواني ويأهل العملاء ويحجز المواعيد أو المعاينات ويحول للموظف، مع CRM بسيط ومتابعات تلقائية و٣٠ يوم ضبط. التسليم في حوالي ٣ أسابيع.' },
+  { id: 'scale', en: 'Scale: full lead system', ar: 'Scale: نظام العملاء الكامل', egp: 65000, usd: 3000,
+    descEn: 'Launch plus Growth, up to 5 custom automations (reminders, reviews, reports), Meta ads account and campaign structure, dashboard, team training and 60 days of tuning. Delivered in 5 to 6 weeks.',
+    descAr: 'Launch وGrowth مع بعض، حتى ٥ أتمتة مخصصة (تذكير وتقييمات وتقارير)، حساب إعلانات Meta وهيكل الحملات، لوحة متابعة، تدريب الفريق و٦٠ يوم ضبط. التسليم في ٥ إلى ٦ أسابيع.' },
+  { id: 'membership', en: 'Membership storefront', ar: 'متجر العضويات', egp: 20000,
+    descEn: 'Bilingual storefront selling up to 3 prepaid plans, payment through your merchant account, customer QR pass, staff redemption and owner dashboard. EGP 20,000 for the first five clients, then from EGP 35,000.',
+    descAr: 'صفحة بيع عربي وإنجليزي لحد ٣ باقات مدفوعة مقدماً، دفع على حساب التاجر، بطاقة QR للعميل، خصم من الموظف ولوحة مالك. ٢٠٬٠٠٠ جنيه لأول خمس عملاء وبعدها من ٣٥٬٠٠٠ جنيه.' },
+]
+
+function offerCatalog(locale: Locale, pageUrl: string) {
+  const isAr = locale === 'ar'
+  return {
+    '@type': 'OfferCatalog',
+    name: isAr ? 'باقات أوتوليدز' : 'AutoLeadss packages',
+    itemListElement: PACKAGES.map(p => {
+      const offers: Record<string, unknown>[] = [
+        { '@type': 'Offer', price: String(p.egp), priceCurrency: 'EGP', areaServed: 'EG', url: `${pageUrl}#services` },
+      ]
+      if (p.usd) offers.push({ '@type': 'Offer', price: String(p.usd), priceCurrency: 'USD', areaServed: ['AE', 'SA', 'QA', 'KW', 'BH', 'OM'], url: `${pageUrl}#services` })
+      return {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          '@id': `${SITE.origin}/#service-${p.id}`,
+          name: isAr ? p.ar : p.en,
+          description: isAr ? p.descAr : p.descEn,
+          provider: { '@id': `${SITE.origin}/#business` },
+          areaServed: AREA_SERVED,
+          offers,
+        },
+      }
+    }),
+  }
 }
 
 function faqEntities(locale: Locale) {
@@ -65,17 +87,26 @@ function professionalService(locale: Locale, pageUrl: string) {
     },
     areaServed: AREA_SERVED,
     serviceType: isAr
-      ? ['نظام اشتراكات شهرية', 'موقع اشتراكات', 'بطاقة عضوية QR', 'ماسح اشتراكات', 'لوحة تحكم للمشتركين']
-      : ['Membership system', 'Subscription storefront', 'QR membership pass', 'Staff redemption scanner', 'Subscriber dashboard'],
+      ? ['شات بوت واتساب بالذكاء الاصطناعي', 'وكيل مبيعات واتساب', 'صفحة هبوط لتجميع العملاء', 'حجز مواعيد العيادات على واتساب', 'تأهيل ليدز العقارات', 'متابعة تلقائية للعملاء', 'نظام عضويات واشتراكات']
+      : ['AI WhatsApp agent', 'WhatsApp chatbot', 'Lead generation landing page', 'Clinic appointment booking on WhatsApp', 'Real estate lead qualification', 'Lead follow-up automation', 'Membership storefront'],
+    description: isAr
+      ? 'استوديو في القاهرة بيبني وكلاء واتساب بالذكاء الاصطناعي وصفحات تجميع عملاء وأتمتة متابعة للعيادات والعقارات ومراكز التجميل في مصر والخليج.'
+      : 'Cairo-based studio that builds AI WhatsApp agents, lead-capture pages and follow-up automations for clinics, real estate teams and beauty businesses in Egypt and the Gulf.',
+    knowsAbout: ['WhatsApp Business Platform', 'AI chat agents', 'Lead qualification', 'Dental clinic marketing', 'Real estate lead generation', 'Meta ads', 'Arabic and English websites'],
+    audience: [
+      { '@type': 'BusinessAudience', audienceType: isAr ? 'عيادات الأسنان والجلدية والتجميل' : 'Dental, dermatology and cosmetic clinics' },
+      { '@type': 'BusinessAudience', audienceType: isAr ? 'شركات الوساطة العقارية والمطورين' : 'Real estate brokerages and developers' },
+      { '@type': 'BusinessAudience', audienceType: isAr ? 'الصالونات ومراكز التجميل' : 'Salons and beauty studios' },
+    ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',
       email: SITE.email,
       telephone: '+201100054278',
       availableLanguage: ['en', 'ar'],
-      areaServed: ['EG', 'AE'],
+      areaServed: ['EG', 'AE', 'SA'],
     },
-    offers: packageOffers(pageUrl),
+    hasOfferCatalog: offerCatalog(locale, pageUrl),
   }
   if (isAr) node.alternateName = 'أوتوليدز'
   return node

@@ -1,50 +1,61 @@
-# AutoLeadss — https://autoleadss.com
+# AutoLeadss
 
-AutoLeadss designs, builds and hands over branded membership systems for repeat-service businesses in Egypt. The product is suited to barbers, salons, car washes, laundries, pet-care shops, cafés and similar businesses with a repeat purchase.
+> AutoLeadss (https://autoleadss.com) is a Cairo-based studio that builds AI WhatsApp agents, lead-capture pages and follow-up automations for clinics, real estate teams and beauty businesses in Egypt and the Gulf (UAE, Saudi Arabia). Every inquiry from WhatsApp, Instagram or ads gets an instant reply in Arabic or English, qualifying questions, and a booking or a handoff to the business's team. Part of MBAI Group (https://mbai-group.com).
 
-Core delivery:
-- Arabic and English membership storefront
-- Up to three packages with 1, 3, 6 and 12-month terms
-- Online payment through the merchant's approved payment account
-- Customer QR membership pass
-- Staff redemption flow
-- Focused owner dashboard
-- Installable PWA, training and code handoff
+## The problem we solve
 
-Commercial model:
-- Founding offer for the first five clients: 20,000 EGP
-- Payment: 10,000 EGP to start and 10,000 EGP at accepted handoff
-- Target delivery: two weeks after deposit, approved content, package rules and required account access are received
-- Standard implementations after the first five projects start at 35,000 EGP
-- The merchant owns the delivered build; there is no mandatory AutoLeadss monthly software fee
-- Domain, hosting, messages, payment transaction fees and other third-party costs are paid to their providers
+Customers in Egypt and the Gulf ask businesses questions on WhatsApp and Instagram. When replies are slow or nobody follows up, the lead books elsewhere and the ad money behind it is lost. AutoLeadss replies in seconds, 24/7, qualifies the lead and books it.
 
-Public product pages:
+## Who it is for
+
+- Clinics: dental, dermatology, laser and cosmetic clinics in Egypt, Saudi Arabia and the UAE. The agent answers price, location, doctor and slot questions, books appointments, sends reminders and passes medical questions to staff. It does not give medical advice.
+- Real estate: brokerages and developers in Cairo, Dubai and Riyadh. The agent replies to ad and portal leads, asks budget, area, unit type, timeline and cash or installments, books a call or viewing and hands a summary to the right agent.
+- Beauty and salons: salons, lash and brow studios and spas. Bookings from Instagram and WhatsApp in one place, follow-up for people who did not book, and prepaid monthly plans through the membership storefront.
+
+## Packages (fixed price, one-time)
+
+- Launch, lead page for ads: EGP 18,000 in Egypt or $750 in the Gulf. Bilingual landing page or site up to 5 pages, lead form to WhatsApp and Google Sheets, click-to-chat, Meta Pixel and Google Analytics, basic SEO. 10 working days.
+- Growth, AI WhatsApp agent: EGP 32,000 or $1,500. Official WhatsApp Business Platform number, AI agent trained on the business's prices and FAQs in Arabic and English, lead qualification and booking, human handoff, simple CRM and automatic follow-ups, 30 days of tuning. About 3 weeks.
+- Scale, full lead system: EGP 65,000 or $3,000. Launch plus Growth, up to 5 custom automations, Meta ads account and campaign structure, dashboard, team training, 60 days of tuning. 5 to 6 weeks.
+- Membership storefront: EGP 20,000 for the first five clients, then from EGP 35,000. Sells up to 3 prepaid plans, customer QR pass, staff redemption, owner dashboard.
+- Optional monthly plans: Care EGP 2,500, Grow EGP 6,000, Lead Engine EGP 12,000 (ad spend extra). Monthly plans are not required.
+- Payment terms: 50% to start, 50% at handoff. Meta message fees, ad spend, hosting and payment-provider fees are paid to those providers directly.
+
+## What counts as a qualified lead
+
+A real person who asked about a service the business sells, in an area it serves, reachable on WhatsApp, who either booked a time or answered the agreed qualifying questions (for example budget and timeline). The rules are agreed with each client before launch.
+
+## Proof
+
+- 200+ leads generated across 3 MENA markets.
+- Client project: Lash Cartel Cosmetics, an Australian beauty brand. Live store: https://lashcartelcosmetics.com
+- Other work: TUT (https://tutapp.co), MBAI Group (https://mbai-group.com).
+
+## Ownership
+
+The business owns its domain, WhatsApp number, ad accounts, customer data and the delivered build. Payments for memberships settle in the business's own merchant account (for example Paymob), never through AutoLeadss.
+
+## Pages
+
 - English home: https://autoleadss.com/en
 - Arabic home: https://autoleadss.com/ar
-- Interactive membership flow: https://autoleadss.com/en/demo/membership-flow
-- Package blueprints: https://autoleadss.com/en/packages
-- Examples and templates: https://autoleadss.com/en/work
-- Pricing: https://autoleadss.com/en/pricing
+- Services and prices: https://autoleadss.com/en#services
+- Who we build for: https://autoleadss.com/en#who-we-help
+- FAQ: https://autoleadss.com/en#faq
+- Membership pricing: https://autoleadss.com/en/pricing
 
-Selected public work:
-- TUT: https://tutapp.co
-- Lash Cartel concept demo: https://autoleadss.com/en/demo/lashes
-- MBAI Group: https://mbai-group.com
+## Contact
 
-The barber, car-wash, laundry, pet-care and café examples on the public portfolio are fictional, adaptable templates. Shop-specific pitch concepts are private sales materials and are not presented as commissioned client work.
-
-Contact:
+- WhatsApp: +20 110 005 4278 (https://wa.me/201100054278)
 - Email: mohanad.barakat@mbai-group.com
-- WhatsApp: +20 110 005 4278
-- https://wa.me/201100054278
+- Based in Cairo, serving Egypt, UAE, Saudi Arabia and the wider Gulf.
 
 ## عربي
 
-أوتوليدز تصمم وتبني وتسلم أنظمة عضويات باسم النشاط للخدمات والمشتريات المتكررة في مصر: الحلاقة والصالونات وغسيل السيارات والمغاسل ورعاية الحيوانات والكافيهات وما يشبهها.
+أوتوليدز استوديو في القاهرة بيبني وكلاء واتساب بالذكاء الاصطناعي وصفحات تجميع عملاء وأتمتة متابعة للعيادات وشركات العقارات ومراكز التجميل في مصر والخليج. كل استفسار بياخد رد فوري بالعربي أو الإنجليزي، وأسئلة تأهيل، وحجز أو تحويل للفريق.
 
-التسليم الأساسي يشمل صفحة بيع عربي وإنجليزي، حتى ثلاث باقات بمدد ١ و٣ و٦ و١٢ شهراً، دفعاً عبر حساب التاجر المعتمد، بطاقة QR للعميل، تدفق استخدام للموظف، لوحة مالك، PWA قابلة للإضافة للموبايل، تدريباً وتسليم الكود.
+الباقات: Launch صفحة عملاء ١٨٬٠٠٠ جنيه أو ٧٥٠ دولار. Growth وكيل واتساب بالذكاء الاصطناعي ٣٢٬٠٠٠ جنيه أو ١٬٥٠٠ دولار. Scale النظام الكامل ٦٥٬٠٠٠ جنيه أو ٣٬٠٠٠ دولار. متجر العضويات ٢٠٬٠٠٠ جنيه لأول خمس عملاء وبعدها من ٣٥٬٠٠٠ جنيه. الخطط الشهرية اختيارية من ٢٬٥٠٠ لـ ١٢٬٠٠٠ جنيه.
 
-عرض أول خمس عملاء: ٢٠٬٠٠٠ جنيه، ١٠٬٠٠٠ للبدء و١٠٬٠٠٠ عند التسليم المقبول. مدة التنفيذ المستهدفة أسبوعان بعد استلام العربون والمحتوى المعتمد وقواعد الباقات والحسابات المطلوبة. بعد أول خمس مشاريع يبدأ التنفيذ الأساسي من ٣٥٬٠٠٠ جنيه. العميل يملك النسخة المسلمة ولا يوجد اشتراك شهري إجباري لأوتوليدز.
-
-التواصل: mohanad.barakat@mbai-group.com · واتساب +20 110 005 4278
+التواصل على واتساب:
+⁦+20 110 005 4278⁩
+أو mohanad.barakat@mbai-group.com

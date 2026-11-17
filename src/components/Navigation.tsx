@@ -45,20 +45,18 @@ export default function Navigation() {
   const home = localePath()
   const navLinks = locale === 'ar'
     ? [
-        { label: 'المنتج', href: `${home}#offer`, id: 'offer' },
-        { label: 'الباقات', href: `${home}#packages`, id: 'packages' },
-        { label: 'اختبر الفكرة', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'بنخدم مين', href: `${home}#who-we-help`, id: 'who-we-help' },
         { label: 'الخدمات', href: `${home}#services`, id: 'services' },
         { label: 'شغلنا', href: `${home}#work`, id: 'work' },
-        { label: 'السعر', href: `${home}#pricing`, id: 'pricing' },
+        { label: 'العضويات', href: `${home}#packages`, id: 'packages' },
+        { label: 'أسئلة', href: `${home}#faq`, id: 'faq' },
       ]
     : [
-        { label: 'Product', href: `${home}#offer`, id: 'offer' },
-        { label: 'Packages', href: `${home}#packages`, id: 'packages' },
-        { label: 'Fit check', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'Who we help', href: `${home}#who-we-help`, id: 'who-we-help' },
         { label: 'Services', href: `${home}#services`, id: 'services' },
         { label: 'Work', href: `${home}#work`, id: 'work' },
-        { label: 'Price', href: `${home}#pricing`, id: 'pricing' },
+        { label: 'Memberships', href: `${home}#packages`, id: 'packages' },
+        { label: 'FAQ', href: `${home}#faq`, id: 'faq' },
       ]
 
   useEffect(() => {

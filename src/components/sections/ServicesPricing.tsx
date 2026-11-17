@@ -14,6 +14,7 @@ type ServicePackage = {
   egp: number
   usd?: number
   priceNote?: string
+  bestFor: string
   items: string[]
   featured?: boolean
 }
@@ -37,16 +38,16 @@ export default function ServicesPricing() {
 
   const packages: ServicePackage[] = ar
     ? [
-        { id: 'launch', name: 'Launch', title: 'موقع وقمع عملاء', delivery: '١٠ أيام عمل', egp: 18000, usd: 750, items: ['موقع عربي وإنجليزي حتى ٥ صفحات أو صفحة هبوط واحدة', 'فورم عملاء بيوصل على واتساب وGoogle Sheet', 'زر محادثة واتساب مباشر', 'Meta Pixel وGoogle Analytics', 'SEO أساسي', 'على دومينك وحساباتك'] },
-        { id: 'growth', name: 'Growth', title: 'وكيل مبيعات واتساب بالذكاء الاصطناعي', delivery: '٣ أسابيع', egp: 32000, usd: 1500, featured: true, items: ['رقم رسمي على WhatsApp Business API', 'وكيل AI متدرب على أسعارك وأسئلتك بالعربي والإنجليزي', 'تأهيل العملاء والحجز', 'تحويل للموظف عند الحاجة', 'CRM بسيط ومتابعات تلقائية', '٣٠ يوم ضبط وتحسين'] },
-        { id: 'scale', name: 'Scale', title: 'نظام النمو الكامل', delivery: '٥ إلى ٦ أسابيع', egp: 65000, usd: 3000, items: ['Launch وGrowth مع بعض', 'حتى ٥ أتمتة n8n مخصصة (تذكير، تقييمات، تقارير)', 'حساب إعلانات Meta وهيكل الحملات', 'لوحة متابعة', 'تدريب الفريق', '٦٠ يوم ضبط وتحسين'] },
-        { id: 'membership', name: 'Membership', title: 'متجر العضويات', delivery: 'أسبوعان', egp: 20000, priceNote: 'لأول ٥ عملاء، بعدها ٣٥٬٠٠٠ جنيه', items: ['صفحة بيع حتى ٣ باقات', 'الدفع على حساب التاجر المعتمد', 'بطاقة QR للعميل وخصم للموظف', 'لوحة مالك', 'يتثبت على الموبايل'] },
+        { id: 'launch', name: 'Launch', title: 'صفحة عملاء لإعلاناتك', bestFor: 'عيادة أو استوديو بيبدأ إعلانات وعايز الرسايل توصل مرتبة', delivery: '١٠ أيام عمل', egp: 18000, usd: 750, items: ['موقع عربي وإنجليزي حتى ٥ صفحات أو صفحة هبوط واحدة', 'فورم عملاء بيوصل على واتساب وGoogle Sheet', 'زر محادثة واتساب مباشر', 'Meta Pixel وGoogle Analytics', 'SEO أساسي', 'على دومينك وحساباتك'] },
+        { id: 'growth', name: 'Growth', title: 'وكيل واتساب بالذكاء الاصطناعي يرد ويأهل ويحجز', bestFor: 'عيادات وشركات عقارات ومراكز تجميل بتستقبل رسايل كل يوم', delivery: '٣ أسابيع', egp: 32000, usd: 1500, featured: true, items: ['رقم رسمي على WhatsApp Business API', 'وكيل AI متدرب على أسعارك وأسئلتك بالعربي والإنجليزي', 'تأهيل العملاء والحجز', 'تحويل للموظف عند الحاجة', 'CRM بسيط ومتابعات تلقائية', '٣٠ يوم ضبط وتحسين'] },
+        { id: 'scale', name: 'Scale', title: 'نظام العملاء الكامل: إعلانات وصفحة ووكيل ومتابعة', bestFor: 'عيادات بأكتر من فرع، وسطاء ومطورين عقاريين بميزانية إعلانات', delivery: '٥ إلى ٦ أسابيع', egp: 65000, usd: 3000, items: ['Launch وGrowth مع بعض', 'حتى ٥ أتمتة n8n مخصصة (تذكير، تقييمات، تقارير)', 'حساب إعلانات Meta وهيكل الحملات', 'لوحة متابعة', 'تدريب الفريق', '٦٠ يوم ضبط وتحسين'] },
+        { id: 'membership', name: 'Membership', title: 'متجر العضويات', bestFor: 'صالونات وحلاقين واستوديوهات رموش وأي نشاط العميل بيرجعله', delivery: 'أسبوعان', egp: 20000, priceNote: 'لأول ٥ عملاء، بعدها ٣٥٬٠٠٠ جنيه', items: ['صفحة بيع حتى ٣ باقات', 'الدفع على حساب التاجر المعتمد', 'بطاقة QR للعميل وخصم للموظف', 'لوحة مالك', 'يتثبت على الموبايل'] },
       ]
     : [
-        { id: 'launch', name: 'Launch', title: 'Website and lead funnel', delivery: '10 working days', egp: 18000, usd: 750, items: ['Arabic and English site, up to 5 pages or one landing page', 'Lead form sent to WhatsApp and a Google Sheet', 'WhatsApp click-to-chat', 'Meta Pixel and Google Analytics', 'Basic SEO', 'On your domain and accounts'] },
-        { id: 'growth', name: 'Growth', title: 'AI WhatsApp sales agent', delivery: '3 weeks', egp: 32000, usd: 1500, featured: true, items: ['Official WhatsApp Business API number', 'AI agent trained on your prices and FAQs in Arabic and English', 'Lead qualification and booking', 'Human handoff', 'Simple CRM pipeline and automatic follow-ups', '30 days of tuning'] },
-        { id: 'scale', name: 'Scale', title: 'The full growth system', delivery: '5 to 6 weeks', egp: 65000, usd: 3000, items: ['Launch plus Growth', 'Up to 5 custom n8n automations (reminders, reviews, reports)', 'Meta ads account and campaign structure', 'Dashboard', 'Team training', '60 days of tuning'] },
-        { id: 'membership', name: 'Membership', title: 'Membership storefront', delivery: '2 weeks', egp: 20000, priceNote: 'For the first five clients, then EGP 35,000', items: ['Sales page with up to 3 plans', 'Payment through your merchant account', 'Customer QR pass and staff redemption', 'Owner dashboard', 'Installable on phones'] },
+        { id: 'launch', name: 'Launch', title: 'Lead page for your ads', bestFor: 'A clinic or studio starting ads that needs every inquiry to land in one place', delivery: '10 working days', egp: 18000, usd: 750, items: ['Arabic and English site, up to 5 pages or one landing page', 'Lead form sent to WhatsApp and a Google Sheet', 'WhatsApp click-to-chat', 'Meta Pixel and Google Analytics', 'Basic SEO', 'On your domain and accounts'] },
+        { id: 'growth', name: 'Growth', title: 'AI WhatsApp agent that replies, qualifies and books', bestFor: 'Clinics, real estate teams and beauty businesses that get chats every day', delivery: '3 weeks', egp: 32000, usd: 1500, featured: true, items: ['Official WhatsApp Business API number', 'AI agent trained on your prices and FAQs in Arabic and English', 'Lead qualification and booking', 'Human handoff', 'Simple CRM pipeline and automatic follow-ups', '30 days of tuning'] },
+        { id: 'scale', name: 'Scale', title: 'The full lead system: ads, page, agent and follow-up', bestFor: 'Multi-branch clinics, brokerages and developers with an ad budget', delivery: '5 to 6 weeks', egp: 65000, usd: 3000, items: ['Launch plus Growth', 'Up to 5 custom n8n automations (reminders, reviews, reports)', 'Meta ads account and campaign structure', 'Dashboard', 'Team training', '60 days of tuning'] },
+        { id: 'membership', name: 'Membership', title: 'Membership storefront', bestFor: 'Salons, barbers, lash studios and other repeat-visit businesses', delivery: '2 weeks', egp: 20000, priceNote: 'For the first five clients, then EGP 35,000', items: ['Sales page with up to 3 plans', 'Payment through your merchant account', 'Customer QR pass and staff redemption', 'Owner dashboard', 'Installable on phones'] },
       ]
 
   const monthly: MonthlyPlan[] = ar
@@ -84,9 +85,9 @@ export default function ServicesPricing() {
         <div className="grid gap-5 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
           <div>
             <p className="eyebrow text-accent">{ar ? 'الخدمات والأسعار' : 'Services and pricing'}</p>
-            <h2 className="mt-3 max-w-2xl font-display text-[clamp(2.1rem,5vw,4rem)] font-bold leading-[0.98] tracking-[-0.045em] text-[#0A0A0B]">{ar ? 'سعر ثابت. مدة ثابتة. والنسخة ملكك.' : 'Fixed price. Fixed timeline. You own the build.'}</h2>
+            <h2 className="mt-3 max-w-2xl font-display text-[clamp(2.1rem,5vw,4rem)] font-bold leading-[0.98] tracking-[-0.045em] text-[#0A0A0B]">{ar ? 'متخسرش ولا عميل بعت رسالة.' : 'Stop losing the leads you already paid for.'}</h2>
           </div>
-          <p className="max-w-xl text-base leading-relaxed text-muted-fg lg:justify-self-end">{ar ? 'مواقع بتجمع عملاء، ووكلاء واتساب بالذكاء الاصطناعي بيردوا ويحجزوا، وأتمتة بتتابع بدالك. بالعربي والإنجليزي للأنشطة في مصر والخليج.' : 'Websites that capture leads, AI WhatsApp agents that answer and book, and automations that follow up. In Arabic and English, for businesses in Egypt and the Gulf.'}</p>
+          <p className="max-w-xl text-base leading-relaxed text-muted-fg lg:justify-self-end">{ar ? 'صفحات بتجمع العملاء من إعلاناتك، ووكيل واتساب بالذكاء الاصطناعي بيرد في ثواني ويأهل ويحجز، وأتمتة بتتابع اللي ماحجزش. سعر ثابت ومدة ثابتة والنسخة ملكك، للعيادات والعقارات والتجميل في مصر والخليج.' : 'Pages that capture your ad leads, an AI WhatsApp agent that replies in seconds, qualifies and books, and automations that follow up with everyone who did not book. Fixed price, fixed timeline, and you own the build. For clinics, real estate and beauty in Egypt and the Gulf.'}</p>
         </div>
 
         <div className="mt-10 grid overflow-hidden rounded-[28px] bg-[#0A0A0B] text-white sm:grid-cols-3">
@@ -120,6 +121,7 @@ export default function ServicesPricing() {
                   {dark ? <span className="rounded-full bg-[#fe8c58]/15 px-2.5 py-1 text-[10px] font-semibold text-[#fe8c58]">{ar ? 'الأكثر طلباً' : 'Most requested'}</span> : null}
                 </div>
                 <h3 className="mt-4 font-display text-2xl font-bold leading-tight">{pkg.title}</h3>
+                <p className={`mt-2 text-xs leading-relaxed ${dark ? 'text-white/55' : 'text-muted-fg'}`}><span className="font-semibold">{ar ? 'مناسب لـ: ' : 'Best for: '}</span>{pkg.bestFor}</p>
                 <div className="mt-6 flex items-end gap-2">
                   <span className="font-serif text-[2.9rem] leading-[0.85]" dir="ltr">{p.value}</span>
                   {region === 'gulf' && pkg.usd ? null : <span className={`pb-0.5 text-sm ${dark ? 'text-white/50' : 'text-muted-fg'}`}>{p.unit}</span>}

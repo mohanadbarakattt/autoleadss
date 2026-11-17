@@ -17,9 +17,11 @@ import {
   Waves,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import MembershipFlowDemo from '../MembershipFlowDemo'
 import QuoteBuilder from './QuoteBuilder'
 import ServicesPricing from './ServicesPricing'
+import LeadHero from './LeadHero'
+import Niches from './Niches'
+import { PAGE_FAQ } from '../../seo/pageFaq'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
@@ -61,56 +63,6 @@ function SectionIntro({ eyebrow, title, body, dark = false }: { eyebrow: string;
   )
 }
 
-function Hero() {
-  const { isRTL, localePath } = useLocale()
-  const deliverables = isRTL
-    ? ['بيع الباقات', 'تحصيل الدفع', 'استخدام QR', 'متابعة الأداء']
-    : ['Sell packages', 'Take payment', 'Redeem by QR', 'See performance']
-
-  return (
-    <>
-      <section className="relative overflow-hidden bg-[#0A0A0B] text-white">
-        <div aria-hidden className="absolute inset-0 grain-overlay opacity-70" />
-        <div aria-hidden className="absolute -end-32 -top-48 h-[620px] w-[620px] rounded-full bg-[#ff5c2a]/20 blur-[120px]" />
-        <div className="content-width relative grid items-center gap-10 pb-16 pt-28 sm:pt-32 lg:min-h-[720px] lg:grid-cols-[0.88fr_1.12fr] lg:gap-14 lg:pb-24 lg:pt-36">
-          <div className="max-w-2xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">AutoLeadss / Cairo</p>
-            <h1 className="mt-6 font-display text-[clamp(3.4rem,7.5vw,6.8rem)] font-bold leading-[0.88] tracking-[-0.066em]">
-              {isRTL ? 'بيع الشهر' : 'Sell the month'}
-              <span className="mt-1 block font-serif font-normal italic text-[#fe8c58]">{isRTL ? 'مقدماً.' : 'upfront.'}</span>
-            </h1>
-            <p className="mt-6 max-w-lg text-base leading-relaxed text-white/62 sm:text-lg">
-              {isRTL
-                ? 'نحوّل خدمتك المتكررة لعضوية باسمك: بيع، QR ولوحة مالك.'
-                : 'We turn repeat services into an owned membership product: storefront, QR and dashboard.'}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#pricing" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#fe8c58] px-6 text-sm font-semibold text-[#111214] transition-transform hover:-translate-y-0.5">
-                {isRTL ? 'عرض أول ٥ عملاء' : 'Founding offer'}
-              </a>
-                <Link to={localePath('/showroom')} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/16 bg-white/[0.05] px-6 text-sm font-medium text-white transition-colors hover:bg-white/10">{isRTL ? 'شوف النظام كاملاً' : 'See the full system'}</Link>
-            </div>
-          </div>
-          <div className="mx-auto w-full max-w-xl lg:max-w-none lg:ps-4">
-            <MembershipFlowDemo mode="compact" />
-          </div>
-        </div>
-      </section>
-
-      <section id="offer" className="scroll-mt-36 border-y border-black/10 bg-[#EFECE4]">
-        <div className="content-width grid sm:grid-cols-2 lg:grid-cols-4">
-          {deliverables.map((item, index) => (
-            <div key={item} className="flex min-h-28 items-center gap-4 border-b border-black/10 py-6 sm:px-5 lg:border-b-0 lg:border-e first:ps-0 last:border-e-0">
-              <span className="font-mono text-xs text-accent">0{index + 1}</span>
-              <p className="max-w-[12rem] font-display text-lg font-bold leading-tight">{item}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </>
-  )
-}
-
 function MembershipFlow() {
   const { isRTL } = useLocale()
   const steps = isRTL
@@ -133,7 +85,7 @@ function MembershipFlow() {
     <section className="bg-[#FAFAF7] py-20 sm:py-28">
       <div className="content-width">
         <SectionIntro
-          eyebrow={isRTL ? 'منتج واحد متصل' : 'One connected product'}
+          eyebrow={isRTL ? 'متجر العضويات · للأنشطة اللي العميل بيرجعلها' : 'Membership storefront · for repeat-visit businesses'}
           title={isRTL ? 'من أول دفعة لآخر استخدام.' : 'From first payment to every redemption.'}
           body={isRTL ? 'نفس قواعد الباقة والسعر والرصيد بتظهر للعميل والموظف والمالك، من غير اختلاف بين الشاشات.' : 'The same package rules, price and balance follow the customer, staff and owner—without mismatched screens.'}
         />
@@ -383,21 +335,8 @@ function FoundingOffer() {
 function FaqAndContact() {
   const { isRTL } = useLocale()
   const t = useT()
-  const questions = isRTL
-    ? [
-        ['هل لازم أدفع اشتراك شهري لأوتوليدز؟', 'لا، الخطط الشهرية اختيارية. كل باقة بسعر ثابت وتسليم كامل للنسخة. لو عايز متابعة أو تحسين أو إدارة إعلانات، تقدر تضيف خطة شهرية من ٢٬٥٠٠ لـ ١٢٬٠٠٠ جنيه.'],
-        ['مين بيستقبل فلوس الباقات؟', 'التاجر من خلال حسابه المعتمد لدى مقدم الدفع. إحنا نجهز تجربة الربط ولا نضمن قبول مقدم الخدمة.'],
-        ['هل النظام يشتغل على الموبايل؟', 'نعم. واجهة العميل والموظف قابلة للإضافة على الشاشة الرئيسية كتطبيق PWA.'],
-        ['هل كل الأنشطة بتاخد نفس التصميم؟', 'نفس الهيكل التقني، لكن الهوية والصور والباقات والمحتوى والتفاصيل تتكيف مع كل نشاط.'],
-        ['إمتى يبدأ الأسبوعان؟', 'بعد استلام الدفعة والمحتوى المعتمد وقواعد الباقات وأي وصول مطلوب للحسابات.'],
-      ]
-    : [
-        ['Do I have to pay AutoLeadss a monthly subscription?', 'No. Monthly plans are optional. Every package is a fixed price with a full handoff of the build. If you want ongoing care, tuning or ads management, you can add a monthly plan from EGP 2,500 to 12,000.'],
-        ['Who receives the membership payments?', 'The merchant receives them through its approved provider account. We prepare the connection experience but cannot guarantee provider approval.'],
-        ['Does the system work on a phone?', 'Yes. Customer and staff experiences can be installed on the home screen as a PWA.'],
-        ['Does every business receive the same design?', 'The technical system is consistent; brand, imagery, plans, content and details are tailored to each business.'],
-        ['When do the two weeks begin?', 'After the deposit, approved content, package rules and required account access are received.'],
-      ]
+  const { locale } = useLocale()
+  const questions = PAGE_FAQ[locale].map(item => [item.q, item.a] as const)
 
   return (
     <section id="faq" className="scroll-mt-36 bg-[#FAFAF7] py-20 sm:py-28">
@@ -405,7 +344,7 @@ function FaqAndContact() {
         <div className="lg:sticky lg:top-28 lg:self-start">
           <p className="eyebrow text-accent">{isRTL ? 'قبل ما نبدأ' : 'Before we start'}</p>
           <h2 className="mt-3 font-display text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.98] tracking-[-0.045em]">{isRTL ? 'واضح من البداية.' : 'Clear from day one.'}</h2>
-          <p className="mt-5 max-w-md text-base leading-relaxed text-muted-fg">{isRTL ? 'نبيع مشروع محدد، بسعر واضح، وتسليم واضح. أول محادثة هدفها نعرف هل عندك عرض شهري يستاهل البناء.' : 'A defined project, a visible price and a clear handoff. The first conversation decides whether your repeat purchase is strong enough to package.'}</p>
+          <p className="mt-5 max-w-md text-base leading-relaxed text-muted-fg">{isRTL ? 'نبيع مشروع محدد، بسعر واضح، وتسليم واضح. أول مكالمة هدفها نعرف بييجيلك كام رسالة، منين، وإيه اللي بيضيع منها.' : 'A defined project, a visible price and a clear handoff. The first call maps how many messages you get, where they come from and where they are lost.'}</p>
         </div>
         <div className="divide-y divide-border border-y border-border">
           {questions.map(([question, answer], index) => <details key={question} className="group py-1" open={index === 0}><summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-6 font-display text-lg font-bold"><span>{question}</span><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-accent transition-transform group-open:rotate-45">+</span></summary><p className="max-w-2xl pb-6 pe-12 text-sm leading-relaxed text-muted-fg">{answer}</p></details>)}
@@ -416,7 +355,7 @@ function FaqAndContact() {
         <div className="relative overflow-hidden rounded-[32px] bg-[#0A0A0B] px-7 py-12 text-white sm:px-12 sm:py-16">
           <div aria-hidden className="absolute -end-24 -top-32 h-80 w-80 rounded-full bg-[#ff5c2a]/25 blur-[90px]" />
           <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div><p className="eyebrow text-[#fe8c58]">{isRTL ? 'مكالمة قصيرة قبل أي التزام' : 'A short call before any commitment'}</p><h2 className="mt-3 max-w-3xl font-display text-[clamp(2.25rem,5.5vw,4.8rem)] font-bold leading-[0.95] tracking-[-0.05em]">{isRTL ? 'إيه الحاجة اللي عميلك بيشتريها كل شهر؟' : 'What does your customer already buy every month?'}</h2></div>
+            <div><p className="eyebrow text-[#fe8c58]">{isRTL ? 'مكالمة قصيرة قبل أي التزام' : 'A short call before any commitment'}</p><h2 className="mt-3 max-w-3xl font-display text-[clamp(2.25rem,5.5vw,4.8rem)] font-bold leading-[0.95] tracking-[-0.05em]">{isRTL ? 'كام رسالة جاتلك امبارح ومحدش رد عليها؟' : 'How many messages waited for a reply yesterday?'}</h2></div>
             <a href={waLink(t.hero.waText)} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#1E7E48] px-7 text-sm font-semibold text-white">{isRTL ? 'ابعتلنا على واتساب' : 'Start on WhatsApp'}</a>
           </div>
         </div>
@@ -428,13 +367,14 @@ function FaqAndContact() {
 export default function HomePageSystem() {
   return (
     <>
-      <Hero />
+      <LeadHero />
+      <Niches />
+      <ServicesPricing />
+      <TrustStrip />
+      <Work />
       <MembershipFlow />
       <PackageLab />
-      <TrustStrip />
       <QuoteBuilder />
-      <ServicesPricing />
-      <Work />
       <FoundingOffer />
       <FaqAndContact />
     </>
