@@ -19,6 +19,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import MembershipFlowDemo from '../MembershipFlowDemo'
 import QuoteBuilder from './QuoteBuilder'
+import ServicesPricing from './ServicesPricing'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
 import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
@@ -304,11 +305,11 @@ function PackageLab() {
 }
 
 function Work() {
-  const { locale, localePath, isRTL } = useLocale()
+  const { isRTL } = useLocale()
   const [activeWork, setActiveWork] = useState(0)
   const items = [
     { name: 'TUT', domain: 'tutapp.co', label: isRTL ? 'منتج حي' : 'Live product', body: isRTL ? 'منتج سفر لمصر مبني على إجابات موثقة ومصادر واضحة.' : 'An Egypt travel product built around sourced, verifiable answers.', image: '/work/tut.png', href: 'https://tutapp.co', external: true, aspect: 'aspect-[2467/1297]', surface: 'bg-[#f4eddc]' },
-    { name: 'Lash Cartel', domain: 'lash-cartel.demo', label: isRTL ? 'ديمو تصوري' : 'Concept demo', body: isRTL ? 'تجربة حجز راقية لاستوديو رموش في الزمالك.' : 'A premium booking experience for a Zamalek lash studio.', image: `/demos/lashes/${locale === 'ar' ? 'ar' : 'en'}-hero.png`, href: localePath('/demo/lashes'), external: false, aspect: 'aspect-[2880/1284]', surface: 'bg-[#080808]' },
+    { name: 'Lash Cartel Cosmetics', domain: 'lashcartelcosmetics.com', label: isRTL ? 'مشروع عميل · أستراليا' : 'Client project · Australia', body: isRTL ? 'المتجر الإلكتروني الكامل لبراند رموش أسترالي بيصمم ويشحن من أستراليا. الموقع شغال على lashcartelcosmetics.com.' : 'The full online store for an Australian beauty brand that designs and ships its lashes from Australia. Live at lashcartelcosmetics.com.', built: isRTL ? ['متجر ودفع أونلاين عن طريق Stripe', 'اختبار من ٥ أسئلة يرشح الرموش المناسبة', 'شات بوت للأسئلة الشائعة', 'فورم طلبات للموزعين وماكينات البيع', 'إيميلات تلقائية للطلب والسلة المتروكة ورجوع المنتج', 'لوحة إدارة للمخزون والشحن'] : ['Shop and Stripe checkout', 'Five-question lash match quiz', 'FAQ chatbot', 'Stockist and vending machine enquiry forms', 'Automated order, abandoned cart and back-in-stock emails', 'Stock and dispatch admin dashboard'], image: '/work/lashcartel.png', href: 'https://lashcartelcosmetics.com', external: true, aspect: 'aspect-[2467/1297]', surface: 'bg-[#f5d6d2]' },
     { name: 'MBAI Group', domain: 'mbai-group.com', label: isRTL ? 'موقع المجموعة' : 'Group website', body: isRTL ? 'واجهة تحريرية لمجموعة ذكاء اصطناعي ومنتجات في المنطقة.' : 'An editorial site for a regional AI and product group.', image: '/work/mbai.png', href: 'https://mbai-group.com', external: true, aspect: 'aspect-[2467/1297]', surface: 'bg-[#cbc8c3]' },
   ]
   const activeItem = items[activeWork]
@@ -327,7 +328,7 @@ function Work() {
           <div className="flex h-11 items-center justify-between border-b border-white/10 bg-[#171719] px-4 sm:h-12 sm:px-5"><div className="flex items-center gap-1.5" aria-hidden><span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></div><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/38" dir="ltr">{activeItem.domain}</span></div>
           <div className={`${activeItem.aspect} ${activeItem.surface}`}><img key={activeItem.image} src={activeItem.image} alt={`${activeItem.name} website homepage`} decoding="async" className="h-full w-full object-contain object-top" /></div>
         </div>
-        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="font-display text-3xl font-bold">{activeItem.name}</h3><p className="mt-2 max-w-xl text-sm leading-relaxed text-white/50">{activeItem.body}</p></div>{projectLink}</div>
+        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="font-display text-3xl font-bold">{activeItem.name}</h3><p className="mt-2 max-w-xl text-sm leading-relaxed text-white/50">{activeItem.body}</p>{'built' in activeItem && activeItem.built ? <div className="mt-5"><p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#fe8c58]">{isRTL ? 'اللي بنيناه' : 'What we built'}</p><ul className="mt-3 grid max-w-2xl gap-x-6 gap-y-2 sm:grid-cols-2">{activeItem.built.map(point => <li key={point} className="flex gap-2 text-sm text-white/70"><Check size={15} className="mt-0.5 shrink-0 text-[#fe8c58]" />{point}</li>)}</ul></div> : null}</div>{projectLink}</div>
       </div>
     </section>
   )
@@ -384,14 +385,14 @@ function FaqAndContact() {
   const t = useT()
   const questions = isRTL
     ? [
-        ['هل العميل بيدفع اشتراك شهري لأوتوليدز؟', 'لا. ده تنفيذ وتسليم مقابل سعر المشروع. أي صيانة أو تطوير لاحق يكون باتفاق منفصل.'],
+        ['هل لازم أدفع اشتراك شهري لأوتوليدز؟', 'لا، الخطط الشهرية اختيارية. كل باقة بسعر ثابت وتسليم كامل للنسخة. لو عايز متابعة أو تحسين أو إدارة إعلانات، تقدر تضيف خطة شهرية من ٢٬٥٠٠ لـ ١٢٬٠٠٠ جنيه.'],
         ['مين بيستقبل فلوس الباقات؟', 'التاجر من خلال حسابه المعتمد لدى مقدم الدفع. إحنا نجهز تجربة الربط ولا نضمن قبول مقدم الخدمة.'],
         ['هل النظام يشتغل على الموبايل؟', 'نعم. واجهة العميل والموظف قابلة للإضافة على الشاشة الرئيسية كتطبيق PWA.'],
         ['هل كل الأنشطة بتاخد نفس التصميم؟', 'نفس الهيكل التقني، لكن الهوية والصور والباقات والمحتوى والتفاصيل تتكيف مع كل نشاط.'],
         ['إمتى يبدأ الأسبوعان؟', 'بعد استلام الدفعة والمحتوى المعتمد وقواعد الباقات وأي وصول مطلوب للحسابات.'],
       ]
     : [
-        ['Does the client pay AutoLeadss a monthly subscription?', 'No. This is a fixed implementation and handoff. Optional maintenance or later development is agreed separately.'],
+        ['Do I have to pay AutoLeadss a monthly subscription?', 'No. Monthly plans are optional. Every package is a fixed price with a full handoff of the build. If you want ongoing care, tuning or ads management, you can add a monthly plan from EGP 2,500 to 12,000.'],
         ['Who receives the membership payments?', 'The merchant receives them through its approved provider account. We prepare the connection experience but cannot guarantee provider approval.'],
         ['Does the system work on a phone?', 'Yes. Customer and staff experiences can be installed on the home screen as a PWA.'],
         ['Does every business receive the same design?', 'The technical system is consistent; brand, imagery, plans, content and details are tailored to each business.'],
@@ -432,6 +433,7 @@ export default function HomePageSystem() {
       <PackageLab />
       <TrustStrip />
       <QuoteBuilder />
+      <ServicesPricing />
       <Work />
       <FoundingOffer />
       <FaqAndContact />

@@ -42,7 +42,7 @@ export default function WorkIndex() {
   }
   const projects = [
     { name: 'TUT', label: ar ? 'منتج حي' : 'Live product', image: '/work/tut.png', href: 'https://tutapp.co' },
-    { name: 'Lash Cartel', label: ar ? 'ديمو عميل' : 'Client demo', image: `/demos/lashes/${ar ? 'ar' : 'en'}-hero.png`, href: localePath('/demo/lashes'), internal: true },
+    { name: 'Lash Cartel Cosmetics', label: ar ? 'مشروع عميل · أستراليا' : 'Client project · Australia', image: '/work/lashcartel.png', href: 'https://lashcartelcosmetics.com', internal: false },
     { name: 'MBAI Group', label: ar ? 'موقع المجموعة' : 'Group website', image: '/work/mbai.png', href: 'https://mbai-group.com' },
   ]
   return <div className="min-h-screen bg-[#F4F1E9] text-[#11110F]">

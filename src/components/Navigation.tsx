@@ -48,6 +48,7 @@ export default function Navigation() {
         { label: 'المنتج', href: `${home}#offer`, id: 'offer' },
         { label: 'الباقات', href: `${home}#packages`, id: 'packages' },
         { label: 'اختبر الفكرة', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'الخدمات', href: `${home}#services`, id: 'services' },
         { label: 'شغلنا', href: `${home}#work`, id: 'work' },
         { label: 'السعر', href: `${home}#pricing`, id: 'pricing' },
       ]
@@ -55,6 +56,7 @@ export default function Navigation() {
         { label: 'Product', href: `${home}#offer`, id: 'offer' },
         { label: 'Packages', href: `${home}#packages`, id: 'packages' },
         { label: 'Fit check', href: `${home}#quote-builder`, id: 'quote-builder' },
+        { label: 'Services', href: `${home}#services`, id: 'services' },
         { label: 'Work', href: `${home}#work`, id: 'work' },
         { label: 'Price', href: `${home}#pricing`, id: 'pricing' },
       ]
