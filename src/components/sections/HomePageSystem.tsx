@@ -23,6 +23,7 @@ import LeadHero from './LeadHero'
 import Niches from './Niches'
 import { PAGE_FAQ } from '../../seo/pageFaq'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { ON_CALL_COPY } from '../../content/onCall'
 import { trackLeadFormConversion } from '../../analytics'
 import { waLink } from '../../site'
 
@@ -257,7 +258,7 @@ function PackageLab() {
 }
 
 function Work() {
-  const { isRTL } = useLocale()
+  const { isRTL, locale, localePath } = useLocale()
   const [activeWork, setActiveWork] = useState(0)
   const items = [
     { name: 'TUT', domain: 'tutapp.co', label: isRTL ? 'منتج حي' : 'Live product', body: isRTL ? 'منتج سفر لمصر مبني على إجابات موثقة ومصادر واضحة.' : 'An Egypt travel product built around sourced, verifiable answers.', image: '/work/tut.png', href: 'https://tutapp.co', external: true, aspect: 'aspect-[2467/1297]', surface: 'bg-[#f4eddc]' },
@@ -280,7 +281,7 @@ function Work() {
           <div className="flex h-11 items-center justify-between border-b border-white/10 bg-[#171719] px-4 sm:h-12 sm:px-5"><div className="flex items-center gap-1.5" aria-hidden><span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></div><span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/38" dir="ltr">{activeItem.domain}</span></div>
           <div className={`${activeItem.aspect} ${activeItem.surface}`}><img key={activeItem.image} src={activeItem.image} alt={`${activeItem.name} website homepage`} decoding="async" className="h-full w-full object-contain object-top" /></div>
         </div>
-        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="font-display text-3xl font-bold">{activeItem.name}</h3><p className="mt-2 max-w-xl text-sm leading-relaxed text-white/50">{activeItem.body}</p>{'built' in activeItem && activeItem.built ? <div className="mt-5"><p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#fe8c58]">{isRTL ? 'اللي بنيناه' : 'What we built'}</p><ul className="mt-3 grid max-w-2xl gap-x-6 gap-y-2 sm:grid-cols-2">{activeItem.built.map(point => <li key={point} className="flex gap-2 text-sm text-white/70"><Check size={15} className="mt-0.5 shrink-0 text-[#fe8c58]" />{point}</li>)}</ul></div> : null}</div>{projectLink}</div>
+        <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><h3 className="font-display text-3xl font-bold">{activeItem.name}</h3><p className="mt-2 max-w-xl text-sm leading-relaxed text-white/50">{activeItem.body}</p>{'built' in activeItem && activeItem.built ? <div className="mt-5"><p className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#fe8c58]">{isRTL ? 'اللي بنيناه' : 'What we built'}</p><ul className="mt-3 grid max-w-2xl gap-x-6 gap-y-2 sm:grid-cols-2">{activeItem.built.map(point => <li key={point} className="flex gap-2 text-sm text-white/70"><Check size={15} className="mt-0.5 shrink-0 text-[#fe8c58]" />{point}</li>)}</ul></div> : null}{activeItem.name === 'Lash Cartel Cosmetics' ? <Link to={localePath('/on-call')} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#fe8c58] hover:underline">{ON_CALL_COPY[locale].lashLink} <ArrowUpRight size={15} /></Link> : null}</div>{projectLink}</div>
       </div>
     </section>
   )

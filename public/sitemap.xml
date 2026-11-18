@@ -25,6 +25,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/pricing" />
   </url>
   <url>
+    <loc>https://autoleadss.com/en/on-call</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/on-call" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/on-call" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/on-call" />
+  </url>
+  <url>
+    <loc>https://autoleadss.com/ar/on-call</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/on-call" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/on-call" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en/on-call" />
+  </url>
+  <url>
     <loc>https://autoleadss.com/en/packages</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://autoleadss.com/en/packages" />
     <xhtml:link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar/packages" />

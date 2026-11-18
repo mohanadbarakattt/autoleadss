@@ -26,6 +26,7 @@ const WorkIndex = lazy(() => import('./pages/WorkIndex'))
 const MembershipFlowDemoPage = lazy(() => import('./pages/MembershipFlowDemoPage'))
 const PackagesPage = lazy(() => import('./pages/PackagesPage'))
 const GuidedShowcasePage = lazy(() => import('./pages/GuidedShowcasePage'))
+const OnCallPage = lazy(() => import('./pages/OnCallPage'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -63,6 +64,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/ar/pilot/:slug/admin" element={<LocaleProvider locale="ar"><PilotAdmin /></LocaleProvider>} />
           <Route path="/en/pilot/:slug" element={<LocaleProvider locale="en"><PilotStorefront /></LocaleProvider>} />
           <Route path="/ar/pilot/:slug" element={<LocaleProvider locale="ar"><PilotStorefront /></LocaleProvider>} />
+          <Route path="/on-call" element={<Navigate to="/en/on-call" replace />} />
+          <Route path="/en/on-call" element={<LocaleProvider locale="en"><OnCallPage /></LocaleProvider>} />
+          <Route path="/ar/on-call" element={<LocaleProvider locale="ar"><OnCallPage /></LocaleProvider>} />
           <Route path="/en/:slug" element={<LocaleProvider locale="en"><VerticalLanding /></LocaleProvider>} />
           <Route path="/en" element={<LocaleProvider locale="en"><App /></LocaleProvider>} />
           <Route path="/ar" element={<LocaleProvider locale="ar"><App /></LocaleProvider>} />

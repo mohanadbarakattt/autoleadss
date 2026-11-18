@@ -6,7 +6,7 @@ import { SITE } from '../site'
 
 export default function Footer() {
   const t = useT()
-  const { localePath } = useLocale()
+  const { locale, localePath } = useLocale()
   const waHref = SITE.waBase
   const mailHref = `mailto:${SITE.email}`
 
@@ -75,6 +75,7 @@ export default function Footer() {
             <p className="text-xs text-[#8A857D]">{t.footer.copyright}</p>
             <span className="hidden h-3 w-px bg-white/10 sm:block" />
             <div className="flex items-center gap-4">
+              <a href={localePath('/on-call')} className="text-xs text-[#8A857D] hover:text-white">{locale === 'ar' ? 'أون كول' : 'On Call'}</a>
               <a href={localePath('/privacy')} className="text-xs text-[#8A857D] hover:text-white">{t.footer.privacy}</a>
               <a href={localePath('/terms')} className="text-xs text-[#8A857D] hover:text-white">{t.footer.terms}</a>
             </div>

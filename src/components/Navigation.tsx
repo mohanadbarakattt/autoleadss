@@ -40,13 +40,16 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
   const wa = waLink(t.hero.waText)
-  const forceGlass = /privacy|terms|pricing|se3r|work|packages|demo/.test(location.pathname)
+  const forceGlass = /privacy|terms|pricing|se3r|work|packages|demo|on-call/.test(location.pathname)
 
   const home = localePath()
+  const onCallHref = localePath('/on-call')
+  const onOnCall = location.pathname.includes('/on-call')
   const navLinks = locale === 'ar'
     ? [
         { label: 'بنخدم مين', href: `${home}#who-we-help`, id: 'who-we-help' },
         { label: 'الخدمات', href: `${home}#services`, id: 'services' },
+        { label: 'أون كول', href: onCallHref, id: 'on-call' },
         { label: 'شغلنا', href: `${home}#work`, id: 'work' },
         { label: 'العضويات', href: `${home}#packages`, id: 'packages' },
         { label: 'أسئلة', href: `${home}#faq`, id: 'faq' },
@@ -54,6 +57,7 @@ export default function Navigation() {
     : [
         { label: 'Who we help', href: `${home}#who-we-help`, id: 'who-we-help' },
         { label: 'Services', href: `${home}#services`, id: 'services' },
+        { label: 'On Call', href: onCallHref, id: 'on-call' },
         { label: 'Work', href: `${home}#work`, id: 'work' },
         { label: 'Memberships', href: `${home}#packages`, id: 'packages' },
         { label: 'FAQ', href: `${home}#faq`, id: 'faq' },
@@ -95,7 +99,7 @@ export default function Navigation() {
 
           <nav className="relative hidden items-center rounded-full bg-black/30 p-1 lg:flex">
             {navLinks.map(link => {
-              const on = active === link.id
+              const on = link.id === 'on-call' ? onOnCall : (!onOnCall && active === link.id)
               return (
                 <a
                   key={link.href}

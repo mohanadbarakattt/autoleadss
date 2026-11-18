@@ -3,6 +3,13 @@ import type { Locale } from '../i18n/translations'
 import { PAGE_FAQ } from './pageFaq'
 import type { DemoId } from '../demos/data'
 import { DEMO_SEO } from '../demos/seo'
+import {
+  ON_CALL_COPY,
+  ON_CALL_CURRENCIES,
+  ON_CALL_PATH,
+  ON_CALL_PRICES,
+  ON_CALL_TIERS,
+} from '../content/onCall'
 
 const AREA_SERVED = [
   { '@type': 'Country', name: 'Egypt' },
@@ -188,5 +195,95 @@ export function innerPageGraph(locale: Locale, path: string, title: string, desc
     description,
     inLanguage: locale === 'ar' ? 'ar' : 'en',
     isPartOf: { '@id': `${SITE.origin}/#website` },
+  }
+}
+
+const ON_CALL_AREA = [
+  ...AREA_SERVED,
+  { '@type': 'Country', name: 'United States' },
+  { '@type': 'Country', name: 'United Kingdom' },
+]
+
+export function onCallGraph(locale: Locale, title: string, description: string) {
+  const isAr = locale === 'ar'
+  const pageUrl = `${SITE.origin}/${locale}${ON_CALL_PATH}`
+  const copy = ON_CALL_COPY[locale]
+  const tiers = ON_CALL_TIERS[locale]
+  const catalog = {
+    '@type': 'OfferCatalog',
+    name: isAr ? 'باقات أوتوليدز أون كول' : 'AutoLeadss On Call plans',
+    itemListElement: tiers.map((tier) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        '@id': `${SITE.origin}/#on-call-${tier.id}`,
+        name: isAr ? `أوتوليدز أون كول · ${tier.name}` : `AutoLeadss On Call · ${tier.name}`,
+        description: `${tier.title}. ${tier.intro} ${tier.items.join(' ')}`,
+        provider: { '@id': `${SITE.origin}/#business` },
+        areaServed: ON_CALL_AREA,
+        offers: ON_CALL_CURRENCIES.map((currency) => ({
+          '@type': 'Offer',
+          price: String(ON_CALL_PRICES[tier.id][currency]),
+          priceCurrency: currency,
+          unitText: 'MONTH',
+          url: `${pageUrl}#plans`,
+        })),
+      },
+    })),
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: title,
+        description,
+        inLanguage: isAr ? 'ar' : 'en',
+        isPartOf: { '@id': `${SITE.origin}/#website` },
+        about: { '@id': `${SITE.origin}/#on-call-service` },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${SITE.origin}/#on-call-service`,
+        name: isAr ? 'أوتوليدز أون كول' : 'AutoLeadss On Call',
+        serviceType: isAr
+          ? 'خطة شهرية لإدارة المتاجر الإلكترونية'
+          : 'Monthly ecommerce store support retainer',
+        provider: { '@id': `${SITE.origin}/#business` },
+        areaServed: ON_CALL_AREA,
+        audience: {
+          '@type': 'BusinessAudience',
+          audienceType: isAr
+            ? 'متاجر إلكترونية من ١ إلى ١٠ أفراد ومن غير مطور أو مصمم داخلي'
+            : 'Online retailers with 1 to 10 staff and no in-house developer or designer',
+        },
+        description,
+        url: pageUrl,
+        hasOfferCatalog: catalog,
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${pageUrl}#faq`,
+        url: `${pageUrl}#faq`,
+        inLanguage: isAr ? 'ar' : 'en',
+        isPartOf: { '@id': `${pageUrl}#webpage` },
+        mainEntity: copy.faq.items.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: SITE.name, item: `${SITE.origin}/${locale}` },
+          { '@type': 'ListItem', position: 2, name: isAr ? 'أون كول' : 'On Call', item: pageUrl },
+        ],
+      },
+    ],
   }
 }
