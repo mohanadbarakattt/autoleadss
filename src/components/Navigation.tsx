@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
-import { useLocale, useT } from '../i18n/LocaleProvider'
+import { useLocale } from '../i18n/LocaleProvider'
 import type { Locale } from '../i18n/translations'
 import Logo from './Logo'
 import { trackLeadFormConversion } from '../analytics'
-import { SITE, waLink } from '../site'
+import { SITE } from '../site'
+import { AUDIT_COPY, auditLink } from '../content/audit'
 
 const LOCALE_LABEL: Record<Locale, string> = { en: 'EN', ar: 'AR' }
 const LOCALES: Locale[] = ['en', 'ar']
@@ -33,25 +34,26 @@ function LocaleSwitcher({ locale, switchLocale, size = 'md' }: { locale: Locale;
 }
 
 export default function Navigation() {
-  const t = useT()
   const { locale, switchLocale, localePath } = useLocale()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('')
-  const wa = waLink(t.hero.waText)
+  const wa = auditLink(locale)
   const forceGlass = /privacy|terms|pricing|se3r|work|packages|demo|on-call/.test(location.pathname)
 
   const home = localePath()
   const onCallHref = localePath('/on-call')
   const onOnCall = location.pathname.includes('/on-call')
+  const onPackages = location.pathname.endsWith('/packages')
   const navLinks = locale === 'ar'
     ? [
         { label: 'بنخدم مين', href: `${home}#who-we-help`, id: 'who-we-help' },
         { label: 'الخدمات', href: `${home}#services`, id: 'services' },
         { label: 'أون كول', href: onCallHref, id: 'on-call' },
         { label: 'شغلنا', href: `${home}#work`, id: 'work' },
-        { label: 'العضويات', href: `${home}#packages`, id: 'packages' },
+        { label: 'تحليل مجاني', href: `${home}#audit`, id: 'audit' },
+        { label: 'العضويات', href: localePath('/packages'), id: 'memberships' },
         { label: 'أسئلة', href: `${home}#faq`, id: 'faq' },
       ]
     : [
@@ -59,7 +61,8 @@ export default function Navigation() {
         { label: 'Services', href: `${home}#services`, id: 'services' },
         { label: 'On Call', href: onCallHref, id: 'on-call' },
         { label: 'Work', href: `${home}#work`, id: 'work' },
-        { label: 'Memberships', href: `${home}#packages`, id: 'packages' },
+        { label: 'Free audit', href: `${home}#audit`, id: 'audit' },
+        { label: 'Memberships', href: localePath('/packages'), id: 'memberships' },
         { label: 'FAQ', href: `${home}#faq`, id: 'faq' },
       ]
 
@@ -99,7 +102,7 @@ export default function Navigation() {
 
           <nav className="relative hidden items-center rounded-full bg-black/30 p-1 lg:flex">
             {navLinks.map(link => {
-              const on = link.id === 'on-call' ? onOnCall : (!onOnCall && active === link.id)
+              const on = link.id === 'on-call' ? onOnCall : link.id === 'memberships' ? onPackages : (!onOnCall && !onPackages && active === link.id)
               return (
                 <a
                   key={link.href}
@@ -131,7 +134,7 @@ export default function Navigation() {
               className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white shadow-[0_10px_28px_-8px_rgba(30,126,72,0.55)] transition-transform hover:-translate-y-0.5"
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-              {t.nav.cta}
+              {AUDIT_COPY[locale].ctaShort}
             </a>
           </div>
 
@@ -176,7 +179,7 @@ export default function Navigation() {
                   onClick={trackLeadFormConversion}
                   className="inline-flex items-center gap-2 rounded-full bg-wa px-5 py-2.5 text-sm font-medium text-white"
                 >
-                  {t.nav.cta}
+                  {AUDIT_COPY[locale].ctaShort}
                 </a>
               </div>
             </div>

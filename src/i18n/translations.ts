@@ -157,7 +157,7 @@ export const translations = {
       mail: 'Email the business brief',
     },
     footer: {
-      tagline: 'Premium subscription storefronts, QR membership and a dashboard local teams can actually use.',
+      tagline: 'AI WhatsApp agents that reply in seconds, qualify and book, in Arabic and English. For clinics, real estate and beauty in Egypt and the Gulf.',
       advanced: 'If you need more advanced builds, check',
       copyright: '© 2026 AutoLeadss. All rights reserved.',
       cities: 'Cairo, Giza, Alexandria · Egypt · Dubai, UAE · Gulf',
@@ -341,7 +341,7 @@ export const translations = {
       mail: 'ابعت موجز النشاط',
     },
     footer: {
-      tagline: 'واجهات اشتراك احترافية وعضوية QR ولوحة تحكم يقدر الفريق يستخدمها فعلاً.',
+      tagline: 'وكلاء واتساب بالذكاء الاصطناعي بيردوا في ثواني ويأهلوا العميل ويحجزوا، بالعربي والإنجليزي. للعيادات والعقارات ومراكز التجميل في مصر والخليج.',
       advanced: 'لو محتاج شغل أمتن أو أذكى، شوف',
       copyright: '© ٢٠٢٦ أوتوليدز. جميع الحقوق محفوظة.',
       cities: 'القاهرة، الجيزة، الإسكندرية · مصر · دبي، الإمارات · الخليج',

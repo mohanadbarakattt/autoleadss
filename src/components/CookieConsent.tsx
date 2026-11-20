@@ -34,6 +34,14 @@ export function useCookieDecided() {
 
 function save(analytics: boolean) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, analytics, ts: Date.now() }))
+  // Google Consent Mode (defaults to "denied" in index.html).
+  const state = analytics ? 'granted' : 'denied'
+  window.gtag?.('consent', 'update', {
+    ad_storage: state,
+    analytics_storage: state,
+    ad_user_data: state,
+    ad_personalization: state,
+  })
   window.dispatchEvent(new CustomEvent('autoleadss:consent', { detail: { analytics } }))
   window.dispatchEvent(new Event(CONSENT_EVENT))
 }

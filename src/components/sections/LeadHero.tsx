@@ -1,7 +1,7 @@
 import { Check, MessageCircle } from 'lucide-react'
 import { useLocale, useT } from '../../i18n/LocaleProvider'
+import { AUDIT_COPY, auditLink } from '../../content/audit'
 import { trackLeadFormConversion } from '../../analytics'
-import { bookCallLink } from './ServicesPricing'
 
 function ChatMock({ ar }: { ar: boolean }) {
   const msgs = ar
@@ -47,9 +47,10 @@ function ChatMock({ ar }: { ar: boolean }) {
 }
 
 export default function LeadHero() {
-  const { isRTL } = useLocale()
+  const { isRTL, locale } = useLocale()
   const t = useT()
   const ar = isRTL
+  const audit = AUDIT_COPY[locale]
   const steps = ar
     ? ['رد في ثواني', 'تأهيل العميل', 'حجز الكشف أو المعاينة', 'متابعة تلقائية']
     : ['Reply in seconds', 'Qualify the lead', 'Book the visit or viewing', 'Follow up automatically']
@@ -80,14 +81,15 @@ export default function LeadHero() {
               ))}
             </ul>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={bookCallLink(ar)} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1E7E48] px-6 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
-                <MessageCircle size={16} /> {ar ? 'احجز مكالمة على واتساب' : 'Book a call on WhatsApp'}
+              <a href={auditLink(locale)} target="_blank" rel="noopener noreferrer" onClick={trackLeadFormConversion} data-track-location="hero" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1E7E48] px-6 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5">
+                <MessageCircle size={16} /> {audit.cta}
               </a>
               <a href="#services" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#fe8c58] px-6 text-sm font-semibold text-[#111214] transition-transform hover:-translate-y-0.5">
                 {ar ? 'شوف الباقات والأسعار' : 'See packages and prices'}
               </a>
             </div>
-            <p className="mt-6 text-xs text-white/45">{ar ? '+٢٠٠ عميل محتمل اتولّد عبر ٣ أسواق في الشرق الأوسط وشمال أفريقيا' : '200+ leads generated across 3 MENA markets'}</p>
+            <p className="mt-4 text-xs text-white/55">{audit.note}</p>
+            <p className="mt-2 text-xs text-white/45">{ar ? '+٢٠٠ عميل محتمل اتولّد عبر ٣ أسواق في الشرق الأوسط وشمال أفريقيا' : '200+ leads generated across 3 MENA markets'}</p>
           </div>
           <div className="pb-6">
             <ChatMock ar={ar} />
