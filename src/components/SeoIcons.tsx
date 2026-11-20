@@ -1,6 +1,8 @@
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useLocation } from 'react-router-dom'
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 function keepLast(selector: string, key: (el: Element) => string) {
   const nodes = [...document.head.querySelectorAll(selector)]
@@ -28,7 +30,7 @@ function collapseHead() {
 export default function SeoIcons() {
   const { pathname } = useLocation()
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     collapseHead()
     const ids = [0, 50].map(ms => window.setTimeout(collapseHead, ms))
     return () => ids.forEach(id => window.clearTimeout(id))

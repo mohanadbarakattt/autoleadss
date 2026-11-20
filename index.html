@@ -3,9 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI WhatsApp agents and lead pages for clinics and real estate in Egypt and the Gulf | AutoLeadss</title>
-    <meta name="description" content="Stop losing WhatsApp and Instagram leads. AutoLeadss builds AI WhatsApp agents that reply in seconds in Arabic and English, qualify and book, plus lead pages and follow-up, for clinics, real estate and beauty businesses in Egypt, UAE and Saudi Arabia. Fixed prices from EGP 18,000." />
-    <meta name="keywords" content="WhatsApp chatbot for clinics, AI WhatsApp agent Egypt, WhatsApp chatbot Saudi Arabia, WhatsApp automation for real estate, real estate lead generation Dubai, AI receptionist for dental clinic, lead generation agency Egypt, شات بوت واتساب, تسويق عيادات, ليدز عقارات" />
     <meta name="google-site-verification" content="FZa9T-HGhkkbLW1er9dCvDqJg_OectZ0SjFr58VG16M" />
 
     <!-- Google tag (gtag.js) -->
@@ -13,6 +10,20 @@
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      // Consent Mode v2: nothing is stored until the visitor accepts the cookie banner.
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        analytics_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+      try {
+        var c = JSON.parse(localStorage.getItem('mbai-cookie-consent') || 'null');
+        if (c && c.analytics === true) {
+          gtag('consent', 'update', { ad_storage: 'granted', analytics_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' });
+        }
+      } catch (e) {}
       gtag('js', new Date());
       gtag('config', 'AW-18455548368');
     </script>
@@ -26,23 +37,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="AutoLeadss" />
 
-    <meta property="og:title" content="Every WhatsApp lead, answered in seconds | AutoLeadss" />
-    <meta property="og:description" content="AI WhatsApp agents, lead pages and follow-up for clinics, real estate and beauty businesses in Egypt and the Gulf. Arabic and English. Fixed prices." />
-    <meta property="og:url" content="https://autoleadss.com" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://autoleadss.com/og-image.png" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Every WhatsApp lead, answered in seconds | AutoLeadss" />
-    <meta name="twitter:description" content="AI WhatsApp agents, lead pages and follow-up for clinics, real estate and beauty businesses in Egypt and the Gulf. Arabic and English. Fixed prices." />
-    <meta name="twitter:image" content="https://autoleadss.com/og-image.png" />
-
-    <link rel="canonical" href="https://autoleadss.com/en" />
-    <link rel="alternate" hreflang="en" href="https://autoleadss.com/en" />
-    <link rel="alternate" hreflang="ar" href="https://autoleadss.com/ar" />
-    <link rel="alternate" hreflang="x-default" href="https://autoleadss.com/en" />
-
-    <!-- Runtime JSON-LD in src/seo/jsonld.ts is the authoritative schema. The static summary inside #root is for crawlers that do not run JavaScript. -->
+    <!-- Title, description, canonical, hreflang, social tags and JSON-LD are rendered per page (src/components/RouteHead.tsx and each page's <Helmet>) and baked into each page's HTML at build time by scripts/prerender.mjs. -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
@@ -54,7 +50,7 @@
     <div id="root">
       <main style="min-height:100vh;background:#0A0A0B;color:rgba(255,255,255,0.72);padding:120px max(20px,calc((100vw - 760px)/2)) 48px;font-family:system-ui,sans-serif;line-height:1.6">
         <h1>AutoLeadss: AI WhatsApp agents and lead pages for clinics, real estate and beauty businesses in Egypt and the Gulf</h1>
-        <p>AutoLeadss is a Cairo-based studio. We build AI WhatsApp agents that reply to every inquiry in seconds in Arabic and English, ask qualifying questions, book the appointment or viewing, and follow up with people who did not book. We also build lead pages for ads and membership storefronts for repeat-visit businesses.</p>
+        <p>AutoLeadss is a Cairo-based studio. We build AI WhatsApp agents that reply to every inquiry in seconds in Arabic and English, ask qualifying questions, book the appointment or viewing, and follow up with people who did not book. We also build lead pages for ads. Start with a free missed-leads audit on WhatsApp.</p>
         <h2>Who it is for</h2>
         <ul>
           <li>Clinics: dental, dermatology, laser and cosmetic clinics in Egypt, Saudi Arabia and the UAE.</li>
@@ -66,8 +62,7 @@
           <li>Launch, lead page for ads: EGP 18,000 or $750, 10 working days.</li>
           <li>Growth, AI WhatsApp agent: EGP 32,000 or $1,500, about 3 weeks.</li>
           <li>Scale, full lead system: EGP 65,000 or $3,000, 5 to 6 weeks.</li>
-          <li>Membership storefront: EGP 20,000 for the first five clients, then from EGP 35,000.</li>
-          <li>Optional monthly plans: EGP 2,500, 6,000 or 12,000.</li>
+                    <li>Optional monthly plans: EGP 2,500, 6,000 or 12,000.</li>
         </ul>
         <p>Proof: 200+ leads generated across 3 MENA markets. Client work includes Lash Cartel Cosmetics, an Australian beauty brand (lashcartelcosmetics.com).</p>
         <p>Contact: WhatsApp <a style="color:#fe8c58" href="https://wa.me/201100054278">+20 110 005 4278</a> or mohanad.barakat@mbai-group.com. Arabic version: <a style="color:#fe8c58" href="https://autoleadss.com/ar">autoleadss.com/ar</a>.</p>

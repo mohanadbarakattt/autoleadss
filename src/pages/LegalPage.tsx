@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { AlertTriangle } from 'lucide-react'
 import Navigation from '../components/Navigation'
 import Footer from '../components/Footer'
 import { useLocale } from '../i18n/LocaleProvider'
@@ -13,14 +12,9 @@ import type { Locale } from '../i18n/translations'
 
 const HTML_LANG: Record<Locale, string> = { en: 'en', ar: 'ar' }
 
-const DRAFT_NOTICE: Record<Locale, string> = {
-  en: 'Draft for legal review — not a substitute for advice in your jurisdiction.',
-  ar: 'مسودة للمراجعة القانونية — ليست بديلاً عن استشارة في بلدك.',
-}
-
 const OTHER_LINK: Record<Locale, { privacy: string; terms: string }> = {
-  en: { privacy: 'Privacy Policy', terms: 'Terms of Use' },
-  ar: { privacy: 'سياسة الخصوصية', terms: 'شروط الاستخدام' },
+  en: { privacy: 'Privacy Policy', terms: 'Terms of Service' },
+  ar: { privacy: 'سياسة الخصوصية', terms: 'شروط الخدمة' },
 }
 
 export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy' | 'terms' }) {
@@ -51,10 +45,6 @@ export default function LegalPage({ doc, kind }: { doc: LegalDoc; kind: 'privacy
             {doc.title}
           </h1>
           <p className="mt-2 text-sm text-muted-fg">{doc.updated}</p>
-          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3.5 text-sm text-amber-800">
-            <AlertTriangle size={18} className="mt-0.5 shrink-0" />
-            <p>{DRAFT_NOTICE[locale]}</p>
-          </div>
           <p className="mt-8 leading-relaxed text-foreground/90">{doc.intro}</p>
           <div className="mt-10 flex flex-col gap-9">
             {doc.sections.map((s, i) => (

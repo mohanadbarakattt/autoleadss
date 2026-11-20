@@ -1,19 +1,10 @@
-import { useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 
-const SCRIPT_ID = 'al-jsonld'
-
+/** Structured data rendered through Helmet so it is also baked into the pre-rendered HTML. */
 export default function JsonLd({ data }: { data: unknown }) {
-  useEffect(() => {
-    const json = JSON.stringify(data)
-    let el = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null
-    if (!el) {
-      el = document.createElement('script')
-      el.id = SCRIPT_ID
-      el.type = 'application/ld+json'
-      document.head.appendChild(el)
-    }
-    el.text = json
-  }, [data])
-
-  return null
+  return (
+    <Helmet>
+      <script type="application/ld+json">{JSON.stringify(data).replace(/</g, '\\u003c')}</script>
+    </Helmet>
+  )
 }

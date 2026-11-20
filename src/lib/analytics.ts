@@ -26,7 +26,14 @@ export function loadAnalytics() {
   if (GA_ID) {
     appendScript(`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`)
     window.dataLayer = window.dataLayer || []
-    window.gtag = (...args: unknown[]) => window.dataLayer?.push(args)
+    // Reuse the gtag defined in index.html. gtag.js only reads the native
+    // `arguments` object, so a replacement that pushes an array would break it.
+    if (typeof window.gtag !== 'function') {
+      window.gtag = function gtag() {
+        // eslint-disable-next-line prefer-rest-params
+        window.dataLayer?.push(arguments)
+      }
+    }
     window.gtag('js', new Date())
     window.gtag('config', GA_ID, { anonymize_ip: true })
   }
